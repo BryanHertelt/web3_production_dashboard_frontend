@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# CI/CD artifacts
+gl-codequality.json
+gl-dependency-scanning-report.json
