@@ -1,4 +1,4 @@
-image: node:20-alpine
+image: node:20-slim
 
 workflow:
   rules:
@@ -15,7 +15,7 @@ stages:
   - security
 
 variables:
-  NODE_OPTIONS: "--max-old-space-size=4096"
+  NODE_OPTIONS: "--max-old-space-size=2048"
   NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm"
   CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
 
@@ -148,8 +148,26 @@ build_app:
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
       when: always
     - when: never
-  timeout: 20m
+  timeout: 30m
 
+# ---------------------------
+# Scan build output for secrets
+# ---------------------------
+scan_build_secrets:
+  stage: security
+  image: python:3.11-alpine
+  script:
+    - pip install detect-secrets
+    - "detect-secrets scan .next/ > detect_secrets_report.json || true"
+    - 'if [ -s detect_secrets_report.json ]; then echo "Secrets detected in build output!" && exit 1; fi'
+  needs:
+    - job: build_app
+      artifacts: true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+      when: always
+    - when: never
+  timeout: 5m
 # ---------------------------
 # Security audit
 # ---------------------------
