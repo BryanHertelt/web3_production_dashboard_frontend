@@ -1,8 +1,11 @@
-# GitLab CI/CD Pipeline for Next.js Project
-# Runs linting, type checking, tests, builds, and security audits
-# Differentiates pipelines for dev vs main merges
-
 image: node:20-alpine
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # Run on MR creation/update
+    - if: $CI_COMMIT_BRANCH == 'dev' && $CI_PIPELINE_SOURCE == 'push' # Run after merge to dev
+    - if: $CI_COMMIT_BRANCH == 'main' && $CI_PIPELINE_SOURCE == 'push' # Run after merge to main
+    - when: never # Exclude all other cases (feature branch pushes, etc.)
 
 stages:
   - install
@@ -47,10 +50,7 @@ install_dependencies:
     paths:
       - node_modules/
     expire_in: 1 hour
-  rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-      when: always
-    - when: never
+  timeout: 15m
 
 # ---------------------------
 # TypeScript type checking
@@ -62,14 +62,14 @@ typescript_check:
   dependencies:
     - install_dependencies
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-      changes:
+    - changes:
         - "**/*.ts"
         - "**/*.tsx"
         - tsconfig.json
         - package*.json
       when: always
     - when: never
+  timeout: 5m
 
 # ---------------------------
 # ESLint code quality check
@@ -86,8 +86,7 @@ eslint:
     when: always
     expire_in: 1 week
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-      changes:
+    - changes:
         - "**/*.ts"
         - "**/*.tsx"
         - "**/*.js"
@@ -96,6 +95,7 @@ eslint:
         - package*.json
       when: always
     - when: never
+  timeout: 5m
 
 # ---------------------------
 # Run Jest tests with coverage
@@ -118,8 +118,7 @@ test_jest:
     when: always
     expire_in: 1 week
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-      changes:
+    - changes:
         - "**/*.ts"
         - "**/*.tsx"
         - "**/*.js"
@@ -131,6 +130,7 @@ test_jest:
         - package*.json
       when: always
     - when: never
+  timeout: 15m
 
 # ---------------------------
 # Build the Next.js application
@@ -147,9 +147,10 @@ build_app:
       - out/
     expire_in: 1 week
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
       when: always
     - when: never
+  timeout: 20m
 
 # ---------------------------
 # Security audit
@@ -162,11 +163,11 @@ security_audit:
     - install_dependencies
   allow_failure: true
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-      changes:
+    - changes:
         - package*.json
       when: always
     - when: never
+  timeout: 10m
 
 # ---------------------------
 # Clean up cache periodically
