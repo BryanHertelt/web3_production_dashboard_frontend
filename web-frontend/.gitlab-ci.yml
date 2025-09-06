@@ -12,9 +12,7 @@ stages:
   - lint
   - test
   - build
-  - performance
   - security
-  - deploy
 
 variables:
   NODE_OPTIONS: "--max-old-space-size=4096"
