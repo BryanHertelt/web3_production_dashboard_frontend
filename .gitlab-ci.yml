@@ -48,6 +48,8 @@ install_dependencies:
     expire_in: 20 minutes
   timeout: 10m
   rules:
+    - if: $CI_COMMIT_BRANCH == "pipeline-testing"
+      when: always
     - when: manual
 
 # ---------------------------
@@ -63,6 +65,8 @@ typescript_check:
       artifacts: true
   timeout: 3m
   rules:
+    - if: $CI_COMMIT_BRANCH == "pipeline-testing"
+      when: always
     - when: manual
 
 # ---------------------------
@@ -83,6 +87,8 @@ eslint:
     expire_in: 3 days
   timeout: 3m
   rules:
+    - if: $CI_COMMIT_BRANCH == "pipeline-testing"
+      when: always
     - when: manual
 
 # ---------------------------
@@ -109,6 +115,8 @@ test_jest:
     expire_in: 3 days
   timeout: 8m
   rules:
+    - if: $CI_COMMIT_BRANCH == "pipeline-testing"
+      when: always
     - when: manual
 
 # ---------------------------
@@ -129,6 +137,8 @@ build_app:
       - web-frontend/public/
     expire_in: 3 days
   rules:
+    - if: $CI_COMMIT_BRANCH == "pipeline-testing"
+      when: always
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
       when: manual
     - when: manual
@@ -148,6 +158,8 @@ scan_build_secrets:
     - job: build_app
       artifacts: true
   rules:
+    - if: $CI_COMMIT_BRANCH == "pipeline-testing"
+      when: always
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
       when: manual
     - when: manual
@@ -167,6 +179,8 @@ security_audit:
   allow_failure: true
   timeout: 5m
   rules:
+    - if: $CI_COMMIT_BRANCH == "pipeline-testing"
+      when: always
     - when: manual
 
 # ---------------------------
