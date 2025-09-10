@@ -5,6 +5,7 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # Run on MR creation/update
     - if: $CI_COMMIT_BRANCH == 'dev' && $CI_PIPELINE_SOURCE == 'push' # Run after merge to dev
     - if: $CI_COMMIT_BRANCH == 'main' && $CI_PIPELINE_SOURCE == 'push' # Run after merge to main
+    - if: $CI_COMMIT_BRANCH == 'pipeline-testing' && $CI_PIPELINE_SOURCE == 'push' # Run on pipeline-testing branch
     - when: never # Exclude all other cases (feature branch pushes, etc.)
 
 stages:

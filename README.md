@@ -1,5 +1,5 @@
 # Welcome to Web Project
 
-# Test push,
+# Test push
 
 For more instructions please read the documentation.
