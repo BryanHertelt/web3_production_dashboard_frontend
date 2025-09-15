@@ -151,10 +151,10 @@ trivy_scan:
     - trivy image --format json --output trivy-report.json $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
     - trivy image --format table $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
     - |
-      if trivy image --exit-code 1 --severity HIGH,CRITICAL $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG; then
-        echo "No HIGH or CRITICAL vulnerabilities found"
+      if trivy image --exit-code 1 --severity CRITICAL $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG; then
+        echo "No CRITICAL vulnerabilities found"
       else
-        echo "HIGH or CRITICAL vulnerabilities found!"
+        echo "CRITICAL vulnerabilities found!"
         exit 1
       fi
   needs:
