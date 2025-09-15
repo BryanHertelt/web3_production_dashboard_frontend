@@ -1,13 +1,19 @@
 # Use multi-stage build for smaller final image
 FROM node:18-alpine AS base
 
+# Install production dependencies only
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-
+COPY --from=deps /app .
 COPY . .
+RUN npm ci
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
