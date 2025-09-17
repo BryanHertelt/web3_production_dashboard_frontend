@@ -43,7 +43,6 @@ install_dependencies:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
-      - web-frontend/node_modules/
     policy: pull-push
   timeout: 10m
 
@@ -62,7 +61,6 @@ typescript_check:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
-      - web-frontend/node_modules/
     policy: pull
   timeout: 3m
 
@@ -81,7 +79,6 @@ eslint:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
-      - web-frontend/node_modules/
     policy: pull
   artifacts:
     reports:
@@ -105,7 +102,6 @@ test_jest:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
-      - web-frontend/node_modules/
     policy: pull
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
   artifacts:
@@ -135,7 +131,6 @@ build_app:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
-      - web-frontend/node_modules/
       - web-frontend/.next/cache/
     policy: pull
   artifacts:
@@ -184,7 +179,6 @@ security_audit:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
-      - web-frontend/node_modules/
     policy: pull
   allow_failure: true
   timeout: 5m
@@ -207,7 +201,6 @@ pages:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
-      - web-frontend/node_modules/
     policy: pull
   artifacts:
     paths:
