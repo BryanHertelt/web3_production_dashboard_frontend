@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "../../widgets/example-widget/ui/Navbar";
 import Searchbar from "@/widgets/example-widget/ui/Searchbar";
+import TimeRange from "@/features/select-time-range";
 
 const summaryData = [
   {
@@ -42,31 +43,7 @@ export default function CryptoDashboard() {
         <Searchbar />
         {/* Dashboard content */}
         <section>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold">Today</h1>
-              <div className="flex space-x-2">
-                {[
-                  "Last 24h",
-                  "Last week",
-                  "Last month",
-                  "Last year",
-                  "All time",
-                ].map((label, idx) => (
-                  <button
-                    key={idx}
-                    className={`px-3 py-1 rounded border hover:bg-yellow-700 ${
-                      idx === 0
-                        ? "bg-yellow-700 text-white border-yellow-800"
-                        : "border-gray-300 text-gray-700"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+          <TimeRange />
           <div className="grid grid-cols-5 gap-4 mb-6">
             {summaryData.map(({ color, title, value, change }, idx) => (
               <div
