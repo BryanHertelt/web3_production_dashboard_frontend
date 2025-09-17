@@ -10,8 +10,7 @@ workflow:
 
 stages:
   - install
-  - lint
-  - test
+  - quality-check
   - build
   - security
   - deploy
@@ -27,6 +26,7 @@ cache:
       - web-frontend/package-lock.json
   paths:
     - web-frontend/.npm/
+    - web-frontend/node_modules/
     - web-frontend/.next/cache/
   policy: pull-push
 
@@ -44,36 +44,46 @@ install_dependencies:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
-  artifacts:
-    paths:
       - web-frontend/node_modules/
-    expire_in: 20 minutes
+    policy: pull-push
   timeout: 10m
 
 # ---------------------------
 # TypeScript type checking
 # ---------------------------
 typescript_check:
-  stage: lint
+  stage: quality-check
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npx tsc --noEmit
-  needs:
-    - job: install_dependencies
-      artifacts: true
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+      - web-frontend/node_modules/
+    policy: pull
   timeout: 3m
 
 # ---------------------------
 # ESLint code quality check
 # ---------------------------
 eslint:
-  stage: lint
+  stage: quality-check
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npm run lint
-  needs:
-    - job: install_dependencies
-      artifacts: true
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+      - web-frontend/node_modules/
+    policy: pull
   artifacts:
     reports:
       codequality: web-frontend/gl-codequality.json
@@ -85,13 +95,19 @@ eslint:
 # Run Jest tests with coverage
 # ---------------------------
 test_jest:
-  stage: test
+  stage: quality-check
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npm run test -- --ci --watchAll=false --passWithNoTests
-  needs:
-    - job: install_dependencies
-      artifacts: true
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+      - web-frontend/node_modules/
+    policy: pull
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
   artifacts:
     reports:
@@ -112,10 +128,17 @@ build_app:
   stage: build
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npm run build
-  needs:
-    - job: install_dependencies
-      artifacts: true
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+      - web-frontend/node_modules/
+      - web-frontend/.next/cache/
+    policy: pull
   artifacts:
     paths:
       - web-frontend/.next/standalone/
@@ -151,13 +174,19 @@ scan_build_secrets:
 # Security audit
 # ---------------------------
 security_audit:
-  stage: security
+  stage: quality-check
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npm audit --audit-level=moderate
-  needs:
-    - job: install_dependencies
-      artifacts: false
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+      - web-frontend/node_modules/
+    policy: pull
   allow_failure: true
   timeout: 5m
 
@@ -168,12 +197,19 @@ pages:
   stage: deploy
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npm run docs
     - cd ..
     - mkdir public
     - cp -r web-frontend/docs/* public/
-  needs:
-    - install_dependencies
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+      - web-frontend/node_modules/
+    policy: pull
   artifacts:
     paths:
       - public
