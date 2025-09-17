@@ -47,10 +47,7 @@ install_dependencies:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
-  artifacts:
-    paths:
-      - web-frontend/node_modules/
-    expire_in: 20 minutes
+    policy: pull-push
   timeout: 10m
 
 # ---------------------------
@@ -60,10 +57,18 @@ typescript_check:
   stage: lint
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npx tsc --noEmit
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+    policy: pull
   needs:
     - job: install_dependencies
-      artifacts: true
+      artifacts: false
   timeout: 3m
 
 # ---------------------------
@@ -73,15 +78,45 @@ eslint:
   stage: lint
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npm run lint
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+    policy: pull
   needs:
     - job: install_dependencies
-      artifacts: true
+      artifacts: false
   artifacts:
     reports:
       codequality: web-frontend/gl-codequality.json
     when: always
     expire_in: 3 days
+  timeout: 3m
+
+# ---------------------------
+# Prettier formatting check
+# ---------------------------
+prettier_check:
+  stage: lint
+  script:
+    - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
+    - npm run format:check
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+    policy: pull
+  needs:
+    - job: install_dependencies
+      artifacts: false
+  allow_failure: true
   timeout: 3m
 
 # ---------------------------
@@ -91,10 +126,18 @@ test_jest:
   stage: test
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npm run test -- --ci --watchAll=false --passWithNoTests
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+    policy: pull
   needs:
     - job: install_dependencies
-      artifacts: true
+      artifacts: false
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
   artifacts:
     reports:
@@ -107,6 +150,85 @@ test_jest:
     when: always
     expire_in: 3 days
   timeout: 8m
+
+# ---------------------------
+# Auto-format code and commit changes
+# ---------------------------
+prettier_format:
+  stage: lint
+  needs:
+    - prettier_check
+  script:
+    - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
+    - npm run format:write
+    - |
+      if [ -n "$(git status --porcelain)" ]; then
+        git config user.name "Pipeline"
+        git config user.email "${GITLAB_USER_EMAIL} "
+        git add .
+        git commit -m "style: Auto-format code with Prettier.
+
+        🤖 Automated formatting applied by CI pipeline
+
+        Co-Authored-By: GitLab CI <ci@gitlab.com>"
+        git push https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git HEAD:${CI_COMMIT_REF_NAME}
+        echo "Code formatted and committed successfully"
+      else
+        echo "No formatting changes needed"
+      fi
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+    policy: pull
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - when: never
+  timeout: 5m
+
+# ---------------------------
+# Build the Next.js application
+# ---------------------------
+docker_build:
+  stage: docker-build
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - docker info
+  script:
+    - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
+    - npm run build
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+      - web-frontend/.next/cache/
+    policy: pull
+  needs:
+    - job: install_dependencies
+      artifacts: false
+  artifacts:
+    reports:
+      container_scanning: trivy-report.json
+    paths:
+      - trivy-report.json
+    when: always
+    expire_in: 3 days
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+      when: always
+    - when: never
+  timeout: 15m
 
 # ---------------------------
 # Build Docker image
@@ -139,6 +261,28 @@ docker_build:
       when: always
     - when: never
   timeout: 20m
+
+
+# ---------------------------
+# Scan code base for secrets
+# ---------------------------
+scan_build_secrets:
+  stage: security
+  image: python:3.11-alpine
+  script:
+    - pip install detect-secrets
+    - cd web-frontend
+    - "detect-secrets scan --all-files . > ../detect_secrets_report.json || true"
+    - cd ..
+    - 'if [ -s detect_secrets_report.json ]; then echo "Secrets detected in source code!" && exit 1; fi'
+  needs:
+    - job: install_dependencies
+      artifacts: false
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+      when: always
+    - when: never
+  timeout: 3m
 
 # ---------------------------
 # Trivy security scanning
@@ -180,34 +324,21 @@ trivy_scan:
   timeout: 10m
 
 # ---------------------------
-# Scan code base for secrets
-# ---------------------------
-scan_build_secrets:
-  stage: security
-  image: python:3.11-alpine
-  script:
-    - pip install detect-secrets
-    - cd web-frontend
-    - "detect-secrets scan --all-files . > ../detect_secrets_report.json || true"
-    - cd ..
-    - 'if [ -s detect_secrets_report.json ]; then echo "Secrets detected in source code!" && exit 1; fi'
-  needs:
-    - job: install_dependencies
-      artifacts: false
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
-      when: always
-    - when: never
-  timeout: 3m
-
-# ---------------------------
 # Security audit
 # ---------------------------
 security_audit:
   stage: security
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npm audit --audit-level=moderate
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+    policy: pull
   needs:
     - job: install_dependencies
       artifacts: false
@@ -221,12 +352,21 @@ pages:
   stage: deploy
   script:
     - cd web-frontend
+    - npm ci --cache .npm --prefer-offline
     - npm run docs
     - cd ..
     - mkdir public
     - cp -r web-frontend/docs/* public/
+  cache:
+    key:
+      files:
+        - web-frontend/package-lock.json
+    paths:
+      - web-frontend/.npm/
+    policy: pull
   needs:
-    - install_dependencies
+    - job: install_dependencies
+      artifacts: false
   artifacts:
     paths:
       - public
