@@ -1,5 +1,20 @@
 import React from "react";
 
+/**
+ * Searchbar component
+ *
+ * A simple search input field wrapped in a styled container.
+ * Intended for use as a search bar in forms or pages.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <Searchbar />
+ * ```
+ *
+ * @returns {JSX.Element} A styled search input field
+ */
+
 const Searchbar: React.FC = () => (
   <div className="flex items-center mb-6">
     <input

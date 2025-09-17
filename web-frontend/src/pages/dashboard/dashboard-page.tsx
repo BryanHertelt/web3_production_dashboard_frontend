@@ -6,6 +6,24 @@ import InfoBoxes from "@/widgets/example-widget/ui/info-boxes";
 import PlaceholderChart from "@/widgets/example-widget/ui/charts";
 import Table from "@/widgets/example-widget/ui/table";
 
+/**
+ * A full-page dashboard layout for cryptocurrency analytics.
+ *
+ * @remarks
+ * - Includes a sidebar (`Navbar`) for navigation.
+ * - The top bar contains a `Searchbar`.
+ * - Main dashboard content includes:
+ *   - `TimeRange` selector
+ *   - `InfoBoxes` with key metrics
+ *   - `PlaceholderChart` for visualization
+ *   - `Table` showing coin data
+ *
+ * @example
+ * ```tsx
+ * <CryptoDashboard />
+ * ```
+ */
+
 export default function CryptoDashboard() {
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900">

@@ -30,6 +30,26 @@ const summaryData = [
   },
 ];
 
+/**
+ * InfoBoxes component
+ *
+ * Renders a grid of summary information boxes, each representing
+ * key financial metrics such as revenue, transactions, refunds,
+ * balances, and payouts.
+ *
+ * Each box is built using the shared `InfoBox` component, and
+ * may include an optional footer (e.g., "Withdraw balance" or
+ * "View more") depending on the type of data.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <InfoBoxes />
+ * ```
+ *
+ * @returns {JSX.Element} A grid layout containing multiple InfoBox components
+ */
+
 const InfoBoxes: React.FC = () => {
   return (
     <div className="grid grid-cols-5 gap-4 mb-6">

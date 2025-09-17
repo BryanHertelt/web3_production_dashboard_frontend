@@ -15,6 +15,21 @@ const tableConfig = {
   headers: ["Coin", "Amount", "Buy Price", "Current Price", "Profit/Loss"],
 };
 
+/**
+ * Table component
+ *
+ * A table component that displays bought coins data fetched from an API.
+ * Intended for use in dashboards or pages showing portfolio holdings.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <Table />
+ * ```
+ *
+ * @returns {JSX.Element} A table displaying coin data with profit/loss information
+ */
+
 const Table = () => {
   const [data, setData] = useState<TableRow[]>([]);
   const [error, setError] = useState<string | null>(null);
