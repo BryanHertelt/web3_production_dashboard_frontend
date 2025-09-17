@@ -1,5 +1,8 @@
 # Use multi-stage build for smaller final image
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
+
+# Update npm to latest version to fix security vulnerabilities
+RUN npm install -g npm@latest
 
 # Install production dependencies only
 FROM base AS deps
