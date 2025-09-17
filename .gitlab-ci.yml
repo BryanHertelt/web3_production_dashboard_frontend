@@ -10,8 +10,8 @@ workflow:
 
 stages:
   - install
-  - quality-check
   - build
+  - quality-check
   - security
   - deploy
 
@@ -26,7 +26,6 @@ cache:
       - web-frontend/package-lock.json
   paths:
     - web-frontend/.npm/
-    - web-frontend/node_modules/
     - web-frontend/.next/cache/
   policy: pull-push
 
