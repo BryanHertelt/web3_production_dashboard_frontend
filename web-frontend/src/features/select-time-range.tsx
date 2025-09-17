@@ -1,5 +1,4 @@
 import React from "react";
-
 /**
  * A button group for selecting a time range filter.
  *
@@ -13,7 +12,6 @@ import React from "react";
  * <TimeRange />
  * ```
  */
-
 const TimeRange: React.FC = () => (
   <div className="flex items-center justify-between mb-4">
     <div className="flex items-center space-x-4">

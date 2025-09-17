@@ -5,7 +5,6 @@ import TimeRange from "@/features/select-time-range";
 import InfoBoxes from "@/widgets/example-widget/ui/info-boxes";
 import PlaceholderChart from "@/widgets/example-widget/ui/charts";
 import Table from "@/widgets/example-widget/ui/table";
-
 /**
  * A full-page dashboard layout for cryptocurrency analytics.
  *
@@ -23,7 +22,6 @@ import Table from "@/widgets/example-widget/ui/table";
  * <CryptoDashboard />
  * ```
  */
-
 export default function CryptoDashboard() {
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900">

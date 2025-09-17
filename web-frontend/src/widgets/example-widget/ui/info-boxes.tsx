@@ -29,7 +29,6 @@ const summaryData = [
     value: "$12,340",
   },
 ];
-
 /**
  * InfoBoxes component
  *
@@ -49,7 +48,6 @@ const summaryData = [
  *
  * @returns {JSX.Element} A grid layout containing multiple InfoBox components
  */
-
 const InfoBoxes: React.FC = () => {
   return (
     <div className="grid grid-cols-5 gap-4 mb-6">

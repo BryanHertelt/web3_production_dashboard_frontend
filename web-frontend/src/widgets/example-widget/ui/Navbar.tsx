@@ -1,5 +1,4 @@
 import React from "react";
-
 /**
  * Navbar component
  *
@@ -15,7 +14,6 @@ import React from "react";
  *
  * @returns {JSX.Element} A styled sidebar navigation menu
  */
-
 const Navbar: React.FC = () => (
   <aside className="w-64 bg-white border-r border-gray-200 p-4 flex flex-col">
     <div className="text-xl font-bold mb-6">Dashboard</div>

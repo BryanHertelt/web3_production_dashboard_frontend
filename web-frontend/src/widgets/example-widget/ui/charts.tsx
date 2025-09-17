@@ -2,7 +2,6 @@ import React from "react";
 
 const chartConfig =
   "bg-white rounded p-6 shadow h-48 flex items-center justify-center text-gray-400";
-
 /**
  * PlaceholderChart component
  *
@@ -18,7 +17,6 @@ const chartConfig =
  *
  * @returns {JSX.Element} A three-column grid with chart placeholders
  */
-
 const PlaceholderChart: React.FC = () => (
   <div className="grid grid-cols-3 gap-4">
     <div className={chartConfig}>Chart placeholder 1</div>

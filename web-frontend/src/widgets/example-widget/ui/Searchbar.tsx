@@ -1,5 +1,4 @@
 import React from "react";
-
 /**
  * Searchbar component
  *
@@ -14,7 +13,6 @@ import React from "react";
  *
  * @returns {JSX.Element} A styled search input field
  */
-
 const Searchbar: React.FC = () => (
   <div className="flex items-center mb-6">
     <input

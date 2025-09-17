@@ -14,7 +14,6 @@ interface TableRow {
 const tableConfig = {
   headers: ["Coin", "Amount", "Buy Price", "Current Price", "Profit/Loss"],
 };
-
 /**
  * Table component
  *
@@ -29,7 +28,6 @@ const tableConfig = {
  *
  * @returns {JSX.Element} A table displaying coin data with profit/loss information
  */
-
 const Table = () => {
   const [data, setData] = useState<TableRow[]>([]);
   const [error, setError] = useState<string | null>(null);

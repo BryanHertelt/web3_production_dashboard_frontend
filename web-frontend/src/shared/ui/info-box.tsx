@@ -32,7 +32,6 @@ interface InfoBoxProps {
    */
   footer?: React.ReactNode;
 }
-
 /**
  * A card-like component for displaying key metrics, such as statistics
  * with an optional trend indicator and footer.
@@ -48,7 +47,6 @@ interface InfoBoxProps {
  * />
  * ```
  */
-
 interface InfoBoxProps {
   title: string;
   value: string;
