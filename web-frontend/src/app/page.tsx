@@ -1,4 +1,4 @@
-import CryptoDashboard from "@/pages/dashboard/DashboardPage";
+import CryptoDashboard from "@/pages/dashboard/dashboard-page";
 
 export default function CryptoDashboardPage() {
   return <CryptoDashboard />;

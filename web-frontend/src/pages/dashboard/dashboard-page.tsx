@@ -2,35 +2,7 @@ import React from "react";
 import Navbar from "../../widgets/example-widget/ui/Navbar";
 import Searchbar from "@/widgets/example-widget/ui/Searchbar";
 import TimeRange from "@/features/select-time-range";
-
-const summaryData = [
-  {
-    title: "Revenue",
-    value: "$25,680",
-    change: "+8%",
-    color: "bg-purple-500",
-  },
-  {
-    title: "Transactions",
-    value: "$18,420",
-    change: "+5%",
-    color: "bg-blue-400",
-  },
-  {
-    title: "Refunds",
-    value: "$3,260",
-    change: "-2%",
-    color: "bg-orange-400",
-  },
-  {
-    title: "USD balance",
-    value: "$25,680",
-  },
-  {
-    title: "Pending payouts",
-    value: "$12,340",
-  },
-];
+import InfoBoxes from "@/widgets/info-boxes";
 
 export default function CryptoDashboard() {
   return (
@@ -44,46 +16,7 @@ export default function CryptoDashboard() {
         {/* Dashboard content */}
         <section>
           <TimeRange />
-          <div className="grid grid-cols-5 gap-4 mb-6">
-            {summaryData.map(({ color, title, value, change }, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded p-4 shadow flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-normal mb-2">
-                  {color && (
-                    <span
-                      className={`w-3 h-3 rounded-full ${color} mr-2`}
-                    ></span>
-                  )}
-                  <h2 className="font-semibold">{title}</h2>
-                </div>
-                <div className="text-xl font-bold">{value}</div>
-                {change && (
-                  <div
-                    className={`text-sm font-semibold ${
-                      change.startsWith("+") ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {change} vs last period
-                  </div>
-                )}
-                {!change && title === "USD balance" && (
-                  <button className="mt-2 w-full border border-gray-300 rounded py-1 text-sm">
-                    Withdraw balance
-                  </button>
-                )}
-                {!change && title === "Pending payouts" && (
-                  <>
-                    <div className="mt-2 text-sm">Expected:</div>
-                    <button className="mt-1 w-full border border-gray-300 rounded py-1 text-sm">
-                      View more
-                    </button>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
+          <InfoBoxes />
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-white rounded p-6 shadow h-48 flex items-center justify-center text-gray-400">
               Chart placeholder 1
