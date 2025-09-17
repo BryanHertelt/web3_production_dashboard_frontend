@@ -3,6 +3,7 @@ import Navbar from "../../widgets/example-widget/ui/Navbar";
 import Searchbar from "@/widgets/example-widget/ui/Searchbar";
 import TimeRange from "@/features/select-time-range";
 import InfoBoxes from "@/widgets/example-widget/ui/info-boxes";
+import PlaceholderChart from "@/widgets/example-widget/ui/charts";
 
 export default function CryptoDashboard() {
   return (
@@ -17,17 +18,7 @@ export default function CryptoDashboard() {
         <section>
           <TimeRange />
           <InfoBoxes />
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white rounded p-6 shadow h-48 flex items-center justify-center text-gray-400">
-              Chart placeholder 1
-            </div>
-            <div className="bg-white rounded p-6 shadow h-48 flex items-center justify-center text-gray-400">
-              Chart placeholder 2
-            </div>
-            <div className="bg-white rounded p-6 shadow h-48 flex items-center justify-center text-gray-400">
-              Chart placeholder 3
-            </div>
-          </div>
+          <PlaceholderChart />
           {/* Simple table for bought coins */}
           <div className="bg-white rounded p-6 shadow mt-6 overflow-auto">
             <h2 className="text-lg font-semibold mb-4">Bought Coins</h2>
