@@ -1,5 +1,6 @@
 import React from "react";
-import Navbar from "../../../widgets/example-widget/ui/Navbar";
+import Navbar from "../../widgets/example-widget/ui/Navbar";
+import Searchbar from "@/widgets/example-widget/ui/Searchbar";
 
 const summaryData = [
   {
@@ -38,14 +39,7 @@ export default function CryptoDashboard() {
       {/* Main content */}
       <main className="flex-grow p-6 overflow-auto">
         {/* Top bar */}
-        <div className="flex items-center mb-6">
-          <input
-            type="search"
-            placeholder="Search..."
-            className="flex-grow border border-gray-300 rounded px-3 py-2"
-          />
-        </div>
-
+        <Searchbar />
         {/* Dashboard content */}
         <section>
           <div className="flex items-center justify-between mb-4">
