@@ -14,7 +14,7 @@ const eslintConfig = [
   // Next.js + TypeScript defaults
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   ...compat.config({
-    extends: ['next', 'prettier'],
+    extends: ["next", "prettier"],
   }),
   // 1. Jest plugin integration
   {

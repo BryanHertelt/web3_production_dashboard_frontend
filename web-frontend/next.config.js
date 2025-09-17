@@ -1,6 +1,6 @@
-const path = require('path')
- 
+const path = require("path");
+
 module.exports = {
   outputFileTracingRoot: path.join(__dirname),
-  output: 'standalone',
-}
+  output: "standalone",
+};
