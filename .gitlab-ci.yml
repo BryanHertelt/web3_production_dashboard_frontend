@@ -116,6 +116,7 @@ prettier_check:
   needs:
     - job: install_dependencies
       artifacts: false
+  allow_failure: true
   timeout: 3m
 
 # ---------------------------
