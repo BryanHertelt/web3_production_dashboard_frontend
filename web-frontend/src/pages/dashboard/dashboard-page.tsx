@@ -2,7 +2,7 @@ import React from "react";
 import Navbar from "../../widgets/example-widget/ui/Navbar";
 import Searchbar from "@/widgets/example-widget/ui/Searchbar";
 import TimeRange from "@/features/select-time-range";
-import InfoBoxes from "@/widgets/info-boxes";
+import InfoBoxes from "@/widgets/example-widget/ui/info-boxes";
 
 export default function CryptoDashboard() {
   return (
