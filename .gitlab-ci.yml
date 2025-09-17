@@ -226,23 +226,22 @@ build_app:
 # ---------------------------
 docker_build:
   stage: docker-build
-  image: docker:24-dind
+  image: docker:26
   services:
-    - docker:24-dind
+    - docker:26-dind
   variables:
-    DOCKER_HOST: tcp://docker:2376
     DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: "/certs/client"
+    DOCKER_DRIVER: overlay2
   before_script:
-    - docker info
+    - until docker info >/dev/null 2>&1; do echo "waiting for dockerd"; sleep 1; done
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
   script:
     - cd web-frontend
-    - docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .
-    - docker build -t $DOCKER_IMAGE_NAME:latest .
-    - docker save $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG > ../docker-image.tar
-  artifacts:
-    paths:
-      - docker-image.tar
-    expire_in: 1 day
+    - docker build -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
       when: always
@@ -278,30 +277,25 @@ scan_build_secrets:
 # ---------------------------
 trivy_scan:
   stage: security
-  image: docker:24-cli
-  services:
-    - docker:24-dind
+  needs: ["docker_build"]
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  before_script: []
   variables:
-    DOCKER_HOST: tcp://docker:2376
-    DOCKER_TLS_CERTDIR: "/certs"
-  before_script:
-    - apk add --no-cache wget
-    - wget -qO- https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz | tar xz
-    - mv trivy /usr/local/bin/
+    IMAGE_REF: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    TRIVY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/trivy"
+  cache:
+    key: trivy-db
+    policy: pull-push
+    paths: [".cache/trivy"]
   script:
-    - docker load < docker-image.tar
-    - trivy image --format json --output trivy-report.json $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
-    - trivy image --format table $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
-    - |
-      if trivy image --exit-code 1 --severity CRITICAL $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG; then
-        echo "No CRITICAL vulnerabilities found"
-      else
-        echo "CRITICAL vulnerabilities found!"
-        exit 1
-      fi
-  needs:
-    - job: docker_build
-      artifacts: true
+    # 1) auth to GitLab Container Registry
+    - echo "$CI_REGISTRY_PASSWORD" | trivy registry login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    # 2) scan the pushed image via remote registry (no docker daemon)
+    - trivy image --image-src=remote --scanners vuln,secret --severity HIGH,CRITICAL --ignore-unfixed --format table --exit-code 1 "$IMAGE_REF"
+    # 3) export reports (non-fatal)
+    - trivy image --image-src=remote --format json -o trivy-report.json "$IMAGE_REF" || true
   artifacts:
     reports:
       container_scanning: trivy-report.json
