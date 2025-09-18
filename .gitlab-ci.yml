@@ -99,28 +99,6 @@ eslint:
   timeout: 3m
 
 # ---------------------------
-# Prettier formatting check
-# ---------------------------
-prettier_check:
-  stage: lint
-  script:
-    - cd web-frontend
-    - npm run format:check
-  cache:
-    key:
-      files:
-        - web-frontend/package-lock.json
-    paths:
-      - web-frontend/.npm/
-      - web-frontend/node_modules/
-    policy: pull
-  needs:
-    - job: install_dependencies
-      artifacts: false
-  allow_failure: true
-  timeout: 3m
-
-# ---------------------------
 # Run Jest tests with coverage
 # ---------------------------
 test_jest:
@@ -183,7 +161,7 @@ prettier_format:
         echo "Changes detected, committing and pushing to ${CI_COMMIT_REF_NAME}..."
         git add .
         git commit -m "style: Auto-format code with Prettier. 
-        
+
         Co-Authored-By: GitLab CI <ci@gitlab.com>"
         git push origin HEAD:${CI_COMMIT_REF_NAME} -o ci.skip
         echo "Code formatted and committed successfully"
