@@ -96,7 +96,7 @@ eslint:
     reports:
       codequality: web-frontend/gl-codequality.json
     when: always
-    expire_in: 3 days
+    expire_in: 5 days
   timeout: 3m
 
 # ---------------------------
@@ -150,7 +150,7 @@ test_jest:
     paths:
       - web-frontend/coverage/
     when: always
-    expire_in: 3 days
+    expire_in: 5 days
   timeout: 8m
 
 # ---------------------------
@@ -216,7 +216,7 @@ build_app:
       - web-frontend/.next/standalone/
       - web-frontend/.next/static/
       - web-frontend/public/
-    expire_in: 3 days
+    expire_in: 5 days
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
       when: always
@@ -304,7 +304,7 @@ trivy_scan:
     paths:
       - trivy-report.json
     when: always
-    expire_in: 3 days
+    expire_in: 5 days
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
       when: always
