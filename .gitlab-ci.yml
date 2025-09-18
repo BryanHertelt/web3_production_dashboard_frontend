@@ -192,18 +192,28 @@ prettier_format:
 docker_build:
   stage: build_docker
   image: docker:26
-variables:
-  DOCKER_TLS_CERTDIR: "/certs"    
-  DOCKER_HOST: tcp://docker:2376
-  DOCKER_TLS_VERIFY: "1"
-  DOCKER_CERT_PATH: "/certs/client"
-  DOCKER_DRIVER: overlay2
+  variables:
+    DOCKER_HOST: unix:///var/run/docker.sock
+    DOCKER_BUILDKIT: "1"
+    BUILDKIT_PROGRESS: plain
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
   script:
     - cd web-frontend
-    - docker build -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
+    - echo "Building Docker image with BuildKit and layer caching..."
+    - |
+      docker build \
+        --cache-from "$CI_REGISTRY_IMAGE:cache" \
+        --cache-from "$CI_REGISTRY_IMAGE:latest" \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
+        --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
+        -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" \
+        -t "$CI_REGISTRY_IMAGE:latest" \
+        .
+    - echo "Pushing Docker images to registry..."
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
       when: always
