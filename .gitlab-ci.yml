@@ -152,6 +152,7 @@ test_jest:
     expire_in: 5 days
   timeout: 8m
 
+
 # ---------------------------
 # Auto-format code and commit changes
 # ---------------------------
@@ -159,23 +160,35 @@ prettier_format:
   stage: lint
   needs:
     - prettier_check
-  script:
+  before_script:
     - apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-    - git --version 
+    - git --version
+    # Configure Git
+    - git config --global user.email "bryanhertelt@gmail.com"
+    - git config --global user.name "Pipeline"
+    # Set HTTPS URL with PAT for authentication
+    - git remote set-url origin "https://oauth2:${ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    # Ensure the correct branch is checked out
+    - git checkout ${CI_COMMIT_REF_NAME}
+    # Debug: Verify remote and branch
+    - git remote -v
+    - git branch
+  script:
     - cd web-frontend
-    - npm run format:write
+    # Run prettier format, allowing failures
+    - npm run format:write || true
+    # Check for changes and push to remote
     - |
-      if [ -n "$(git status --porcelain)" ]; then
-        git config user.name "Pipeline"
-        git config user.email "pipelineweb@gitlab.com"
+      if ! git diff --quiet; then
+        echo "Changes detected, committing and pushing to ${CI_COMMIT_REF_NAME}..."
         git add .
-        git commit -m "style: Auto-format code with Prettier.
-
+        git commit -m "style: Auto-format code with Prettier. 
+        
         Co-Authored-By: GitLab CI <ci@gitlab.com>"
-        git push https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git HEAD:${CI_COMMIT_REF_NAME}
+        git push origin HEAD:${CI_COMMIT_REF_NAME} -o ci.skip
         echo "Code formatted and committed successfully"
       else
-        echo "No formatting changes needed"
+        echo "No changes detected, skipping commit and push."
       fi
   cache:
     key:
@@ -186,6 +199,7 @@ prettier_format:
       - web-frontend/node_modules/
     policy: pull
   timeout: 5m
+
 
 
 # ---------------------------
