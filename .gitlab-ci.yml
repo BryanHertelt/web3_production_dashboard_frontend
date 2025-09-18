@@ -160,6 +160,8 @@ prettier_format:
   needs:
     - prettier_check
   script:
+    - apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+    - git --version 
     - cd web-frontend
     - npm run format:write
     - |
