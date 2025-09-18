@@ -12,9 +12,9 @@ stages:
   - lint
   - test
   - build
-  - docker-build
+  - build_docker
   - security
-  - deploy
+  - deploy_docs
 
 variables:
   NODE_OPTIONS: "--max-old-space-size=2048"
@@ -190,7 +190,7 @@ prettier_format:
 # Build Docker image
 # ---------------------------
 docker_build:
-  stage: docker-build
+  stage: build_docker
   image: docker:26
   variables:
     DOCKER_HOST: unix:///var/run/docker.sock
@@ -295,7 +295,7 @@ security_audit:
 # Generate and deploy documentation to GitLab Pages
 # ---------------------------
 pages:
-  stage: deploy
+  stage: deploy_docs
   script:
     - cd web-frontend
     - npm run docs
