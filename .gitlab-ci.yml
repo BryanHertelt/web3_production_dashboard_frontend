@@ -4,7 +4,6 @@ workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # Run on MR creation/update
     - if: $CI_COMMIT_BRANCH == 'dev' && $CI_PIPELINE_SOURCE == 'push' # Run after merge to dev
-    - if: $CI_COMMIT_BRANCH == 'main' && $CI_PIPELINE_SOURCE == 'push' # Run after merge to main
     - if: $CI_COMMIT_BRANCH == 'pipeline-testing' && $CI_PIPELINE_SOURCE == 'push' # Run on pipeline-testing branch
     - when: never # Exclude all other cases (feature branch pushes, etc.)
 
@@ -226,7 +225,7 @@ docker_build:
       - web-frontend/public/
     expire_in: 5 days
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev")'
       when: always
     - when: never
   timeout: 15m
@@ -255,8 +254,6 @@ docker_build:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
       when: always
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
-      when: always
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
       when: always
     - when: never
@@ -279,7 +276,7 @@ scan_build_secrets:
     - job: install_dependencies
       artifacts: false
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev")'
       when: always
     - when: never
   timeout: 3m
@@ -317,8 +314,6 @@ trivy_scan:
     expire_in: 5 days
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
-      when: always
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
       when: always
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
       when: always
