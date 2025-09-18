@@ -31,6 +31,7 @@ cache:
   paths:
     - web-frontend/.npm/
     - web-frontend/.next/cache/
+    - web-frontend/node_modules/
   policy: pull-push
 
 # ---------------------------
@@ -47,6 +48,7 @@ install_dependencies:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
+      - web-frontend/node_modules/
     policy: pull-push
   timeout: 10m
 
@@ -57,7 +59,6 @@ typescript_check:
   stage: lint
   script:
     - cd web-frontend
-    - npm ci --cache .npm --prefer-offline
     - npx tsc --noEmit
   cache:
     key:
@@ -65,6 +66,7 @@ typescript_check:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
+      - web-frontend/node_modules/
     policy: pull
   needs:
     - job: install_dependencies
@@ -78,7 +80,6 @@ eslint:
   stage: lint
   script:
     - cd web-frontend
-    - npm ci --cache .npm --prefer-offline
     - npm run lint
   cache:
     key:
@@ -86,6 +87,7 @@ eslint:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
+      - web-frontend/node_modules/
     policy: pull
   needs:
     - job: install_dependencies
@@ -104,7 +106,6 @@ prettier_check:
   stage: lint
   script:
     - cd web-frontend
-    - npm ci --cache .npm --prefer-offline
     - npm run format:check
   cache:
     key:
@@ -112,6 +113,7 @@ prettier_check:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
+      - web-frontend/node_modules/
     policy: pull
   needs:
     - job: install_dependencies
@@ -126,7 +128,6 @@ test_jest:
   stage: test
   script:
     - cd web-frontend
-    - npm ci --cache .npm --prefer-offline
     - npm run test -- --ci --watchAll=false --passWithNoTests
   cache:
     key:
@@ -134,6 +135,7 @@ test_jest:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
+      - web-frontend/node_modules/
     policy: pull
   needs:
     - job: install_dependencies
@@ -160,7 +162,6 @@ prettier_format:
     - prettier_check
   script:
     - cd web-frontend
-    - npm ci --cache .npm --prefer-offline
     - npm run format:write
     - |
       if [ -n "$(git status --porcelain)" ]; then
@@ -183,6 +184,7 @@ prettier_format:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
+      - web-frontend/node_modules/
     policy: pull
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -196,7 +198,6 @@ build_app:
   stage: build
   script:
     - cd web-frontend
-    - npm ci --cache .npm --prefer-offline
     - npm run build
   cache:
     key:
@@ -205,6 +206,7 @@ build_app:
     paths:
       - web-frontend/.npm/
       - web-frontend/.next/cache/
+      - web-frontend/node_modules/
     policy: pull
   needs:
     - job: install_dependencies
@@ -320,7 +322,6 @@ security_audit:
   stage: security
   script:
     - cd web-frontend
-    - npm ci --cache .npm --prefer-offline
     - npm audit --audit-level=moderate
   cache:
     key:
@@ -328,6 +329,7 @@ security_audit:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
+      - web-frontend/node_modules/
     policy: pull
   needs:
     - job: install_dependencies
@@ -342,7 +344,6 @@ pages:
   stage: deploy
   script:
     - cd web-frontend
-    - npm ci --cache .npm --prefer-offline
     - npm run docs
     - cd ..
     - mkdir public
@@ -353,6 +354,7 @@ pages:
         - web-frontend/package-lock.json
     paths:
       - web-frontend/.npm/
+      - web-frontend/node_modules/
     policy: pull
   needs:
     - job: install_dependencies
