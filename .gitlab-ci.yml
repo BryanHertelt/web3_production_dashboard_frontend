@@ -137,7 +137,52 @@ test_jest:
 prettier_format:
   stage: lint
   before_script:
-    - apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+    - echo "=== DEBUGGING APT/GPG ISSUE ==="
+    - echo "Pipeline: $CI_PIPELINE_SOURCE | Branch: $CI_COMMIT_REF_NAME | Job: $CI_JOB_NAME"
+    - echo "Runner: $CI_RUNNER_DESCRIPTION | Image: node:20-slim"
+    - echo "Timestamp: $(date -u)"
+
+    # Check base image info
+    - echo "=== BASE IMAGE INFO ==="
+    - cat /etc/os-release
+    - uname -a
+    - echo "Image build date: $(stat -c %y /etc/os-release)"
+
+    # Check current APT sources
+    - echo "=== APT SOURCES ==="
+    - cat /etc/apt/sources.list
+    - ls -la /etc/apt/sources.list.d/ || true
+
+    # Check GPG keyrings
+    - echo "=== GPG KEYRINGS ==="
+    - ls -la /etc/apt/trusted.gpg.d/
+    - apt-key list || true
+
+    # Network connectivity test
+    - echo "=== NETWORK TEST ==="
+    - ping -c 3 deb.debian.org || true
+    - nslookup deb.debian.org || true
+
+    # Check cache state
+    - echo "=== CACHE STATE ==="
+    - ls -la /var/lib/apt/lists/ | head -20
+    - echo "Cache file count: $(ls /var/lib/apt/lists/ | wc -l)"
+    - echo "Latest cache file: $(ls -t /var/lib/apt/lists/ | head -1)"
+
+    # Keyring debugging
+    - echo "=== KEYRING DEBUGGING ==="
+    - gpg --list-keys || true
+    - apt-key adv --list-public-keys --with-colons | grep -E '^pub|^uid' || true
+    - echo "Keyring files:"
+    - find /etc/apt -name "*.gpg" -o -name "*.asc" | xargs ls -la || true
+
+    # Detailed APT update with verbose output
+    - echo "=== APT UPDATE (VERBOSE) ==="
+    - apt-get update -o Debug::pkgAcquire::Worker=1 -o Debug::Acquire::gpgv=1 || true
+
+    # Try git installation with detailed logging
+    - echo "=== GIT INSTALLATION ATTEMPT ==="
+    - apt-get install -y git -o Debug::pkgProblemResolver=yes || echo "Git installation failed"
     - git --version
     # Configure Git
     - git config --global user.email "bryanhertelt@gmail.com"
