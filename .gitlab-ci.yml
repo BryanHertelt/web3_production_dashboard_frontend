@@ -205,9 +205,9 @@ docker_build:
     - echo "Pushing Docker images to registry..."
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
     - docker push "$CI_REGISTRY_IMAGE:latest"
-    - echo "Removing Docker images from runner..."
+    - echo "Removing docker images from runner..."
     - docker rmi "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" || true
-    - docker rmi "$CI_REGISTRY_IMAGE:latest" || true 
+    - docker rmi "$CI_REGISTRY_IMAGE:latest" || true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
       when: always
