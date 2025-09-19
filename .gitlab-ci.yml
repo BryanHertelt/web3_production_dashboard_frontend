@@ -138,15 +138,15 @@ prettier_format:
   stage: lint
   before_script:
     - echo "=== DEBUGGING APT/GPG ISSUE ==="
-    - echo "Pipeline: $CI_PIPELINE_SOURCE | Branch: $CI_COMMIT_REF_NAME | Job: $CI_JOB_NAME"
-    - echo "Runner: $CI_RUNNER_DESCRIPTION | Image: node:20-slim"
-    - echo "Timestamp: $(date -u)"
+    - echo "Pipeline= $CI_PIPELINE_SOURCE | Branch = $CI_COMMIT_REF_NAME | Job = $CI_JOB_NAME"
+    - echo "Runner= $CI_RUNNER_DESCRIPTION | Image= node:20-slim"
+    - echo "Timestamp= $(date -u)"
 
     # Check base image info
     - echo "=== BASE IMAGE INFO ==="
     - cat /etc/os-release
     - uname -a
-    - echo "Image build date: $(stat -c %y /etc/os-release)"
+    - echo "Image build date= $(stat -c %y /etc/os-release)"
 
     # Check current APT sources
     - echo "=== APT SOURCES ==="
@@ -166,8 +166,8 @@ prettier_format:
     # Check cache state
     - echo "=== CACHE STATE ==="
     - ls -la /var/lib/apt/lists/ | head -20
-    - echo "Cache file count: $(ls /var/lib/apt/lists/ | wc -l)"
-    - echo "Latest cache file: $(ls -t /var/lib/apt/lists/ | head -1)"
+    - echo "Cache file count= $(ls /var/lib/apt/lists/ | wc -l)"
+    - echo "Latest cache file= $(ls -t /var/lib/apt/lists/ | head -1)"
 
     # Keyring debugging
     - echo "=== KEYRING DEBUGGING ==="
