@@ -158,10 +158,10 @@ prettier_format:
     - npm run format:write || true
     # Check for changes and push to remote
     - |
-      if ! git diff --quiet; then
+      if ! git diff --quiet .; then
         echo "Changes detected, committing and pushing to ${CI_COMMIT_REF_NAME}..."
         git add .
-        git commit -m "style: Auto-format code with Prettier. 
+        git commit -m "style: Auto-format code with Prettier.
 
         Co-Authored-By: GitLab CI <ci@gitlab.com>"
         git push origin HEAD:${CI_COMMIT_REF_NAME} -o ci.skip
