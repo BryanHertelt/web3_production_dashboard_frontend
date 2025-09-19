@@ -136,35 +136,17 @@ test_jest:
 # ---------------------------
 prettier_format:
   stage: lint
-  image: node:20-slim
   before_script:
-    - echo "=== DEBUGGING ENVIRONMENT ==="
-    - echo "Pipeline = $CI_PIPELINE_SOURCE | Branch = $CI_COMMIT_REF_NAME | Job = $CI_JOB_NAME"
-    - echo "Runner = $CI_RUNNER_DESCRIPTION | Image = node:20-slim"
-    - echo "Timestamp = $(date -u)"
-    - echo "=== BASE IMAGE INFO ==="
-    - cat /etc/os-release
-    - stat -c %y /etc/os-release
-    - echo "=== FIXING APT SOURCES AND KEYRING ==="
-    # Ensure sources.list exists
-    - |
-      if [ ! -f /etc/apt/sources.list ]; then
-        echo "No /etc/apt/sources.list found, creating a fallback"
-        echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list
-      fi
-    # Update keyring and certificates
-    - apt-get update -o Debug::Acquire::gpgv=true || true
-    - apt-get install -y --no-install-recommends debian-archive-keyring ca-certificates
-    - rm -rf /var/lib/apt/lists/*
-    - apt-get update -o Debug::Acquire::gpgv=true
-    # Install git
-    - apt-get install -y git
+    - apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
     - git --version
-    # Configure Git for CI
+    # Configure Git
     - git config --global user.email "bryanhertelt@gmail.com"
     - git config --global user.name "Pipeline"
+    # Set HTTPS URL with PAT for authentication
     - git remote set-url origin "https://oauth2:${ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    # Ensure the correct branch is checked out
     - git checkout ${CI_COMMIT_REF_NAME}
+    # Debug: Verify remote and branch
     - git remote -v
     - git branch
   script:
@@ -193,7 +175,6 @@ prettier_format:
       - web-frontend/node_modules/
     policy: pull
   timeout: 5m
-
 
 
 # ---------------------------
