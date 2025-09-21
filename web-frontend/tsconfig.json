@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020", // Modern JS output
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true, // Allows JS files if needed
     "skipLibCheck": true, // Skip type checking of dependencies
     "strict": true, // Enable strict mode
@@ -18,21 +14,16 @@
     "incremental": true, // Faster builds
     "jsx": "preserve", // New JSX transform (React 17+)
     "baseUrl": ".", // Base for path aliases
-    "paths": { // Path alias for @/ → src/
-      "@/*": [
-        "./src/*"
-      ]
+    "paths": {
+      // Path alias for @/ → src/
+      "@/*": ["./src/*"]
     },
     "plugins": [
       {
         "name": "next"
       } // Next.js plugin for TS
     ],
-    "types": [
-      "node",
-      "react",
-      "react-dom"
-    ] // Ensure React & Node types are included
+    "types": ["node", "react", "react-dom", "jest"] // Ensure React & Node types are included
   },
   "include": [
     "next-env.d.ts",
@@ -42,7 +33,5 @@
     "next.config.js",
     "src" // Include src folder explicitly
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

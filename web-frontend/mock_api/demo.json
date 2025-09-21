@@ -1,0 +1,134 @@
+{
+  "uuid": "a85f9b58-d77d-474e-a02e-97259049d2ff",
+  "lastMigration": 33,
+  "name": "Demo",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 3001,
+  "hostname": "",
+  "folders": [],
+  "routes": [
+    {
+      "uuid": "2d92bc60-07da-4df2-9cf3-4c81d725e4d2",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "users",
+      "responses": [
+        {
+          "uuid": "f5daa608-0edb-450e-b8d0-9ecc15df2fac",
+          "body": "[\r\n  {\r\n    \"coin\": \"BTC\",\r\n    \"amount\": \"0.25\",\r\n    \"buyPrice\": \"42000.00\",\r\n    \"currentPrice\": \"47850.00\",\r\n    \"profitLoss\": \"+1462.50\",\r\n    \"profitClass\": \"profit\"\r\n  },\r\n  {\r\n    \"coin\": \"ETH\",\r\n    \"amount\": \"5.75\",\r\n    \"buyPrice\": \"2800.00\",\r\n    \"currentPrice\": \"2650.00\",\r\n    \"profitLoss\": \"-862.50\",\r\n    \"profitClass\": \"loss\"\r\n  },\r\n  {\r\n    \"coin\": \"ADA\",\r\n    \"amount\": \"1250.00\",\r\n    \"buyPrice\": \"0.45\",\r\n    \"currentPrice\": \"0.52\",\r\n    \"profitLoss\": \"+87.50\",\r\n    \"profitClass\": \"profit\"\r\n  }\r\n]",
+          "latency": 2000,
+          "statusCode": 200,
+          "label": "",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "4e8eb6e2-e762-4dd0-8f85-487a02ca6c3d",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "infocards",
+      "responses": [
+        {
+          "uuid": "c58a7ee6-6e80-4322-90cf-ad95ffe54d7e",
+          "body": "[\n  {\n    \"title\": \"Revenue\",\n    \"value\": 25.680,\n    \"change\": 8\n  },\n  {\n    \"title\": \"Transactions\",\n    \"value\": 18420,\n    \"change\": 5\n  },\n  {\n    \"title\": \"Refunds\",\n    \"value\": 3260,\n    \"change\": -2\n  },\n  {\n    \"title\": \"USD balance\",\n    \"value\": 25.680\n  },\n  {\n    \"title\": \"Pending payouts\",\n    \"value\": 12.340\n  }\n  ]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    }
+  ],
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "2d92bc60-07da-4df2-9cf3-4c81d725e4d2"
+    },
+    {
+      "type": "route",
+      "uuid": "4e8eb6e2-e762-4dd0-8f85-487a02ca6c3d"
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    },
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "data": [],
+  "callbacks": []
+}
