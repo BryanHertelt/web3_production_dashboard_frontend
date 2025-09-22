@@ -1,28 +1,43 @@
 import React from "react";
-import Navbar from "../../widgets/example-widget/ui/navbar";
-import Searchbar from "@/widgets/example-widget/ui/searchbar";
-import TimeRange from "@/features/select-time-range";
-import InfoBoxes from "@/widgets/example-widget/ui/info-boxes";
-import PlaceholderChart from "@/widgets/example-widget/ui/charts";
-import Table from "@/widgets/example-widget/ui/table";
+import Navbar from "../../widgets/navbar/ui/navbar";
+import Searchbar from "@/widgets/searchbar/ui/searchbar";
+import TimeRange from "@/features/select-time-range/ui/select-time-range";
+import InfoBox from "@/shared/info-box/ui/info-box";
+import PlaceholderChart from "@/widgets/charts/ui/charts";
+import Table from "@/widgets/table/ui/table";
+
+interface Card {
+  title: string;
+  value: number;
+  change?: number;
+  color?: string;
+}
+
 /**
- * A full-page dashboard layout for cryptocurrency analytics.
+ * Renders the main dashboard page for the crypto application, including the sidebar
+ * navigation, search bar, time range selector, informational boxes, placeholder charts,
+ * and a table of bought coins.
  *
- * @remarks
- * - Includes a sidebar (`Navbar`) for navigation.
- * - The top bar contains a `Searchbar`.
- * - Main dashboard content includes:
- *   - `TimeRange` selector
- *   - `InfoBoxes` with key metrics
- *   - `PlaceholderChart` for visualization
- *   - `Table` showing coin data
- *
- * @example
- * ```tsx
- * <CryptoDashboard />
- * ```
+ * @export
+ * @returns {JSX.Element} A React element representing the dashboard page layout.
  */
-export default function CryptoDashboard() {
+export default async function CryptoDashboard() {
+  const fetchData = async () => {
+    try {
+      const rawCardData = await fetch("http://localhost:3001/infocards");
+      const cardData = await rawCardData.json();
+      return cardData;
+    } catch (error) {
+      console.log(`An error occured ${error}`);
+    }
+  };
+
+  const cardData: Card[] = await fetchData();
+
+  const tableConfig = {
+    headers: ["Coin", "Amount", "Buy Price", "Current Price", "Profit/Loss"],
+  };
+
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900">
       {/* Sidebar */}
@@ -34,10 +49,25 @@ export default function CryptoDashboard() {
         {/* Dashboard content */}
         <section>
           <TimeRange />
-          <InfoBoxes />
+          <div className="flex flex-row w-full h-full">
+            {cardData != undefined
+              ? cardData.map((card: Card, index: number) => {
+                  return (
+                    <div key={index} className="w-1/5 mr-3 h-full mb-6">
+                      <InfoBox
+                        title={card.title}
+                        value={card.value}
+                        change={card.change}
+                        color={card.color}
+                      />
+                    </div>
+                  );
+                })
+              : null}
+          </div>
           <PlaceholderChart />
           {/* Simple table for bought coins */}
-          <Table />
+          <Table tableConfig={tableConfig} />
         </section>
       </main>
     </div>
