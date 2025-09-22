@@ -144,8 +144,9 @@ prettier_format:
     - git config --global user.name "Pipeline"
     # Set HTTPS URL with PAT for authentication
     - git remote set-url origin "https://oauth2:${ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
-    # Ensure the correct branch is checked out
-    - git checkout ${CI_COMMIT_REF_NAME}
+     # Fetch and checkout the correct branch
+    - git fetch origin "${CI_COMMIT_REF_NAME}:${CI_COMMIT_REF_NAME}"
+    - git checkout "${CI_COMMIT_REF_NAME}"
     # Debug: Verify remote and branch
     - git remote -v
     - git branch

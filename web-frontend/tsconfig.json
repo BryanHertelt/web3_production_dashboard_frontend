@@ -23,7 +23,7 @@
         "name": "next"
       } // Next.js plugin for TS
     ],
-    "types": ["node", "react", "react-dom"] // Ensure React & Node types are included
+    "types": ["node", "react", "react-dom", "jest"] // Ensure React & Node types are included
   },
   "include": [
     "next-env.d.ts",
