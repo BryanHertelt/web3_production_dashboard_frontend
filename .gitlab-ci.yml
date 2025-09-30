@@ -13,6 +13,7 @@ stages:
   - test
   - build
   - build_docker
+  - lighthouse
   - security
   - deploy_docs
 
@@ -216,6 +217,54 @@ docker_build:
       when: always
     - when: never
   timeout: 20m
+
+
+# ---------------------------
+# Lighthouse Performance Audit
+# ---------------------------
+lighthouse_audit:
+  stage: lighthouse
+  image: cypress/browsers:node-20.18.0-chrome-130.0.6723.58-1-ff-131.0.3-edge-130.0.2849.46-1
+  needs: ["docker_build"]
+  services:
+    - name: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+      alias: web-app
+  variables:
+    LHCI_BUILD_CONTEXT__CURRENT_HASH: "$CI_COMMIT_SHA"
+    LHCI_BUILD_CONTEXT__COMMIT_TIME: "$CI_COMMIT_TIMESTAMP"
+    LHCI_BUILD_CONTEXT__CURRENT_BRANCH: "$CI_COMMIT_REF_NAME"
+    LHCI_BUILD_CONTEXT__COMMIT_MESSAGE: "$CI_COMMIT_MESSAGE"
+  before_script:
+    - npm install -g @lhci/cli@0.13.x
+    - echo "Waiting for web application to be ready..."
+    - |
+      for i in {1..30}; do
+        if curl -f http://web-app:3000 >/dev/null 2>&1; then
+          echo "Web application is ready!"
+          break
+        fi
+        echo "Attempt $i: Web application not ready yet, waiting 10s..."
+        sleep 10
+      done
+    - curl -f http://web-app:3000 || (echo "Web application failed to start" && exit 1)
+  script:
+    - echo "Running Lighthouse CI with 3 runs for accuracy..."
+    - lhci autorun --upload.target=filesystem --upload.outputDir=./lighthouse-reports
+  artifacts:
+    paths:
+      - lighthouse-reports/
+    reports:
+      performance: lighthouse-reports/lhr-*.json
+    expire_in: 30 days
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - when: never
+  timeout: 15m
 
 
 # ---------------------------
