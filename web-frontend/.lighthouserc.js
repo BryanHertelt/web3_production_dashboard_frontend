@@ -1,13 +1,36 @@
 module.exports = {
   ci: {
     collect: {
-      // URL to audit - using the service alias from GitLab CI
-      url: ['http://web-app:3000'],
+      // URL configurations for both mobile and desktop testing
+      url: [
+        {
+          url: 'http://web-app:3000',
+          label: 'mobile'
+        },
+        {
+          url: 'http://web-app:3000',
+          label: 'desktop',
+          settings: {
+            formFactor: 'desktop',
+            screenEmulation: {
+              mobile: false,
+              width: 1350,
+              height: 940,
+              deviceScaleFactor: 1,
+            },
+            throttling: {
+              rttMs: 40,
+              throughputKbps: 10240,
+              cpuSlowdownMultiplier: 1,
+            }
+          }
+        }
+      ],
       settings: {
         // Use headless Chrome
         chromeFlags: '--no-sandbox --disable-dev-shm-usage --headless',
         // Wait for network to have at most two connections left for 500 ms
-        waitUntil: 'networkidle2', 
+        waitUntil: 'networkidle2',
       },
     },
     assert: {
