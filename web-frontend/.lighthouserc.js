@@ -1,31 +1,7 @@
 module.exports = {
   ci: {
     collect: {
-      // URL configurations for both mobile and desktop testing
-      url: [
-        {
-          url: "http://web-app:3000",
-          label: "mobile",
-        },
-        {
-          url: "http://web-app:3000",
-          label: "desktop",
-          settings: {
-            formFactor: "desktop",
-            screenEmulation: {
-              mobile: false,
-              width: 1350,
-              height: 940,
-              deviceScaleFactor: 1,
-            },
-            throttling: {
-              rttMs: 40,
-              throughputKbps: 10240,
-              cpuSlowdownMultiplier: 1,
-            },
-          },
-        },
-      ],
+      url: ['http://web-app:3000'],
       settings: {
         // Use headless Chrome
         chromeFlags: "--no-sandbox --disable-dev-shm-usage --headless",

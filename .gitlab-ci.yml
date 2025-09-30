@@ -234,8 +234,10 @@ lighthouse_audit:
     - curl -f http://web-app:3000 || (echo "Web application failed to start" && exit 1)
   script:
     - cd web-frontend
-    - echo "Running Lighthouse CI..."
+    - echo "Running Lighthouse CI for mobile..."
     - lhci autorun
+    - echo "Running Lighthouse CI for desktop..."
+    - lhci autorun --settings.preset=desktop
   artifacts:
     paths:
       - web-frontend/lighthouse-reports/
