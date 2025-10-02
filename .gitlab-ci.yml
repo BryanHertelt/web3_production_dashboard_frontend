@@ -180,7 +180,7 @@ prettier_format:
 
 
 # ---------------------------
-# Build Docker image
+# Build Docker images
 # ---------------------------
 docker_build:
   stage: build_docker
@@ -212,7 +212,7 @@ docker_build:
         --cache-from "$CI_REGISTRY_IMAGE:cache" \
         --cache-from "$CI_REGISTRY_IMAGE:latest" \
         --build-arg BUILDKIT_INLINE_CACHE=1 \
-        --build-arg NEXT_PUBLIC_API_URL=http://mock-api:3001 \
+        --build-arg NEXT_PUBLIC_API_URL=http://localhost:3001 \
         --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
         --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
         -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" \
@@ -279,33 +279,10 @@ lighthouse_audit:
           build: {}
       EOF
 
-    # Start services with docker-compose
-    - docker-compose up -d
-
-    # Wait for services to be healthy
-    - echo "Waiting for mock API to be ready..."
-    - |
-      for i in $(seq 1 60); do
-        if curl -f http://localhost:3001/infocards >/dev/null 2>&1; then
-          echo "Mock API is ready!"
-          break
-        fi
-        echo "Attempt $i: Mock API not ready yet, waiting 5s..."
-        sleep 5
-      done
-    - curl -f http://localhost:3001/infocards || (echo "Mock API failed to start" && exit 1)
-
-    - echo "Waiting for web application to be ready..."
-    - |
-      for i in $(seq 1 60); do
-        if curl -f http://localhost:3000 >/dev/null 2>&1; then
-          echo "Web application is ready!"
-          break
-        fi
-        echo "Attempt $i: Web application not ready yet, waiting 5s..."
-        sleep 5
-      done
-    - curl -f http://localhost:3000 || (echo "Web application failed to start" && exit 1)
+    # Start services with docker-compose (wait for healthchecks to pass)
+    - echo "Starting services and waiting for healthchecks..."
+    - docker-compose up -d --wait
+    - echo "All services are healthy and ready!"
   script:
     - cd web-frontend
     - echo "Running Lighthouse CI for mobile..."
