@@ -278,9 +278,9 @@ lighthouse_audit:
   script:
     # Get the Docker network name and gateway IP to reach web-app
     - NETWORK_NAME=$(docker network ls --filter "name=${CI_PROJECT_NAME}_default" --format "{{.Name}}" | head -1)
-    - echo "Using Docker network: $NETWORK_NAME"
+    - echo "Using Docker network ':' $NETWORK_NAME"
     - GATEWAY_IP=$(docker network inspect "$NETWORK_NAME" -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
-    - echo "Docker gateway IP: $GATEWAY_IP"
+    - echo "Docker gateway IP ':' $GATEWAY_IP"
 
     # Run Lighthouse CI in a container on the same network
     - cd web-frontend
