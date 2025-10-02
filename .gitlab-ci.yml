@@ -172,7 +172,7 @@ prettier_format:
   timeout: 5m
 
 # ---------------------------
-# Build Docker image
+# Build Docker images
 # ---------------------------
 docker_build:
   stage: build_docker
@@ -184,19 +184,39 @@ docker_build:
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
   script:
-    - cd web-frontend
-    - echo "Building Docker image with BuildKit and layer caching..."
+    # Build Mockoon mock API image
+    - cd web-frontend/mock_api
+    - echo "Building Mockoon Docker image..."
+    - |
+      docker build \
+        -t "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" \
+        -t "$CI_REGISTRY_IMAGE/mock-api:latest" \
+        .
+    - echo "Pushing Mockoon images to registry..."
+    - docker push "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE/mock-api:latest"
+
+    # Build web application image
+    - cd ..
+    - echo "Building web application Docker image with BuildKit and layer caching..."
     - |
       docker build \
         --cache-from "$CI_REGISTRY_IMAGE:latest" \
         --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --build-arg NEXT_PUBLIC_API_URL=http://localhost:3001 \
+        --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
+        --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
         -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" \
         -t "$CI_REGISTRY_IMAGE:latest" \
         .
-    - echo "Pushing Docker images to registry..."
+    - echo "Pushing web application images to registry..."
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
     - docker push "$CI_REGISTRY_IMAGE:latest"
+
+    # Clean up
     - echo "Removing docker images from runner..."
+    - docker rmi "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" || true
+    - docker rmi "$CI_REGISTRY_IMAGE/mock-api:latest" || true
     - docker rmi "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" || true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
@@ -210,34 +230,54 @@ lighthouse_audit:
   stage: lighthouse
   image: cypress/browsers:latest
   needs: ["docker_build"]
-  services:
-    - name: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-      alias: web-app
   variables:
     LHCI_BUILD_CONTEXT__CURRENT_HASH: "$CI_COMMIT_SHA"
     LHCI_BUILD_CONTEXT__COMMIT_TIME: "$CI_COMMIT_TIMESTAMP"
     LHCI_BUILD_CONTEXT__CURRENT_BRANCH: "$CI_COMMIT_REF_NAME"
     LHCI_BUILD_CONTEXT__COMMIT_MESSAGE: "$CI_COMMIT_MESSAGE"
+    DOCKER_HOST: unix:///var/run/docker.sock
   before_script:
-    - apt-get update && apt-get install -y curl
+    # Install Docker and Docker Compose
+    - apt-get update && apt-get install -y curl docker.io docker-compose
+    - docker --version
+    - docker-compose --version
+
+    # Install Lighthouse CLI
     - npm install -g @lhci/cli@latest
-    - echo "Waiting for web application to be ready..."
+
+    # Login to GitLab Container Registry
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
+
+    # Pull pre-built images from registry
+    - docker pull "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
+    - docker pull "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+
+    # Create docker-compose override to use registry images
     - |
-      for i in $(seq 1 60); do
-        if curl -f http://web-app:3000 >/dev/null 2>&1; then
-          echo "Web application is ready!"
-          break
-        fi
-        echo "Attempt $i: Web application not ready yet, waiting 5s..."
-        sleep 5
-      done
-    - curl -f http://web-app:3000 || (echo "Web application failed to start" && exit 1)
+      cat > docker-compose.override.yml <<EOF
+      version: '3.8'
+      services:
+        mock-api:
+          image: $CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA
+          build: {}
+        web-app:
+          image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+          build: {}
+      EOF
+
+    # Start services with docker-compose (wait for healthchecks to pass)
+    - echo "Starting services and waiting for healthchecks..."
+    - docker-compose up -d --wait
+    - echo "All services are healthy and ready!"
   script:
     - cd web-frontend
     - echo "Running Lighthouse CI for mobile..."
     - lhci autorun
     - echo "Running Lighthouse CI for desktop..."
     - lhci autorun --settings.preset=desktop
+  after_script:
+    # Clean up docker-compose services
+    - docker-compose down -v || true
   artifacts:
     paths:
       - web-frontend/lighthouse-reports/
