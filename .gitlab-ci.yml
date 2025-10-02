@@ -231,19 +231,12 @@ lighthouse_audit:
   image: cypress/browsers:latest
   needs: ["docker_build"]
   variables:
-    LHCI_BUILD_CONTEXT__CURRENT_HASH: "$CI_COMMIT_SHA"
-    LHCI_BUILD_CONTEXT__COMMIT_TIME: "$CI_COMMIT_TIMESTAMP"
-    LHCI_BUILD_CONTEXT__CURRENT_BRANCH: "$CI_COMMIT_REF_NAME"
-    LHCI_BUILD_CONTEXT__COMMIT_MESSAGE: "$CI_COMMIT_MESSAGE"
     DOCKER_HOST: unix:///var/run/docker.sock
   before_script:
     # Install Docker and Docker Compose
     - apt-get update && apt-get install -y curl docker.io docker-compose
     - docker --version
     - docker-compose --version
-
-    # Install Lighthouse CLI
-    - npm install -g @lhci/cli@latest
 
     # Login to GitLab Container Registry
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
@@ -282,10 +275,31 @@ lighthouse_audit:
         sleep 2
       done
     - docker logs web-app --tail 20
+
+    # Install Lighthouse CI (latest version via npm)
+    - echo "Installing Lighthouse CI..."
+    - npm install -g @lhci/cli@latest
+    - lhci --version
+
+    # Connect this job container to the docker-compose network so we can reach web-app
+    - NETWORK_NAME=$(docker network ls --filter "name=${CI_PROJECT_NAME}_default" --format "{{.Name}}" | head -1)
+    - echo "Connecting to Docker network: $NETWORK_NAME"
+    - CONTAINER_ID=$(cat /etc/hostname)
+    - docker network connect "$NETWORK_NAME" "$CONTAINER_ID" || echo "Already connected to network"
   script:
     - cd web-frontend
+
+    # Set LHCI environment variables for build context
+    - export LHCI_BUILD_CONTEXT__CURRENT_HASH="$CI_COMMIT_SHA"
+    - export LHCI_BUILD_CONTEXT__COMMIT_TIME="$CI_COMMIT_TIMESTAMP"
+    - export LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME"
+    - export LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE"
+
+    # Run Lighthouse CI for mobile
     - echo "Running Lighthouse CI for mobile..."
     - lhci autorun
+
+    # Run Lighthouse CI for desktop
     - echo "Running Lighthouse CI for desktop..."
     - lhci autorun --settings.preset=desktop
   after_script:
