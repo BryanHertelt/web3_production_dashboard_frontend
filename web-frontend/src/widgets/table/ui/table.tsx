@@ -17,8 +17,9 @@ const Table = (props: { tableConfig: TableProps }) => {
   useEffect(() => {
     // Placeholder API URL - replace with actual endpoint
     const fetchData = async () => {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
       try {
-        const response = await fetch("http://localhost:3001/users");
+        const response = await fetch(`${apiUrl}/users`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }

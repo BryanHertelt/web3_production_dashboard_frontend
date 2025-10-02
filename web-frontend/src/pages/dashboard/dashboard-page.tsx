@@ -23,8 +23,9 @@ interface Card {
  */
 export default async function CryptoDashboard() {
   const fetchData = async () => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
     try {
-      const rawCardData = await fetch("http://localhost:3001/infocards");
+      const rawCardData = await fetch(`${apiUrl}/infocards`);
       const cardData = await rawCardData.json();
       return cardData;
     } catch (error) {
