@@ -283,6 +283,19 @@ lighthouse_audit:
     - echo "Starting services and waiting for healthchecks..."
     - docker-compose up -d --wait
     - echo "All services are healthy and ready!"
+
+    # Verify web-app is accessible before running Lighthouse
+    - echo "Verifying web-app is accessible..."
+    - |
+      for i in {1..30}; do
+        if docker exec web-app node -e "const http = require('http'); const req = http.request('http://localhost:3000', (res) => { process.exit(res.statusCode >= 200 && res.statusCode < 400 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();" 2>/dev/null; then
+          echo "✓ Web app is responding successfully"
+          break
+        fi
+        echo "Waiting for web-app to be ready... ($i/30)"
+        sleep 2
+      done
+    - docker logs web-app --tail 20
   script:
     - cd web-frontend
     - echo "Running Lighthouse CI for mobile..."
