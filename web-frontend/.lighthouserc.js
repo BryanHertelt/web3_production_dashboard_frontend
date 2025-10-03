@@ -2,7 +2,8 @@ module.exports = {
   ci: {
     collect: {
       url: ["http://web-app:3000"],
-      numberOfRuns: 3,
+      startServerCommand: "",       
+      staticDistDir: undefined,     
       settings: {
         // Use headless Chrome
         chromeFlags: "--no-sandbox --disable-dev-shm-usage --headless",
