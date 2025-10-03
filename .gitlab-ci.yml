@@ -5,7 +5,6 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # Run on MR creation/update
     - if: $CI_COMMIT_BRANCH == 'dev' && $CI_PIPELINE_SOURCE == 'push' # Run after merge to dev
     - if: $CI_COMMIT_BRANCH == 'pipeline-testing' && $CI_PIPELINE_SOURCE == 'push' # Run on pipeline-testing branch
-    - when: never # Exclude all other cases (feature branch pushes, etc.)
 
 stages:
   - install
@@ -15,7 +14,7 @@ stages:
   - build_docker
   - lighthouse
   - security
-  - deploy_docs
+  - docs
 
 variables:
   NODE_OPTIONS: "--max-old-space-size=2048"
@@ -69,8 +68,7 @@ typescript_check:
       - web-frontend/node_modules/
     policy: pull
   needs:
-    - job: install_dependencies
-      artifacts: false
+    - install_dependencies
   timeout: 3m
 
 # ---------------------------
@@ -90,8 +88,7 @@ eslint:
       - web-frontend/node_modules/
     policy: pull
   needs:
-    - job: install_dependencies
-      artifacts: false
+    - install_dependencies
   artifacts:
     reports:
       codequality: web-frontend/gl-codequality.json
@@ -116,8 +113,7 @@ test_jest:
       - web-frontend/node_modules/
     policy: pull
   needs:
-    - job: install_dependencies
-      artifacts: false
+    - install_dependencies
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
   artifacts:
     reports:
@@ -125,42 +121,39 @@ test_jest:
         coverage_format: cobertura
         path: web-frontend/coverage/cobertura-coverage.xml
       junit: web-frontend/coverage/junit.xml
-    paths:
-      - web-frontend/coverage/
-    when: always
-    expire_in: 5 days
   timeout: 8m
-
 
 # ---------------------------
 # Auto-format code and commit changes
 # ---------------------------
 prettier_format:
   stage: lint
+  image: node:20-bullseye-slim
   before_script:
-    - apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+    - apt-get update || apt-get update --allow-releaseinfo-change
+    - apt-get install -y --no-install-recommends ca-certificates gnupg git
+    - rm -rf /var/lib/apt/lists/*
     - git --version
     # Configure Git
-    - git config --global user.email "bryanhertelt@gmail.com"
-    - git config --global user.name "Pipeline"
+    - git config user.name "GitLab CI"
+    - git config user.email "ci@gitlab.com"
     # Set HTTPS URL with PAT for authentication
     - git remote set-url origin "https://oauth2:${ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
-     # Fetch and checkout the correct branch
+      # Fetch and checkout the correct branch
     - git fetch origin "${CI_COMMIT_REF_NAME}:${CI_COMMIT_REF_NAME}"
     - git checkout "${CI_COMMIT_REF_NAME}"
     # Debug: Verify remote and branch
-    - git remote -v
     - git branch
   script:
     - cd web-frontend
     # Run prettier format, allowing failures
-    - npm run format:write || true
+    - npm run format:write
     # Check for changes and push to remote
     - |
-      if ! git diff --quiet; then
+      if ! git diff --quiet .; then
         echo "Changes detected, committing and pushing to ${CI_COMMIT_REF_NAME}..."
         git add .
-        git commit -m "style: Auto-format code with Prettier. 
+        git commit -m "style: Auto-format code with Prettier.
 
         Co-Authored-By: GitLab CI <ci@gitlab.com>"
         git push origin HEAD:${CI_COMMIT_REF_NAME} -o ci.skip
@@ -177,7 +170,6 @@ prettier_format:
       - web-frontend/node_modules/
     policy: pull
   timeout: 5m
-
 
 # ---------------------------
 # Build Docker images
@@ -209,7 +201,6 @@ docker_build:
     - echo "Building web application Docker image with BuildKit and layer caching..."
     - |
       docker build \
-        --cache-from "$CI_REGISTRY_IMAGE:cache" \
         --cache-from "$CI_REGISTRY_IMAGE:latest" \
         --build-arg BUILDKIT_INLINE_CACHE=1 \
         --build-arg NEXT_PUBLIC_API_URL=http://localhost:3001 \
@@ -227,37 +218,25 @@ docker_build:
     - docker rmi "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" || true
     - docker rmi "$CI_REGISTRY_IMAGE/mock-api:latest" || true
     - docker rmi "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" || true
-    - docker rmi "$CI_REGISTRY_IMAGE:latest" || true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
-      when: always
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
-      when: always
-    - when: never
   timeout: 20m
-
 
 # ---------------------------
 # Lighthouse Performance Audit
 # ---------------------------
 lighthouse_audit:
   stage: lighthouse
-  image: cypress/browsers:node-20.18.0-chrome-130.0.6723.58-1-ff-131.0.3-edge-130.0.2849.46-1
+  image: cypress/browsers:latest
   needs: ["docker_build"]
   variables:
-    LHCI_BUILD_CONTEXT__CURRENT_HASH: "$CI_COMMIT_SHA"
-    LHCI_BUILD_CONTEXT__COMMIT_TIME: "$CI_COMMIT_TIMESTAMP"
-    LHCI_BUILD_CONTEXT__CURRENT_BRANCH: "$CI_COMMIT_REF_NAME"
-    LHCI_BUILD_CONTEXT__COMMIT_MESSAGE: "$CI_COMMIT_MESSAGE"
     DOCKER_HOST: unix:///var/run/docker.sock
   before_script:
     # Install Docker and Docker Compose
     - apt-get update && apt-get install -y curl docker.io docker-compose
     - docker --version
     - docker-compose --version
-
-    # Install Lighthouse CLI
-    - npm install -g @lhci/cli@latest
 
     # Login to GitLab Container Registry
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
@@ -297,11 +276,42 @@ lighthouse_audit:
       done
     - docker logs web-app --tail 20
   script:
-    - cd web-frontend
-    - echo "Running Lighthouse CI for mobile..."
-    - lhci autorun
-    - echo "Running Lighthouse CI for desktop..."
-    - lhci autorun --settings.preset=desktop
+  # Get the Docker network name and gateway IP to reach web-app
+  - NETWORK_NAME=$(docker network ls --filter "name=${CI_PROJECT_NAME}_default" --format "{{.Name}}" | head -1)
+  - GATEWAY_IP=$(docker network inspect "$NETWORK_NAME" -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
+
+  # Run Lighthouse CI in a container on the same network
+  - echo "Running Lighthouse CI for mobile..."
+  - |
+    docker run --rm \
+      --network="$NETWORK_NAME" \
+      -v "$(pwd)/web-frontend:/workspace" \
+      -w /workspace \
+      -e LHCI_BUILD_CONTEXT__CURRENT_HASH="$CI_COMMIT_SHA" \
+      -e LHCI_BUILD_CONTEXT__COMMIT_TIME="$CI_COMMIT_TIMESTAMP" \
+      -e LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME" \
+      -e LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE" \
+      cypress/browsers:latest \
+      sh -c "npm install -g @lhci/cli@latest && \
+             lhci collect && \
+             lhci assert && \
+             lhci upload"
+
+  - echo "Running Lighthouse CI for desktop..."
+  - |
+    docker run --rm \
+      --network="$NETWORK_NAME" \
+      -v "$(pwd)/web-frontend:/workspace" \
+      -w /workspace \
+      -e LHCI_BUILD_CONTEXT__CURRENT_HASH="$CI_COMMIT_SHA" \
+      -e LHCI_BUILD_CONTEXT__COMMIT_TIME="$CI_COMMIT_TIMESTAMP" \
+      -e LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME" \
+      -e LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE" \
+      cypress/browsers:latest \
+      sh -c "npm install -g @lhci/cli@latest && \
+             lhci collect --settings.preset=desktop && \
+             lhci assert && \
+             lhci upload"
   after_script:
     # Clean up docker-compose services
     - docker-compose down -v || true
@@ -357,7 +367,8 @@ security_secrets:
 # ---------------------------
 trivy_scan:
   stage: security
-  needs: ["docker_build"]
+  needs:
+    - "docker_build"
   image:
     name: aquasec/trivy:latest
     entrypoint: [""]
@@ -385,10 +396,7 @@ trivy_scan:
     expire_in: 5 days
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
-      when: always
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
-      when: always
-    - when: never
   timeout: 10m
 
 # ---------------------------
@@ -408,16 +416,105 @@ security_audit:
       - web-frontend/node_modules/
     policy: pull
   needs:
-    - job: install_dependencies
-      artifacts: false
-  allow_failure: true
+    - install_dependencies
   timeout: 5m
+
+# ---------------------------
+# Semgrep security scanning
+# ---------------------------
+semgrep_scan:
+  stage: security
+  image: python:3.11-slim
+  timeout: 8 minutes
+  needs: ["install_dependencies"]
+  cache:
+    key: ${CI_PROJECT_ID}-pip-cache
+    paths:
+      - .cache/pip/
+    policy: pull-push
+  before_script:
+    - pip install semgrep
+    - apt-get update && apt-get install -y git
+  script:
+    - echo "Running Semgrep security scanner on JavaScript/TypeScript files..."
+    - cd web-frontend
+    - semgrep --config=auto --config=p/security-audit --config=p/owasp-top-ten --config=p/react src/ --exclude="*/__test__/*" --exclude="*/tests/*" --exclude="*.test.*" --json --output semgrep-report.json || true
+
+    # Security evaluation with detailed output
+    - |
+      python3 -c "
+      import json
+      import sys
+
+      total_issues = 0
+      critical_issues = []
+
+      # Check Semgrep results
+      try:
+          with open('semgrep-report.json', 'r') as f:
+              semgrep_data = json.load(f)
+          
+          semgrep_results = semgrep_data.get('results', [])
+          semgrep_critical = [r for r in semgrep_results if r.get('extra', {}).get('severity') == 'ERROR']
+          semgrep_warnings = [r for r in semgrep_results if r.get('extra', {}).get('severity') == 'WARNING']
+          total_issues += len(semgrep_results)
+          critical_issues.extend(semgrep_critical)
+          
+          print(f'Semgrep: {len(semgrep_results)} total issues found')
+          print(f'  - {len(semgrep_critical)} critical (ERROR)')
+          print(f'  - {len(semgrep_warnings)} warnings (WARNING)')
+          print(f'  - {len(semgrep_results) - len(semgrep_critical) - len(semgrep_warnings)} info/other')
+          
+          if semgrep_critical:
+              print()
+              print('=== Critical Security Issues (ERROR) ===')
+              for issue in semgrep_critical:
+                  extra = issue.get('extra', {})
+                  print(f'  🔴 [{extra.get(\"severity\", \"ERROR\")}] {extra.get(\"message\", \"\")}')
+                  print(f'     Rule: {issue.get(\"check_id\", \"\")}')
+                  print(f'     File: {issue.get(\"path\", \"\")}:{issue.get(\"start\", {}).get(\"line\", \"\")}')
+                  if extra.get('references'):
+                      print(f'     References: {extra.get(\"references\", [])}')
+                  print()
+          
+          if semgrep_warnings:
+              print('=== Security Warnings (WARNING) ===')
+              for issue in semgrep_warnings[:5]:  # Show first 5 warnings
+                  extra = issue.get('extra', {})
+                  print(f'  🟡 [{extra.get(\"severity\", \"WARNING\")}] {extra.get(\"message\", \"\")}')
+                  print(f'     Rule: {issue.get(\"check_id\", \"\")}')
+                  print(f'     File: {issue.get(\"path\", \"\")}:{issue.get(\"start\", {}).get(\"line\", \"\")}')
+              if len(semgrep_warnings) > 5:
+                  print(f'  ... and {len(semgrep_warnings) - 5} more warnings')
+              print()
+              
+      except Exception as e:
+          print(f'Semgrep parsing error: {e}')
+          sys.exit(1)
+
+      print(f'Total security issues found: {total_issues}')
+      print(f'Critical issues requiring immediate attention: {len(critical_issues)}')
+
+      if critical_issues:
+          print('❌ Pipeline failing due to critical security issues')
+          sys.exit(1)
+      else:
+          print('✅ No critical security issues found')
+      "
+  artifacts:
+    reports:
+      sast: web-frontend/semgrep-report.json
+    paths:
+      - web-frontend/semgrep-report.json
+    when: always
+    expire_in: 1 week
 
 # ---------------------------
 # Generate and deploy documentation to GitLab Pages
 # ---------------------------
-pages:
-  stage: deploy_docs
+build_docs:
+  stage: docs
+  pages: true
   script:
     - cd web-frontend
     - npm run docs
@@ -433,18 +530,11 @@ pages:
       - web-frontend/node_modules/
     policy: pull
   needs:
-    - job: install_dependencies
-      artifacts: false
-  artifacts:
-    paths:
-      - public
-    expire_in: 30 days
+    - install_dependencies
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev" && $CI_PIPELINE_SOURCE == "push"'
-      when: always
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-    - when: never
+    - if: $CI_COMMIT_BRANCH == 'pipeline-testing' && $CI_PIPELINE_SOURCE == 'push'
   timeout: 10m
 
 # ---------------------------
