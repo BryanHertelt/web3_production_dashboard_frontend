@@ -295,7 +295,7 @@ lighthouse_audit:
         -e LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME" \
         -e LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE" \
         cypress/browsers:latest \
-        sh -c "npm install -g @lhci/cli@latest && lhci autorun"
+        sh -c "npm install -g @lhci/cli@latest && lhci collect && lhci assert && lhci upload"
 
     - echo "Running Lighthouse CI for desktop..."
     - |
@@ -308,7 +308,7 @@ lighthouse_audit:
         -e LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME" \
         -e LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE" \
         cypress/browsers:latest \
-        sh -c "npm install -g @lhci/cli@latest && lhci autorun --settings.preset=desktop"
+        sh -c "npm install -g @lhci/cli@latest && lhci collect --settings.preset=desktop && lhci assert && lhci upload"
   after_script:
     # Clean up docker-compose services
     - docker-compose down -v || true
