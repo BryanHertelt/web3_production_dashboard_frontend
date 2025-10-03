@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CryptoDashboard from "../pages/dashboard/dashboard-page";
 import "@testing-library/jest-dom";
 
@@ -93,7 +94,11 @@ describe("CryptoDashboard component", () => {
     jest.clearAllMocks();
   });
   test("renders the dashboard layout correctly", async () => {
-    render(await CryptoDashboard());
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        {await CryptoDashboard()}
+      </QueryClientProvider>
+    );
 
     // Check main container
     const mainContainer = screen.getByRole("main");
@@ -114,7 +119,11 @@ describe("CryptoDashboard component", () => {
   });
 
   test("renders with correct overall structure", async () => {
-    const { container } = render(await CryptoDashboard());
+    const { container } = render(
+      <QueryClientProvider client={new QueryClient()}>
+        {await CryptoDashboard()}
+      </QueryClientProvider>
+    );
 
     // Check root div
     const rootDiv = container.firstChild;
@@ -130,7 +139,11 @@ describe("CryptoDashboard component", () => {
   });
 
   test("fetches and renders card data correctly", async () => {
-    render(await CryptoDashboard());
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        {await CryptoDashboard()}
+      </QueryClientProvider>
+    );
 
     // Verify fetch was called
     expect(fetch).toHaveBeenCalledWith("http://localhost:3001/infocards");
@@ -148,7 +161,11 @@ describe("CryptoDashboard component", () => {
 
     const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
-    render(await CryptoDashboard());
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        {await CryptoDashboard()}
+      </QueryClientProvider>
+    );
 
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining("An error occured")
@@ -158,7 +175,11 @@ describe("CryptoDashboard component", () => {
   });
 
   test("renders table with correct configuration", async () => {
-    render(await CryptoDashboard());
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        {await CryptoDashboard()}
+      </QueryClientProvider>
+    );
 
     // Check that table is rendered with the correct number of headers
     expect(screen.getByText("Table with 5 headers")).toBeInTheDocument();
