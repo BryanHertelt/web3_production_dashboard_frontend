@@ -276,39 +276,44 @@ lighthouse_audit:
       done
     - docker logs web-app --tail 20
   script:
-    # Get the Docker network name and gateway IP to reach web-app
-    - NETWORK_NAME=$(docker network ls --filter "name=${CI_PROJECT_NAME}_default" --format "{{.Name}}" | head -1)
-    - echo "Using Docker network ':' $NETWORK_NAME"
-    - GATEWAY_IP=$(docker network inspect "$NETWORK_NAME" -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
-    - echo "Docker gateway IP ':' $GATEWAY_IP"
+  # Get the Docker network name and gateway IP to reach web-app
+  - NETWORK_NAME=$(docker network ls --filter "name=${CI_PROJECT_NAME}_default" --format "{{.Name}}" | head -1)
+  - echo "Using Docker network ':' $NETWORK_NAME"
+  - GATEWAY_IP=$(docker network inspect "$NETWORK_NAME" -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
+  - echo "Docker gateway IP ':' $GATEWAY_IP"
 
-    # Run Lighthouse CI in a container on the same network
-    - cd web-frontend
-    - echo "Running Lighthouse CI for mobile..."
-    - |
-      docker run --rm \
-        --network="$NETWORK_NAME" \
-        -v "$(pwd):/workspace" \
-        -w /workspace \
-        -e LHCI_BUILD_CONTEXT__CURRENT_HASH="$CI_COMMIT_SHA" \
-        -e LHCI_BUILD_CONTEXT__COMMIT_TIME="$CI_COMMIT_TIMESTAMP" \
-        -e LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME" \
-        -e LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE" \
-        cypress/browsers:latest \
-        sh -c "npm install -g @lhci/cli@latest && lhci collect && lhci assert && lhci upload"
+  # Run Lighthouse CI in a container on the same network
+  - echo "Running Lighthouse CI for mobile..."
+  - |
+    docker run --rm \
+      --network="$NETWORK_NAME" \
+      -v "$(pwd):/workspace" \
+      -w /workspace \
+      -e LHCI_BUILD_CONTEXT__CURRENT_HASH="$CI_COMMIT_SHA" \
+      -e LHCI_BUILD_CONTEXT__COMMIT_TIME="$CI_COMMIT_TIMESTAMP" \
+      -e LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME" \
+      -e LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE" \
+      cypress/browsers:latest \
+      sh -c "npm install -g @lhci/cli@latest && \
+             lhci collect --config=web-frontend/.lighthouserc.js && \
+             lhci assert --config=web-frontend/.lighthouserc.js && \
+             lhci upload --config=web-frontend/.lighthouserc.js"
 
-    - echo "Running Lighthouse CI for desktop..."
-    - |
-      docker run --rm \
-        --network="$NETWORK_NAME" \
-        -v "$(pwd):/workspace" \
-        -w /workspace \
-        -e LHCI_BUILD_CONTEXT__CURRENT_HASH="$CI_COMMIT_SHA" \
-        -e LHCI_BUILD_CONTEXT__COMMIT_TIME="$CI_COMMIT_TIMESTAMP" \
-        -e LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME" \
-        -e LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE" \
-        cypress/browsers:latest \
-        sh -c "npm install -g @lhci/cli@latest && lhci collect --settings.preset=desktop && lhci assert && lhci upload"
+  - echo "Running Lighthouse CI for desktop..."
+  - |
+    docker run --rm \
+      --network="$NETWORK_NAME" \
+      -v "$(pwd):/workspace" \
+      -w /workspace \
+      -e LHCI_BUILD_CONTEXT__CURRENT_HASH="$CI_COMMIT_SHA" \
+      -e LHCI_BUILD_CONTEXT__COMMIT_TIME="$CI_COMMIT_TIMESTAMP" \
+      -e LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME" \
+      -e LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE" \
+      cypress/browsers:latest \
+      sh -c "npm install -g @lhci/cli@latest && \
+             lhci collect --config=web-frontend/.lighthouserc.js --settings.preset=desktop && \
+             lhci assert --config=web-frontend/.lighthouserc.js && \
+             lhci upload --config=web-frontend/.lighthouserc.js"
   after_script:
     # Clean up docker-compose services
     - docker-compose down -v || true
