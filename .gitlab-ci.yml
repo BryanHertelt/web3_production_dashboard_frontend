@@ -228,15 +228,13 @@ docker_build:
 # ---------------------------
 lighthouse_audit:
   stage: lighthouse
-  image: cypress/browsers:latest
+  image: docker:26
   needs: ["docker_build"]
   variables:
     DOCKER_HOST: unix:///var/run/docker.sock
   before_script:
-    # Install Docker and Docker Compose
-    - apt-get update && apt-get install -y curl docker.io docker-compose
-    - docker --version
-    - docker-compose --version
+    # Install Docker Compose
+    - apk add --no-cache docker-compose
 
     # Login to GitLab Container Registry
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
@@ -248,7 +246,6 @@ lighthouse_audit:
     # Create docker-compose override to use registry images
     - |
       cat > docker-compose.override.yml <<EOF
-      version: '3.8'
       services:
         mock-api:
           image: $CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA
@@ -257,64 +254,12 @@ lighthouse_audit:
           image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
           build: {}
       EOF
-
-    # Start services with docker-compose (wait for healthchecks to pass)
-    - echo "Starting services and waiting for healthchecks..."
-    - docker-compose up -d --wait
-    - echo "All services are healthy and ready!"
-
-    # Verify web-app is accessible before running Lighthouse
-    - echo "Verifying web-app is accessible..."
-    - |
-      for i in {1..30}; do
-        if docker exec web-app node -e "const http = require('http'); const req = http.request('http://localhost:3000', (res) => { process.exit(res.statusCode >= 200 && res.statusCode < 400 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();" 2>/dev/null; then
-          echo "✓ Web app is responding successfully"
-          break
-        fi
-        echo "Waiting for web-app to be ready... ($i/30)"
-        sleep 2
-      done
-    - docker logs web-app --tail 20
   script:
-  # Get the Docker network name and gateway IP to reach web-app
-  - NETWORK_NAME=$(docker network ls --filter "name=${CI_PROJECT_NAME}_default" --format "{{.Name}}" | head -1)
-  - GATEWAY_IP=$(docker network inspect "$NETWORK_NAME" -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
-
-  # Run Lighthouse CI in a container on the same network
-  - echo "Running Lighthouse CI for mobile..."
-  - |
-    docker run --rm \
-      --network="$NETWORK_NAME" \
-      -v "$(pwd)/web-frontend:/workspace" \
-      -w /workspace \
-      -e LHCI_BUILD_CONTEXT__CURRENT_HASH="$CI_COMMIT_SHA" \
-      -e LHCI_BUILD_CONTEXT__COMMIT_TIME="$CI_COMMIT_TIMESTAMP" \
-      -e LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME" \
-      -e LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE" \
-      cypress/browsers:latest \
-      sh -c "npm install -g @lhci/cli@latest && \
-             lhci collect && \
-             lhci assert && \
-             lhci upload"
-
-  - echo "Running Lighthouse CI for desktop..."
-  - |
-    docker run --rm \
-      --network="$NETWORK_NAME" \
-      -v "$(pwd)/web-frontend:/workspace" \
-      -w /workspace \
-      -e LHCI_BUILD_CONTEXT__CURRENT_HASH="$CI_COMMIT_SHA" \
-      -e LHCI_BUILD_CONTEXT__COMMIT_TIME="$CI_COMMIT_TIMESTAMP" \
-      -e LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME" \
-      -e LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE" \
-      cypress/browsers:latest \
-      sh -c "npm install -g @lhci/cli@latest && \
-             lhci collect --settings.preset=desktop && \
-             lhci assert && \
-             lhci upload"
+    # Run Lighthouse CI via docker-compose with the lighthouse profile
+    - docker-compose --profile lighthouse up --exit-code-from lighthouse
   after_script:
     # Clean up docker-compose services
-    - docker-compose down -v || true
+    - docker-compose --profile lighthouse down -v || true
   artifacts:
     paths:
       - web-frontend/lighthouse-reports/
