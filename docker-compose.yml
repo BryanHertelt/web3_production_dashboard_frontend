@@ -41,6 +41,7 @@ services:
   lighthouse:
     image: zenika/alpine-chrome:with-node
     container_name: lighthouse
+    user: root
     working_dir: /workspace/web-frontend
     volumes:
       - ./web-frontend:/workspace/web-frontend
