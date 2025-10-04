@@ -4,7 +4,7 @@ module.exports = {
       url: ["http://web-app:3000"],
       settings: {
         // Chrome flags for Docker environment (headful mode for better rendering)
-        chromeFlags: "--no-sandbox --disable-dev-shm-usage",
+        chromeFlags: "--headless --no-sandbox --disable-dev-shm-usage",
         // Maximum time to wait for page load (90 seconds)
         maxWaitForLoad: 90000,
       },
