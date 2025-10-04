@@ -279,6 +279,10 @@ lighthouse_audit:
       done
     - docker logs web-app --tail 20
   script:
+    # Get the IP address of the web-app container
+    - export WEB_APP_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' web-app)
+    - echo "Web app container IP $WEB_APP_IP"
+
     # Change to web-frontend directory where lighthouserc.js is located
     - cd web-frontend
     - echo "Current directory:" && pwd
@@ -290,15 +294,15 @@ lighthouse_audit:
     - export LHCI_BUILD_CONTEXT__CURRENT_BRANCH="$CI_COMMIT_REF_NAME"
     - export LHCI_BUILD_CONTEXT__COMMIT_MESSAGE="$CI_COMMIT_MESSAGE"
 
-    # Run Lighthouse CI for mobile
+    # Run Lighthouse CI for mobile using the container IP
     - echo "Running Lighthouse CI for mobile..."
-    - lhci collect
+    - lhci collect --url="http://$WEB_APP_IP:3000"
     - lhci assert
     - lhci upload
 
-    # Run Lighthouse CI for desktop
+    # Run Lighthouse CI for desktop using the container IP
     - echo "Running Lighthouse CI for desktop..."
-    - lhci collect --settings.preset=desktop
+    - lhci collect --url="http://$WEB_APP_IP:3000" --settings.preset=desktop
     - lhci assert
     - lhci upload
   after_script:
