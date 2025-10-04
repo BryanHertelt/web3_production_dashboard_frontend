@@ -3,10 +3,10 @@ module.exports = {
     collect: {
       url: ["http://web-app:3000"],
       settings: {
-        // Use headless Chrome
-        chromeFlags: "--no-sandbox --disable-dev-shm-usage --headless",
-        // Wait for network to have at most two connections left for 500 ms
-        waitUntil: "networkidle2",
+        // Chrome flags for Docker environment (headful mode for better rendering)
+        chromeFlags: "--no-sandbox --disable-dev-shm-usage",
+        // Maximum time to wait for page load (90 seconds)
+        maxWaitForLoad: 90000,
       },
     },
     assert: {
