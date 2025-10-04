@@ -39,9 +39,8 @@ services:
       start_period: 30s
 
   lighthouse:
-    image: zenika/alpine-chrome:with-node
+    image: cypress/browsers:latest
     container_name: lighthouse
-    user: root
     working_dir: /workspace/web-frontend
     volumes:
       - ./web-frontend:/workspace/web-frontend
