@@ -56,11 +56,11 @@ services:
       sh -c "
       npm install -g @lhci/cli@latest &&
       echo 'Running Lighthouse CI for mobile...' &&
-      lhci collect --url=http://web-app:3000 &&
+      lhci collect --url=http://web-app:3000 --chrome-flags='--headless --no-sandbox --disable-dev-shm-usage' --max-wait-for-load=90000 &&
       lhci assert &&
       lhci upload &&
       echo 'Running Lighthouse CI for desktop...' &&
-      lhci collect --url=http://web-app:3000 --settings.preset=desktop &&
+      lhci collect --url=http://web-app:3000 --settings.preset=desktop --chrome-flags='--headless --no-sandbox --disable-dev-shm-usage' --max-wait-for-load=90000 &&
       lhci assert &&
       lhci upload
       "
