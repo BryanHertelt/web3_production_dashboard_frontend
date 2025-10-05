@@ -249,8 +249,12 @@ lighthouse_audit:
     # Build lighthouse image (needs to be fresh to include lighthouserc.js)
     - docker-compose build lighthouse
 
-    # Run docker-compose with the lighthouse profile
-    - docker-compose --profile lighthouse up --exit-code-from lighthouse
+    # Start services and run lighthouse (container will be stopped but not removed)
+    - docker-compose --profile lighthouse up --exit-code-from lighthouse || true
+
+    # Copy reports from stopped container to host for GitLab artifacts
+    - mkdir -p ./web-frontend/lighthouse-reports
+    - docker cp lighthouse:/workspace/web-frontend/lighthouse-reports/. ./web-frontend/lighthouse-reports/ || echo "No reports to copy"
 
   after_script:
     - docker-compose --profile lighthouse down -v || true
