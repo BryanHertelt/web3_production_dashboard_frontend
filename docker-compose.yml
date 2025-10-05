@@ -44,7 +44,6 @@ services:
       dockerfile: Dockerfile.lighthouse
     container_name: lighthouse
     working_dir: /workspace/web-frontend
-    # Volume mount removed - use docker cp to extract reports in CI
     # For local dev: docker cp lighthouse:/workspace/web-frontend/lighthouse-reports ./web-frontend/
     depends_on:
       web-app:
