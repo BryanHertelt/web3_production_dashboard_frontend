@@ -11,5 +11,9 @@ WORKDIR /workspace/web-frontend
 # Copy lighthouse configuration into the image
 COPY web-frontend/lighthouserc.js ./lighthouserc.js
 
+# Create lighthouse-reports directory with world-writable permissions
+RUN mkdir -p /workspace/web-frontend/lighthouse-reports \
+    && chmod 777 /workspace/web-frontend/lighthouse-reports
+
 # Keep running as root to allow SYS_ADMIN capability to work properly
 # The cap_add: SYS_ADMIN in docker-compose will allow Chrome sandboxing
