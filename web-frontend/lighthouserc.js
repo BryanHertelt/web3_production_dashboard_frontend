@@ -1,13 +1,7 @@
 module.exports = {
   ci: {
     collect: {
-      url: ["http://web-app:3000"],
-      settings: {
-        // Chrome flags for Docker environment (headful mode for better rendering)
-        chromeFlags: "--headless --no-sandbox --disable-dev-shm-usage",
-        // Maximum time to wait for page load (90 seconds)
-        maxWaitForLoad: 90000,
-      },
+      url: ["http://web-app:3000"]
     },
     assert: {
       // Performance thresholds - adjust these based on your requirements
