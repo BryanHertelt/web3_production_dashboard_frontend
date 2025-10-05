@@ -45,7 +45,7 @@ services:
     container_name: lighthouse
     working_dir: /workspace/web-frontend
     volumes:
-      - ./web-frontend:/workspace/web-frontend
+      - ./web-frontend/lighthouse-reports:/workspace/web-frontend/lighthouse-reports
     depends_on:
       web-app:
         condition: service_healthy
