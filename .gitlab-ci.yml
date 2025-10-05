@@ -228,43 +228,120 @@ docker_build:
 # ---------------------------
 lighthouse_audit:
   stage: lighthouse
-  image: docker:26
-  needs: ["docker_build"]
-  variables:
-    DOCKER_HOST: unix:///var/run/docker.sock
+  image: patrickhulce/lhci-client:latest
+  needs: []
   before_script:
-    # Install Docker Compose
-    - apk add --no-cache docker-compose
+    - apt-get update && apt-get install -y curl procps net-tools
+    # Install Mockoon CLI
+    - npm install -g @mockoon/cli@latest
 
-    # Login to GitLab Container Registry
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
-
-    # Pull pre-built images from registry
-    - docker pull "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
-    - docker pull "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-
-    # Create docker-compose override to use registry images
-    - |
-      cat > docker-compose.override.yml <<EOF
-      services:
-        mock-api:
-          image: $CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA
-          build: {}
-        web-app:
-          image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-          build: {}
-      EOF
+    - cd web-frontend
   script:
-    # Run Lighthouse CI via docker-compose with the lighthouse profile
-    - docker-compose --profile lighthouse up --exit-code-from lighthouse
+    # Verify mock API data file exists
+    - |
+      if [ ! -f "mock_api/demo.json" ]; then
+        echo "ERROR: mock_api/demo.json not found!"
+        ls -la mock_api/ || true
+        exit 1
+      fi
+      echo "Mock API data file found at: $(pwd)/mock_api/demo.json"
+
+    # Start Mockoon mock API in background with verbose logging
+    - mockoon-cli start --data mock_api/demo.json --port 3001 --log-transaction > mockoon.log 2>&1 &
+    - MOCKOON_PID=$!
+    - echo "Started Mockoon with PID $MOCKOON_PID"
+
+    # Give Mockoon a moment to start
+    - sleep 2
+
+    # Check if Mockoon process is still running
+    - |
+      if ! ps -p $MOCKOON_PID > /dev/null 2>&1; then
+        echo "ERROR: Mockoon process died immediately after starting"
+        echo "=== Mockoon logs ==="
+        cat mockoon.log || true
+        exit 1
+      fi
+
+    # Debug network state
+    - |
+      echo "=== Network debugging ==="
+      echo "Listening ports:"
+      netstat -tlnp 2>/dev/null || ss -tlnp 2>/dev/null || true
+      echo "=== Mockoon log output so far ==="
+      cat mockoon.log || true
+
+    # Wait for mock API to be ready
+    - |
+      echo "Waiting for mock API to be ready..."
+      for i in {1..15}; do
+        echo "Attempt $i/15..."
+
+        # Try to curl with more details
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001/users 2>&1) || HTTP_CODE="failed"
+        echo "HTTP response code: $HTTP_CODE"
+
+        if [ "$HTTP_CODE" = "200" ]; then
+          echo "Mock API is ready!"
+          break
+        fi
+
+        if [ $i -eq 15 ]; then
+          echo "Mock API failed to start after 15 attempts"
+          echo "=== Final debugging info ==="
+          echo "Mockoon process status:"
+          ps aux | grep mockoon || true
+          echo "=== Full Mockoon logs ==="
+          cat mockoon.log || true
+          echo "=== Attempting verbose curl ==="
+          curl -v http://localhost:3001/users || true
+          echo "=== Trying root endpoint ==="
+          curl -v http://localhost:3001/ || true
+          exit 1
+        fi
+        sleep 2
+      done
+
+    # Build the web application
+    - npm ci --cache .npm --prefer-offline
+    - npm run build
+
+    # Start the web app in background
+    - npm start &
+    - WEBAPP_PID=$!
+
+    # Wait for web app to be ready
+    - |
+      for i in {1..30}; do
+        if curl -s http://localhost:3000 > /dev/null 2>&1; then
+          echo "Web application is ready!"
+          break
+        fi
+        if [ $i -eq 30 ]; then
+          echo "Web application failed to start"
+          exit 1
+        fi
+        sleep 1
+      done
+
+    # Run Lighthouse CI for mobile
+    - echo "Running Lighthouse CI for mobile..."
+    - lhci collect --chrome-flags='--no-sandbox --disable-dev-shm-usage'
+    - lhci assert
+    - lhci upload
+
+    # Run Lighthouse CI for desktop
+    - echo "Running Lighthouse CI for desktop..."
+    - lhci collect --settings.preset=desktop --chrome-flags='--no-sandbox --disable-dev-shm-usage'
+    - lhci assert
+    - lhci upload
   after_script:
-    # Clean up docker-compose services
-    - docker-compose --profile lighthouse down -v || true
+    # Cleanup processes
+    - kill $MOCKOON_PID 2>/dev/null || true
+    - kill $WEBAPP_PID 2>/dev/null || true
   artifacts:
     paths:
       - web-frontend/lighthouse-reports/
-    reports:
-      performance: web-frontend/lighthouse-reports/lhr-*.json
     expire_in: 30 days
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
