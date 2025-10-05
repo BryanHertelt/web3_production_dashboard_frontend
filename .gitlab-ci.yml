@@ -246,6 +246,9 @@ lighthouse_audit:
     - docker tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" web-app:latest
     - docker tag "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" mock-api:latest
 
+    # Build lighthouse image (needs to be fresh to include lighthouserc.js)
+    - docker-compose build lighthouse
+
     # Run docker-compose with the lighthouse profile
     - docker-compose --profile lighthouse up --exit-code-from lighthouse
 
