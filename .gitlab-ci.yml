@@ -221,6 +221,7 @@ docker_build:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   timeout: 20m
 
 # ---------------------------
@@ -230,7 +231,7 @@ lighthouse_audit:
   stage: lighthouse
   image: docker:26
   needs:
-    - docker_build
+    - ["docker_build"]
   variables:
     DOCKER_HOST: unix:///var/run/docker.sock
     DOCKER_BUILDKIT: "1"
@@ -264,12 +265,8 @@ lighthouse_audit:
     expire_in: 30 days
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
-      when: always
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
-      when: always
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-    - when: never
   timeout: 15m
 
 
