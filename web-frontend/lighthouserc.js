@@ -1,7 +1,7 @@
 module.exports = {
   ci: {
     collect: {
-      url: ["http://web-app:3000"]
+      url: ["http://web-app:3000"],
     },
     assert: {
       // Performance thresholds - adjust these based on your requirements
