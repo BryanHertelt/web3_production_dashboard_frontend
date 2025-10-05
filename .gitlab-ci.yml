@@ -229,42 +229,31 @@ docker_build:
 lighthouse_audit:
   stage: lighthouse
   image: docker:26
-  needs: ["docker_build"]
+  needs:
+    - docker_build
   variables:
     DOCKER_HOST: unix:///var/run/docker.sock
+    DOCKER_BUILDKIT: "1"
   before_script:
-    # Install Docker Compose
     - apk add --no-cache docker-compose
-
-    # Login to GitLab Container Registry
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
-
-    # Pull pre-built images from registry
-    - docker pull "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
-    - docker pull "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-
-    # Create docker-compose override to use registry images
-    - |
-      cat > docker-compose.override.yml <<EOF
-      services:
-        mock-api:
-          image: $CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA
-          build: {}
-        web-app:
-          image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-          build: {}
-      EOF
   script:
-    # Run Lighthouse CI via docker-compose with the lighthouse profile
+    # Pull the built images
+    - docker pull "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    - docker pull "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
+
+    # Tag them for docker-compose
+    - docker tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" web-app:latest
+    - docker tag "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" mock-api:latest
+
+    # Run docker-compose with the lighthouse profile
     - docker-compose --profile lighthouse up --exit-code-from lighthouse
+
   after_script:
-    # Clean up docker-compose services
     - docker-compose --profile lighthouse down -v || true
   artifacts:
     paths:
       - web-frontend/lighthouse-reports/
-    reports:
-      performance: web-frontend/lighthouse-reports/lhr-*.json
     expire_in: 30 days
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
