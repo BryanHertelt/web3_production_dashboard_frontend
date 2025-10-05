@@ -8,5 +8,8 @@ RUN mkdir -p /home/lhci/Downloads /workspace/web-frontend /tmp/.X11-unix \
 # Set working directory
 WORKDIR /workspace/web-frontend
 
+# Copy lighthouse configuration into the image
+COPY web-frontend/lighthouserc.js ./lighthouserc.js
+
 # Keep running as root to allow SYS_ADMIN capability to work properly
 # The cap_add: SYS_ADMIN in docker-compose will allow Chrome sandboxing

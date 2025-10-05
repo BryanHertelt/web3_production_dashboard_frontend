@@ -2,12 +2,7 @@ module.exports = {
   ci: {
     collect: {
       url: ["http://web-app:3000"],
-      chromeFlags: [
-        "--no-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-        "--headless=new",
-      ],
+      chromeFlags: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--headless=new"]
     },
     assert: {
       // Performance thresholds - adjust these based on your requirements
