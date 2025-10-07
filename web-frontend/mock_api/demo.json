@@ -121,8 +121,8 @@
       "uuid": "66b3e1fc-c5f8-4d9f-b2f9-604bb0abf748"
     }
   ],
-  "proxyMode": false,
-  "proxyHost": "",
+  "proxyMode": true,
+  "proxyHost": "http://host.docker.internal:8080",
   "proxyRemovePrefix": false,
   "tlsOptions": {
     "enabled": false,
