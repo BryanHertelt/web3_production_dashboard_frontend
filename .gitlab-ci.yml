@@ -172,9 +172,9 @@ prettier_format:
   timeout: 5m
 
 # ---------------------------
-# Build Docker images
+# Build Mock Api image
 # ---------------------------
-docker_build:
+build_mockoon:
   stage: build_docker
   image: docker:26
   variables:
@@ -187,8 +187,10 @@ docker_build:
     # Build Mockoon mock API image
     - cd web-frontend/mock_api
     - echo "Building Mockoon Docker image..."
+    - docker pull "$CI_REGISTRY_IMAGE/mock-api:latest" || true 
     - |
-      docker build --no-cache \
+      docker build \
+        --cache-from "$CI_REGISTRY_IMAGE/mock-api:latest" \
         -t "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" \
         -t "$CI_REGISTRY_IMAGE/mock-api:latest" \
         .
@@ -196,29 +198,49 @@ docker_build:
     - docker push "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
     - docker push "$CI_REGISTRY_IMAGE/mock-api:latest"
 
-    # Build web application image
-    - cd ..
+    - echo "Removing docker images from runner..."
+    - docker rmi "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" || true
+
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  timeout: 20m
+
+
+# ---------------------------
+# Build web app image
+# ---------------------------
+build_frontend:
+  stage: build_docker
+  image: docker:26
+  variables:
+    DOCKER_HOST: unix:///var/run/docker.sock
+    DOCKER_BUILDKIT: "1"
+    BUILDKIT_PROGRESS: plain
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
+  script:
+    - cd web-frontend
     - echo "Building web application Docker image with BuildKit and layer caching..."
-    - docker pull "$CI_REGISTRY_IMAGE:latest" || true 
+    - docker pull "$CI_REGISTRY_IMAGE/frontend:latest" || true 
     - |
       docker build \
-        --cache-from "$CI_REGISTRY_IMAGE:latest" \
+        --cache-from "$CI_REGISTRY_IMAGE/frontend:latest" \
         --build-arg BUILDKIT_INLINE_CACHE=1 \
         --build-arg NEXT_PUBLIC_API_URL=http://localhost:3001 \
         --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
         --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
-        -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" \
-        -t "$CI_REGISTRY_IMAGE:latest" \
+        -t "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA" \
+        -t "$CI_REGISTRY_IMAGE/frontend:latest" \
         .
     - echo "Pushing web application images to registry..."
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-    - docker push "$CI_REGISTRY_IMAGE:latest"
+    - docker push "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE/frontend:latest"
 
     # Clean up
     - echo "Removing docker images from runner..."
-    - docker rmi "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" || true
-    - docker rmi "$CI_REGISTRY_IMAGE/mock-api:latest" || true
-    - docker rmi "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" || true
+    - docker rmi "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA" || true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
@@ -232,7 +254,8 @@ lighthouse_audit:
   stage: lighthouse
   image: docker:26
   needs:
-    - ["docker_build"]
+    - build_frontend
+    - build_mockoon
   variables:
     DOCKER_HOST: unix:///var/run/docker.sock
     DOCKER_BUILDKIT: "1"
@@ -240,11 +263,11 @@ lighthouse_audit:
     - apk add --no-cache docker-compose
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
   script:
-    - docker pull "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    - docker pull "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA"
     - docker pull "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
 
-    - docker tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" web-app:latest
-    - docker tag "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" mock-api:latest
+    - docker tag "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA" web_web-app:latest
+    - docker tag "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" web_mock-api:latest
 
     - docker-compose build lighthouse
 
@@ -303,14 +326,15 @@ security_secrets:
 trivy_scan:
   stage: security
   needs:
-    - "docker_build"
+    - "build_frontend"
+    - "build_mockoon"
   image:
     name: aquasec/trivy:latest
     entrypoint: [""]
   before_script: []
   variables:
-    WEB_APP: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-    MOCK_API: $CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
+    WEB_APP: "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA"
+    MOCK_API: "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
     TRIVY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/trivy"
   cache:
     key: trivy-db
