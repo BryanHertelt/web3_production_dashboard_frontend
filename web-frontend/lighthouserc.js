@@ -3,7 +3,6 @@ module.exports = {
     collect: {
       url: ["http://web-app:3000"],
       chromeFlags: [
-        "--no-sandbox",
         "--disable-dev-shm-usage",
         "--disable-gpu",
         "--headless=new",
