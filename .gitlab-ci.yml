@@ -248,7 +248,7 @@ lighthouse_audit:
 
     - docker-compose build lighthouse
 
-    - docker-compose --profile lighthouse up --exit-code-from lighthouse || true
+    - docker-compose --profile lighthouse up --exit-code-from lighthouse 
 
     # Copy reports from stopped container to host for GitLab artifacts
     - mkdir -p ./web-frontend/lighthouse-reports
