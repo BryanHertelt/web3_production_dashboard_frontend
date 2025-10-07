@@ -7,7 +7,7 @@ services:
     ports:
       - "3001:3001"
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 3001 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/healthcheck || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -18,7 +18,7 @@ services:
       context: ./web-frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:3001
+        NEXT_PUBLIC_API_URL: http://mock-api:3001
     container_name: web-app
     ports:
       - "3000:3000"
@@ -28,10 +28,8 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "node",
-          "-e",
-          "const http = require('http'); const req = http.request('http://localhost:3000', (res) => { process.exit(res.statusCode >= 200 && res.statusCode < 400 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();",
+          "CMD-SHELL",
+          "curl -f http://localhost:3000 && curl -f http://mock-api:3001/healthcheck || exit 1",
         ]
       interval: 10s
       timeout: 5s
