@@ -1,4 +1,6 @@
-FROM patrickhulce/lhci-client:latest
+# Pin base image by digest for reproducibility and security
+# Image: patrickhulce/lhci-client:latest (pinned on 2025-10-07)
+FROM patrickhulce/lhci-client:latest@sha256:558210c5e422a7babaaa09c285b7469da3f00fac1a9880c37883c65d666a7fc9
 
 # Create necessary directories with proper permissions
 RUN mkdir -p /home/lhci/Downloads /workspace/web-frontend /tmp/.X11-unix \
