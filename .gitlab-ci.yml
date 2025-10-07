@@ -228,7 +228,7 @@ build_frontend:
       docker build \
         --cache-from "$CI_REGISTRY_IMAGE/frontend:latest" \
         --build-arg BUILDKIT_INLINE_CACHE=1 \
-        --build-arg NEXT_PUBLIC_API_URL=http://localhost:3001 \
+        --build-arg NEXT_PUBLIC_API_URL=http://mock-api:3001 \
         --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
         --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
         -t "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA" \
