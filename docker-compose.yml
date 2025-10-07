@@ -42,7 +42,6 @@ services:
       dockerfile: Dockerfile.lighthouse
     container_name: lighthouse
     working_dir: /workspace/web-frontend
-    # For local dev: docker cp lighthouse:/workspace/web-frontend/lighthouse-reports ./web-frontend/
     depends_on:
       web-app:
         condition: service_healthy
@@ -57,13 +56,13 @@ services:
     command: >
       sh -c "
       echo 'Running Lighthouse CI for mobile...' &&
-      lhci collect &&
+      lhci collect --upload.outputDir=./lighthouse-reports/mobile &&
       lhci assert &&
-      lhci upload &&
+      lhci upload --upload.outputDir=./lighthouse-reports/mobile &&
       echo 'Running Lighthouse CI for desktop...' &&
-      lhci collect --settings.preset=desktop &&
+      lhci collect --settings.preset=desktop --upload.outputDir=./lighthouse-reports/desktop &&
       lhci assert &&
-      lhci upload
+      lhci upload --upload.outputDir=./lighthouse-reports/desktop
       "
     profiles:
       - lighthouse
