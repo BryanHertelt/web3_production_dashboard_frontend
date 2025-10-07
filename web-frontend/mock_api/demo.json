@@ -13,7 +13,7 @@
       "type": "http",
       "documentation": "",
       "method": "get",
-      "endpoint": "users",
+      "endpoint": "/users",
       "responses": [
         {
           "uuid": "f5daa608-0edb-450e-b8d0-9ecc15df2fac",
@@ -49,7 +49,7 @@
       "type": "http",
       "documentation": "",
       "method": "get",
-      "endpoint": "infocards",
+      "endpoint": "/infocards",
       "responses": [
         {
           "uuid": "c58a7ee6-6e80-4322-90cf-ad95ffe54d7e",
@@ -80,7 +80,7 @@
       "type": "http",
       "documentation": "",
       "method": "get",
-      "endpoint": "healthcheck",
+      "endpoint": "/healthcheck",
       "responses": [
         {
           "uuid": "a57a6810-b62a-43d6-bc49-41c942e91960",
