@@ -188,7 +188,7 @@ docker_build:
     - cd web-frontend/mock_api
     - echo "Building Mockoon Docker image..."
     - |
-      docker build \
+      docker build --no-cache \
         -t "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" \
         -t "$CI_REGISTRY_IMAGE/mock-api:latest" \
         .
