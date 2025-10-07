@@ -1,7 +1,7 @@
 FROM mockoon/cli:latest
 
-COPY demo.json /data/demo.json
+COPY zenet-api.json /data/zenet-api.json
 
 EXPOSE 3001
 
-CMD ["--data", "/data/demo.json", "--port", "3001"]
+CMD ["--data", "/data/zenet-api.json", "--port", "3001"]
