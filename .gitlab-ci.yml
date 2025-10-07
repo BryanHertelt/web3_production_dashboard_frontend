@@ -239,18 +239,14 @@ lighthouse_audit:
     - apk add --no-cache docker-compose
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
   script:
-    # Pull the built images
     - docker pull "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
     - docker pull "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
 
-    # Tag them for docker-compose
     - docker tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" web-app:latest
     - docker tag "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" mock-api:latest
 
-    # Build lighthouse image (needs to be fresh to include lighthouserc.js)
     - docker-compose build lighthouse
 
-    # Start services and run lighthouse (container will be stopped but not removed)
     - docker-compose --profile lighthouse up --exit-code-from lighthouse || true
 
     # Copy reports from stopped container to host for GitLab artifacts
@@ -312,7 +308,8 @@ trivy_scan:
     entrypoint: [""]
   before_script: []
   variables:
-    IMAGE_REF: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    WEB_APP: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    MOCK_API: $CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
     TRIVY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/trivy"
   cache:
     key: trivy-db
@@ -321,15 +318,19 @@ trivy_scan:
   script:
     # 1) auth to GitLab Container Registry
     - echo "$CI_REGISTRY_PASSWORD" | trivy registry login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    # 2) scan the pushed image via remote registry (no docker daemon)
-    - trivy image --image-src=remote --scanners vuln,secret --severity HIGH,CRITICAL --ignore-unfixed --format table --exit-code 1 "$IMAGE_REF"
-    # 3) export reports (non-fatal)
-    - trivy image --image-src=remote --format json -o trivy-report.json "$IMAGE_REF" || true
+    - echo "Scan web_app"
+    - trivy image --image-src=remote --scanners vuln,secret --severity HIGH,CRITICAL --ignore-unfixed --format table --exit-code 1 "$WEB_APP" 
+    - echo "Scan mock_api"
+    - trivy image --image-src=remote --scanners vuln,secret --severity HIGH,CRITICAL --ignore-unfixed --format table --exit-code 1 "$MOCK_API"
+    - echo "Build reports for web_app and mock_api"
+    - trivy image --image-src=remote --format json -o trivy-web-image-report.json "$WEB_APP" || true
+    - trivy image --image-src=remote --format json -o trivy-mock-api-report.json "$MOCK_API" || true
   artifacts:
     reports:
-      container_scanning: trivy-report.json
+      container_scanning: trivy-web-image-report.json
     paths:
-      - trivy-report.json
+      - trivy-web-image-report.json
+      - trivy-mock-api-report.json
     when: always
     expire_in: 5 days
   rules:
