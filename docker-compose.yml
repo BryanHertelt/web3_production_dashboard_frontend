@@ -8,7 +8,7 @@ services:
       - "3001:3001"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3001/healthcheck || exit 1"]
-      interval: 10s
+      interval: 20s
       timeout: 5s
       retries: 5
       start_period: 10s
@@ -19,6 +19,7 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: http://mock-api:3001
+        INTERNAL_API_URL: http://mock-api:3001
     environment:
       NEXT_PUBLIC_API_URL: http://mock-api:3001
       INTERNAL_API_URL: http://mock-api:3001
@@ -34,7 +35,7 @@ services:
           "CMD-SHELL",
           "curl -f http://localhost:3000 && curl -f http://mock-api:3001/healthcheck || exit 1",
         ]
-      interval: 10s
+      interval: 20s
       timeout: 5s
       retries: 5
       start_period: 30s

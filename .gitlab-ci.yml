@@ -229,6 +229,7 @@ build_frontend:
         --cache-from "$CI_REGISTRY_IMAGE/frontend:latest" \
         --build-arg BUILDKIT_INLINE_CACHE=1 \
         --build-arg NEXT_PUBLIC_API_URL=http://mock-api:3001 \
+        --build-arg INTERNAL_API_URL=http://mock-api:3001 \
         --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
         --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
         -t "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA" \
@@ -248,7 +249,7 @@ build_frontend:
   timeout: 20m
 
 # ---------------------------
-# Lighthouse Performance Audit
+# Performance Reporting
 # ---------------------------
 lighthouse_audit:
   stage: lighthouse
@@ -265,30 +266,30 @@ lighthouse_audit:
   script:
     - docker pull "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA"
     - docker pull "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
-
     - docker tag "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA" web_web-app:latest
     - docker tag "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" web_mock-api:latest
 
-    - docker-compose build lighthouse
+    - docker-compose up -d mock-api
+    - echo "Waiting for mock API..."
+    - sleep 5
 
-    - docker-compose --profile lighthouse up --exit-code-from lighthouse 
+    - docker run --rm \
+        --network web_default \
+        -e NEXT_PUBLIC_API_URL=http://mock-api:3001 \
+        -e INTERNAL_API_URL=http://mock-api:3001 \
+        web_web-app:latest \
+        sh -c "npm run build"
 
-    # Copy reports from stopped container to host for GitLab artifacts
+    - docker-compose --profile lighthouse up --exit-code-from lighthouse
+
     - mkdir -p ./web-frontend/lighthouse-reports
     - docker cp lighthouse:/workspace/web-frontend/lighthouse-reports/. ./web-frontend/lighthouse-reports/ || echo "No reports to copy"
-
   after_script:
     - docker-compose --profile lighthouse down -v || true
   artifacts:
     paths:
       - web-frontend/lighthouse-reports/
     expire_in: 30 days
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  timeout: 15m
-
 
 # ---------------------------
 # Scan code base for secrets
