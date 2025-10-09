@@ -37,6 +37,7 @@ export default async function CryptoDashboard() {
       return cardData;
     } catch (error) {
       console.log(`An error occured ${error}`);
+      return []; // Return empty array on error
     }
   };
 

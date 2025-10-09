@@ -171,41 +171,6 @@ prettier_format:
     policy: pull
   timeout: 5m
 
-# ---------------------------
-# Build Mock Api image
-# ---------------------------
-build_mockoon:
-  stage: build_docker
-  image: docker:26
-  variables:
-    DOCKER_HOST: unix:///var/run/docker.sock
-    DOCKER_BUILDKIT: "1"
-    BUILDKIT_PROGRESS: plain
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
-  script:
-    # Build Mockoon mock API image
-    - cd web-frontend/mock_api
-    - echo "Building Mockoon Docker image..."
-    - docker pull "$CI_REGISTRY_IMAGE/mock-api:latest" || true 
-    - |
-      docker build \
-        --cache-from "$CI_REGISTRY_IMAGE/mock-api:latest" \
-        -t "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" \
-        -t "$CI_REGISTRY_IMAGE/mock-api:latest" \
-        .
-    - echo "Pushing Mockoon images to registry..."
-    - docker push "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
-    - docker push "$CI_REGISTRY_IMAGE/mock-api:latest"
-
-    - echo "Removing docker images from runner..."
-    - docker rmi "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" || true
-
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  timeout: 20m
 
 
 # ---------------------------
@@ -248,6 +213,42 @@ build_frontend:
   timeout: 20m
 
 # ---------------------------
+# Build Mock Api image
+# ---------------------------
+build_mockoon:
+  stage: build_docker
+  image: docker:26
+  variables:
+    DOCKER_HOST: unix:///var/run/docker.sock
+    DOCKER_BUILDKIT: "1"
+    BUILDKIT_PROGRESS: plain
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
+  script:
+    # Build Mockoon mock API image
+    - cd web-frontend/mock_api
+    - echo "Building Mockoon Docker image..."
+    - docker pull "$CI_REGISTRY_IMAGE/mock-api:latest" || true 
+    - |
+      docker build \
+        --cache-from "$CI_REGISTRY_IMAGE/mock-api:latest" \
+        -t "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" \
+        -t "$CI_REGISTRY_IMAGE/mock-api:latest" \
+        .
+    - echo "Pushing Mockoon images to registry..."
+    - docker push "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE/mock-api:latest"
+
+    - echo "Removing docker images from runner..."
+    - docker rmi "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA" || true
+
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "pipeline-testing"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  timeout: 20m
+
+# ---------------------------
 # Performance Reporting
 # ---------------------------
 lighthouse_audit:
@@ -264,6 +265,7 @@ lighthouse_audit:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
   script:
     - docker pull "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA"
+    - docker images "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA" --digests
     - docker pull "$CI_REGISTRY_IMAGE/mock-api:$CI_COMMIT_SHA"
 
     - docker tag "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA" web_web-app:latest
