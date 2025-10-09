@@ -32,7 +32,7 @@ export default async function CryptoDashboard() {
       const cardData = await rawCardData.json();
       return cardData;
     } catch (error) {
-      console.error(`An error occured ${error}`);
+      console.log(`An error occured ${error}`);
     }
   };
 
