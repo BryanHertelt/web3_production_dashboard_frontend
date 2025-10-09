@@ -20,8 +20,8 @@ services:
       args:
         NEXT_PUBLIC_API_URL: http://mock-api:3001
     environment:
-      - NEXT_PUBLIC_API_URL=http://mock-api:3001
-      - INTERNAL_API_URL=http://mock-api:3001
+      NEXT_PUBLIC_API_URL: http://mock-api:3001
+      INTERNAL_API_URL: http://mock-api:3001
     container_name: web-app
     ports:
       - "3000:3000"
