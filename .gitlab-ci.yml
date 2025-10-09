@@ -222,11 +222,10 @@ build_frontend:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
   script:
     - cd web-frontend
-    - echo "Building web application Docker image with BuildKit and layer caching..."
-    - docker pull "$CI_REGISTRY_IMAGE/frontend:latest" || true 
+    - echo "Building web application Docker image with BuildKit (no cache to ensure fresh build)..."
     - |
       docker build \
-        --cache-from "$CI_REGISTRY_IMAGE/frontend:latest" \
+        --no-cache \
         --build-arg BUILDKIT_INLINE_CACHE=1 \
         --build-arg NEXT_PUBLIC_API_URL=http://mock-api:3001 \
         --build-arg INTERNAL_API_URL=http://mock-api:3001 \
