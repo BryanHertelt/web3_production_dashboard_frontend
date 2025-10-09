@@ -6,6 +6,8 @@ import InfoBox from "@/shared/info-box/ui/info-box";
 import PlaceholderChart from "@/widgets/charts/ui/charts";
 import Table from "@/widgets/table/ui/table";
 
+export const dynamic = "force-dynamic";
+
 interface Card {
   title: string;
   value: number;
