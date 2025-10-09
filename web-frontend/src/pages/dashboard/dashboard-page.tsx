@@ -30,7 +30,9 @@ export default async function CryptoDashboard() {
       process.env.NEXT_PUBLIC_API_URL ||
       "http://localhost:3001";
     try {
-      const rawCardData = await fetch(`${apiUrl}/infocards`);
+      const rawCardData = await fetch(`${apiUrl}/infocards`, {
+        cache: "no-store", // ensures fresh fetch on every request
+      });
       const cardData = await rawCardData.json();
       return cardData;
     } catch (error) {

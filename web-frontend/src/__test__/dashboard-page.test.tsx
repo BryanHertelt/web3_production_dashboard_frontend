@@ -146,7 +146,9 @@ describe("CryptoDashboard component", () => {
     );
 
     // Verify fetch was called
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3001/infocards");
+    expect(fetch).toHaveBeenCalledWith("http://localhost:3001/infocards", {
+      cache: "no-store",
+    });
 
     // Check that InfoBox components are rendered with correct data
     await waitFor(() => {
