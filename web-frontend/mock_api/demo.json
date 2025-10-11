@@ -17,7 +17,7 @@
       "responses": [
         {
           "uuid": "f5daa608-0edb-450e-b8d0-9ecc15df2fac",
-          "body": "[\r\n  {\r\n    \"coin\": \"BTC\",\r\n    \"amount\": \"0.25\",\r\n    \"buyPrice\": \"42000.00\",\r\n    \"currentPrice\": \"47850.00\",\r\n    \"profitLoss\": \"+1462.50\",\r\n    \"profitClass\": \"profit\"\r\n  },\r\n  {\r\n    \"coin\": \"ETH\",\r\n    \"amount\": \"5.75\",\r\n    \"buyPrice\": \"2800.00\",\r\n    \"currentPrice\": \"2650.00\",\r\n    \"profitLoss\": \"-862.50\",\r\n    \"profitClass\": \"loss\"\r\n  },\r\n  {\r\n    \"coin\": \"ADA\",\r\n    \"amount\": \"1250.00\",\r\n    \"buyPrice\": \"0.45\",\r\n    \"currentPrice\": \"0.52\",\r\n    \"profitLoss\": \"+87.50\",\r\n    \"profitClass\": \"profit\"\r\n  }\r\n]",
+          "body": "[\n  {\n    \"coin\": \"BTC\",\n    \"amount\": \"0.25\",\n    \"buyPrice\": \"42000.00\",\n    \"currentPrice\": \"47850.00\",\n    \"profitLoss\": \"+1462.50\",\n    \"profitClass\": \"profit\"\n  },\n  {\n    \"coin\": \"ETH\",\n    \"amount\": \"5.75\",\n    \"buyPrice\": \"2800.00\",\n    \"currentPrice\": \"2650.00\",\n    \"profitLoss\": \"-862.50\",\n    \"profitClass\": \"loss\"\n  },\n  {\n    \"coin\": \"ADA\",\n    \"amount\": \"1250.00\",\n    \"buyPrice\": \"0.45\",\n    \"currentPrice\": \"0.52\",\n    \"profitLoss\": \"+87.50\",\n    \"profitClass\": \"profit\"\n  }\n]",
           "latency": 2000,
           "statusCode": 200,
           "label": "",
@@ -74,6 +74,37 @@
       "responseMode": null,
       "streamingMode": null,
       "streamingInterval": 0
+    },
+    {
+      "uuid": "d62f987e-6932-498f-89ac-176fc05ee96e",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio",
+      "responses": [
+        {
+          "uuid": "e395d40c-6222-4d85-ad06-74890fe7493d",
+          "body": "[\n  {\n    \"id\": 1,\n    \"owner\": \"Nick Guber\",\n    \"assets\": \"bitcoin\",\n    \"joined\": \"2025-09-28T08:23:23.290333Z\"\n  }\n]\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
     }
   ],
   "rootChildren": [
@@ -84,6 +115,10 @@
     {
       "type": "route",
       "uuid": "4e8eb6e2-e762-4dd0-8f85-487a02ca6c3d"
+    },
+    {
+      "type": "route",
+      "uuid": "d62f987e-6932-498f-89ac-176fc05ee96e"
     }
   ],
   "proxyMode": false,

@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { TableRow, TableProps } from "@/widgets/table/model/table-model";
+import { ApiError } from "@/shared/api-layer/index";
+import { UsersAPI } from "@/entities/users/api/users-api";
 
 /**
  * Renders a table displaying data for bought coins, including columns for
@@ -10,28 +12,38 @@ import { TableRow, TableProps } from "@/widgets/table/model/table-model";
  *
  * @returns {JSX.Element} A React element containing the table with fetched data.
  */
+
 const Table = (props: { tableConfig: TableProps }) => {
   const [data, setData] = useState<TableRow[]>([]);
   const [error, setError] = useState<string | null>(null);
+  /**
+   * @useEffect Fetches data from the UsersAPI on load.
+   * @mounted flag prevents state updates(setData, setError) if component unmounts before fetch completes.
+   * We tell @getAll what type we expect: TableRow[]Passing `true` enables the cancel-registry to abort a previous call of the same type.
+   * @ApiError checks to differentiate between known API errors and unknown errors and show a user-friendly message.
+   * @message and @status from ApiError are used to create user-friendly error messages.
+   * @returns a cleanup function that sets the mounted flag to false on unmount to prevent state updates on an unmounted component.
+   */
 
   useEffect(() => {
-    // Placeholder API URL - replace with actual endpoint
-    const fetchData = async () => {
+    async function loadData() {
       try {
-        const response = await fetch("http://localhost:3001/users");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+        const users = await UsersAPI.get<TableRow[]>(undefined, true);
+        if (users) {
+          setData(users);
         }
-        const result: TableRow[] = await response.json();
-        setData(result);
-        setError(null); // Clear error on success
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-        setError(`Error occured: ${error}`);
+      } catch (e: unknown) {
+        let msg = "Unknown error";
+        if (e instanceof ApiError) {
+          msg = e.status ? `${e.message} (status ${e.status})` : e.message;
+        } else if (e instanceof Error) {
+          msg = e.message;
+        }
+        setError(msg);
       }
-    };
+    }
 
-    fetchData();
+    loadData();
   }, []);
 
   return (
