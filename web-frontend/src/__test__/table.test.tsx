@@ -3,6 +3,29 @@ import { render, screen, waitFor, act } from "@testing-library/react";
 import Table from "../widgets/table/ui/table";
 import "@testing-library/jest-dom";
 
+// IMPORTANT: import from the same paths the component uses
+import { UsersAPI } from "@/entities/users/api/users-api";
+import { ApiError } from "@/shared/api-layer/index";
+
+// --- mock the UsersAPI from its real module path used by the component ---
+jest.mock("@/entities/users/api/users-api", () => ({
+  UsersAPI: { get: jest.fn() },
+}));
+
+// --- mock ApiError from the shared index (so `instanceof ApiError` matches) ---
+jest.mock("@/shared/api-layer/index", () => {
+  return {
+    ApiError: class ApiError extends Error {
+      status?: number;
+      constructor(message: string, status?: number) {
+        super(message);
+        this.name = "ApiError";
+        this.status = status;
+      }
+    },
+  };
+});
+
 interface TableProps {
   headers: string[];
 }
@@ -16,21 +39,25 @@ interface TableRow {
   profitClass: string;
 }
 
-// Mock the global fetch function
-global.fetch = jest.fn();
-
 const defaultTableConfig: TableProps = {
   headers: ["Coin", "Amount", "Buy Price", "Current Price", "Profit/Loss"],
+};
+
+// Helper to always render inside act to avoid state update warnings
+const renderWithAct = async (ui: React.ReactElement) => {
+  await act(async () => {
+    render(ui);
+  });
 };
 
 describe("Table component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockClear();
   });
 
-  test("renders table headers correctly", () => {
-    render(<Table tableConfig={defaultTableConfig} />);
+  test("renders table headers correctly", async () => {
+    (UsersAPI.get as jest.Mock).mockResolvedValueOnce([]);
+    await renderWithAct(<Table tableConfig={defaultTableConfig} />);
     expect(screen.getByText("Coin")).toBeInTheDocument();
     expect(screen.getByText("Amount")).toBeInTheDocument();
     expect(screen.getByText("Buy Price")).toBeInTheDocument();
@@ -38,17 +65,18 @@ describe("Table component", () => {
     expect(screen.getByText("Profit/Loss")).toBeInTheDocument();
   });
 
-  test("renders custom table headers correctly", () => {
+  test("renders custom table headers correctly", async () => {
+    (UsersAPI.get as jest.Mock).mockResolvedValueOnce([]);
     const customConfig: TableProps = {
       headers: ["Symbol", "Quantity", "Price"],
     };
-    render(<Table tableConfig={customConfig} />);
+    await renderWithAct(<Table tableConfig={customConfig} />);
     expect(screen.getByText("Symbol")).toBeInTheDocument();
     expect(screen.getByText("Quantity")).toBeInTheDocument();
     expect(screen.getByText("Price")).toBeInTheDocument();
   });
 
-  test("renders data rows when fetch is successful", async () => {
+  test("renders data rows when API returns successfully", async () => {
     const mockData: TableRow[] = [
       {
         coin: "Bitcoin",
@@ -68,14 +96,9 @@ describe("Table component", () => {
       },
     ];
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockData,
-    });
+    (UsersAPI.get as jest.Mock).mockResolvedValueOnce(mockData);
 
-    await act(async () => {
-      render(<Table tableConfig={defaultTableConfig} />);
-    });
+    await renderWithAct(<Table tableConfig={defaultTableConfig} />);
 
     await waitFor(() => {
       expect(screen.getByText("Bitcoin")).toBeInTheDocument();
@@ -92,81 +115,48 @@ describe("Table component", () => {
       expect(screen.getByText("3500")).toBeInTheDocument();
       expect(screen.getByText("+5000")).toBeInTheDocument();
     });
+
+    expect(UsersAPI.get).toHaveBeenCalledTimes(1);
+    expect(UsersAPI.get).toHaveBeenCalledWith(undefined, true);
   });
 
-  test("renders error message when fetch fails", async () => {
-    (global.fetch as jest.Mock).mockRejectedValueOnce(
-      new Error("Network response was not ok")
+  test("shows ApiError message with status when API rejects with ApiError", async () => {
+    (UsersAPI.get as jest.Mock).mockRejectedValueOnce(
+      new ApiError("Service Unavailable", 503)
     );
 
-    render(<Table tableConfig={defaultTableConfig} />);
+    await renderWithAct(<Table tableConfig={defaultTableConfig} />);
 
     await waitFor(() => {
       expect(
-        screen.getByText(/Error occured.*Network response was not ok/)
+        screen.getByText("Error: Service Unavailable (status 503)")
       ).toBeInTheDocument();
     });
   });
 
-  test("renders error message when response is not ok", async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: false,
-    });
+  test("shows Error.message when a plain Error is thrown", async () => {
+    (UsersAPI.get as jest.Mock).mockRejectedValueOnce(
+      new Error("Network exploded")
+    );
 
-    render(<Table tableConfig={defaultTableConfig} />);
+    await renderWithAct(<Table tableConfig={defaultTableConfig} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Error occured.*Network response was not ok/)
-      ).toBeInTheDocument();
+      expect(screen.getByText("Error: Network exploded")).toBeInTheDocument();
     });
   });
 
-  test("renders error message when json throws", async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => {
-        throw new Error("JSON parse error");
-      },
-    });
-
-    render(<Table tableConfig={defaultTableConfig} />);
-
+  test("shows 'Unknown error' for non-Error values", async () => {
+    (UsersAPI.get as jest.Mock).mockRejectedValueOnce("weird string");
+    await renderWithAct(<Table tableConfig={defaultTableConfig} />);
     await waitFor(() => {
-      expect(
-        screen.getByText(/Error occured.*JSON parse error/)
-      ).toBeInTheDocument();
+      expect(screen.getByText("Error: Unknown error")).toBeInTheDocument();
     });
   });
 
-  test("renders error message when error is not an Error instance", async () => {
-    (global.fetch as jest.Mock).mockRejectedValueOnce("some string error");
-
-    render(<Table tableConfig={defaultTableConfig} />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/Error occured.*some string error/)
-      ).toBeInTheDocument();
-    });
-  });
-
-  test("fetches data from correct endpoint", async () => {
-    const mockData: TableRow[] = [];
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockData,
-    });
-
-    render(<Table tableConfig={defaultTableConfig} />);
-
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith("http://localhost:3001/users");
-    });
-  });
-
-  test("renders table title correctly", () => {
-    render(<Table tableConfig={defaultTableConfig} />);
+  test("renders table title correctly", async () => {
+    (UsersAPI.get as jest.Mock).mockResolvedValueOnce([]);
+    await renderWithAct(<Table tableConfig={defaultTableConfig} />);
     expect(screen.getByText("Bought Coins")).toBeInTheDocument();
   });
 });
