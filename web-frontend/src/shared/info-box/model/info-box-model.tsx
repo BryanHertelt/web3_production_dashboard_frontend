@@ -1,8 +1,8 @@
 interface InfoBoxProps {
-  title: string;
-  value: number;
-  change?: number;
-  color?: string;
+  id: number;
+  owner: string;
+  assets: string;
+  joined: string;
 }
 
 export default InfoBoxProps;
