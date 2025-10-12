@@ -1,12 +1,35 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CryptoDashboard from "../pages/dashboard/dashboard-page";
 import "@testing-library/jest-dom";
 
 interface TableProps {
   headers: string[];
 }
+
+// Mock the logger to prevent errors during tests
+jest.mock("@/lib/model/logger", () => ({
+  __esModule: true,
+  default: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    fatal: jest.fn(),
+    startOperation: jest.fn(() => ({
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      fatal: jest.fn(),
+      endOperation: jest.fn(),
+      withSampleRate: jest.fn(() => ({
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      })),
+    })),
+  },
+}));
 
 jest.mock("@/widgets/navbar/ui/navbar", () => {
   return function MockNavbar() {
@@ -28,18 +51,19 @@ jest.mock("@/features/select-time-range/ui/select-time-range", () => {
 
 jest.mock("@/shared/info-box/ui/info-box", () => {
   return function MockInfoBox({
-    title,
-    value,
-    change,
+    id,
+    owner,
+    assets,
+    joined,
   }: {
-    title: string;
-    value: number;
-    change?: number;
-    color?: string;
+    id: number;
+    owner: string;
+    assets: string;
+    joined: string;
   }) {
     return (
       <div data-testid="info-box">
-        {title}: {value} {change && `(${change}%)`}
+        {id} {owner} {assets} {joined}
       </div>
     );
   };
@@ -66,26 +90,29 @@ global.fetch = jest.fn();
 
 const mockCardData = [
   {
-    title: "Revenue",
-    value: 25.68,
-    change: 8,
-    color: "bg-purple-500",
+    id: 1,
+    owner: "Owner1",
+    assets: "Asset1",
+    joined: "2023-01-01",
   },
   {
-    title: "Transactions",
-    value: 18420,
-    change: 5,
-    color: "bg-blue-400",
+    id: 2,
+    owner: "Owner2",
+    assets: "Asset2",
+    joined: "2023-02-01",
   },
   {
-    title: "USD balance",
-    value: 25.68,
+    id: 3,
+    owner: "Owner3",
+    assets: "Asset3",
+    joined: "2023-03-01",
   },
 ];
 
 describe("CryptoDashboard component", () => {
   beforeEach(() => {
     (fetch as jest.Mock).mockResolvedValue({
+      ok: true,
       json: async () => mockCardData,
     });
   });
@@ -93,12 +120,9 @@ describe("CryptoDashboard component", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
+
   test("renders the dashboard layout correctly", async () => {
-    render(
-      <QueryClientProvider client={new QueryClient()}>
-        {await CryptoDashboard()}
-      </QueryClientProvider>
-    );
+    render(<CryptoDashboard />);
 
     // Check main container
     const mainContainer = screen.getByRole("main");
@@ -113,17 +137,18 @@ describe("CryptoDashboard component", () => {
 
     // Check dashboard content
     expect(screen.getByTestId("time-range")).toBeInTheDocument();
-    expect(screen.getAllByTestId("info-box")).toHaveLength(3);
+
+    // Wait for data to load
+    await waitFor(() => {
+      expect(screen.getAllByTestId("info-box")).toHaveLength(3);
+    });
+
     expect(screen.getByTestId("charts")).toBeInTheDocument();
     expect(screen.getByTestId("table")).toBeInTheDocument();
   });
 
   test("renders with correct overall structure", async () => {
-    const { container } = render(
-      <QueryClientProvider client={new QueryClient()}>
-        {await CryptoDashboard()}
-      </QueryClientProvider>
-    );
+    const { container } = render(<CryptoDashboard />);
 
     // Check root div
     const rootDiv = container.firstChild;
@@ -139,20 +164,24 @@ describe("CryptoDashboard component", () => {
   });
 
   test("fetches and renders card data correctly", async () => {
-    render(
-      <QueryClientProvider client={new QueryClient()}>
-        {await CryptoDashboard()}
-      </QueryClientProvider>
-    );
+    render(<CryptoDashboard />);
 
     // Verify fetch was called
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3001/infocards");
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith("http://localhost:8000/portfolio");
+    });
 
     // Check that InfoBox components are rendered with correct data
     await waitFor(() => {
-      expect(screen.getByText(/Revenue: 25.68/)).toBeInTheDocument();
-      expect(screen.getByText(/Transactions: 18420/)).toBeInTheDocument();
-      expect(screen.getByText(/USD balance: 25.68/)).toBeInTheDocument();
+      expect(
+        screen.getByText("1 Owner1 Asset1 2023-01-01")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("2 Owner2 Asset2 2023-02-01")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("3 Owner3 Asset3 2023-03-01")
+      ).toBeInTheDocument();
     });
   });
 
@@ -161,27 +190,54 @@ describe("CryptoDashboard component", () => {
 
     const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
-    render(
-      <QueryClientProvider client={new QueryClient()}>
-        {await CryptoDashboard()}
-      </QueryClientProvider>
-    );
+    render(<CryptoDashboard />);
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining("An error occured")
-    );
+    await waitFor(() => {
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("An error occured")
+      );
+    });
 
     consoleSpy.mockRestore();
   });
 
   test("renders table with correct configuration", async () => {
-    render(
-      <QueryClientProvider client={new QueryClient()}>
-        {await CryptoDashboard()}
-      </QueryClientProvider>
-    );
+    render(<CryptoDashboard />);
 
     // Check that table is rendered with the correct number of headers
     expect(screen.getByText("Table with 5 headers")).toBeInTheDocument();
+  });
+
+  test("shows loading state initially", () => {
+    render(<CryptoDashboard />);
+
+    // During loading, InfoBox components should not be rendered yet
+    expect(screen.queryAllByTestId("info-box")).toHaveLength(0);
+  });
+
+  test("renders InfoBox components after data loads", async () => {
+    render(<CryptoDashboard />);
+
+    // Wait for InfoBox components to appear
+    await waitFor(() => {
+      const infoBoxes = screen.getAllByTestId("info-box");
+      expect(infoBoxes).toHaveLength(3);
+    });
+  });
+
+  test("handles empty card data array", async () => {
+    (fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => [],
+    });
+
+    render(<CryptoDashboard />);
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+
+    // Should not render any InfoBox when data is empty
+    expect(screen.queryAllByTestId("info-box")).toHaveLength(0);
   });
 });
