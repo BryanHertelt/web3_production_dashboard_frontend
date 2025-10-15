@@ -1,6 +1,6 @@
 import { AxiosError } from "../../shared/api-layer/model/types";
 import {
-  logByStatus,
+  describeStatus,
   statusOf,
   extractMessage,
   isCancel,
@@ -46,82 +46,79 @@ function makeAxiosErr(
   } as AxiosError;
 }
 
-// ---------------------- logByStatus ----------------------
+// ---------------------- describeStatus ----------------------
+describe("describeStatus", () => {
+  type Case = {
+    code: number;
+    level: "warn" | "error";
+    message: string;
+  };
 
-describe("logByStatus", () => {
-  const cases: Array<[number, string]> = [
-    [400, "Bad Request"],
-    [403, "Forbidden"],
-    [409, "Conflict"],
-    [422, "Unprocessable Entity"],
-    [429, "Too Many Requests"],
-    [500, "Internal Server Error"],
-    [503, "Service Unavailable"],
-    [504, "Gateway Timeout"],
+  const knownCases: Case[] = [
+    { code: 400, level: "warn", message: "Bad Request (invalid client input)" },
+    { code: 401, level: "warn", message: "Unauthorized" },
+    {
+      code: 403,
+      level: "warn",
+      message: "Forbidden (insufficient permissions)",
+    },
+    { code: 404, level: "warn", message: "Not Found" },
+    { code: 409, level: "warn", message: "Conflict (state/version clash)" },
+    {
+      code: 422,
+      level: "warn",
+      message: "Unprocessable Entity (validation failed)",
+    },
+    { code: 429, level: "warn", message: "Too Many Requests (rate limited)" },
+    { code: 500, level: "error", message: "Internal Server Error" },
+    {
+      code: 502,
+      level: "error",
+      message: "Bad Gateway (upstream down/misconfigured)",
+    },
+    {
+      code: 503,
+      level: "error",
+      message: "Service Unavailable (overloaded/maintenance)",
+    },
+    {
+      code: 504,
+      level: "error",
+      message: "Gateway Timeout (upstream slow/unreachable)",
+    },
   ];
 
-  beforeEach(() => jest.clearAllMocks());
-
-  test.each(cases)(
-    "prints readable message for known status codes",
-    (status, phrase) => {
-      const err = makeAxiosErr(status, "put", "/resource");
-      logByStatus(err, status);
-      const [msg] = consoleErrorSpy.mock.calls.at(-1)!;
-      expect(String(msg)).toContain(`API PUT /resource`);
-      expect(String(msg)).toContain(String(status));
-      expect(String(msg)).toMatch(phrase);
+  test.each(knownCases)(
+    "returns level+message for known status $code",
+    ({ code, level, message }) => {
+      const err = makeAxiosErr(code, "put", "/resource");
+      const res = describeStatus(err);
+      expect(res).toEqual({ level, message });
     }
   );
 
-  test("logByStatus ignores 401 (no console output)", () => {
-    const err = makeAxiosErr(401, "get", "/me");
-    logByStatus(err, 401);
-    expect(consoleErrorSpy).not.toHaveBeenCalled();
+  test("returns 'Server error' for unknown 5xx", () => {
+    const err = makeAxiosErr(599, "get", "/x");
+    const res = describeStatus(err);
+    expect(res).toEqual({ level: "error", message: "Server error" });
   });
 
-  test("logByStatus prints specific 502 message", () => {
-    const err = makeAxiosErr(502, "get", "/upstream");
-    logByStatus(err, 502);
-    const [msg] = consoleErrorSpy.mock.calls.at(-1)!;
-    expect(String(msg)).toContain("API GET /upstream");
-    expect(String(msg)).toContain("502");
-    expect(String(msg)).toMatch(/Bad Gateway/i);
+  test("returns 'Client error' for unknown 4xx", () => {
+    const err = makeAxiosErr(499, "get", "/x");
+    const res = describeStatus(err);
+    expect(res).toEqual({ level: "warn", message: "Client error" });
   });
 
-  test("logByStatus prints a concise 404 message and includes method/url", () => {
-    const err = makeAxiosErr(404, "get", "/thing");
-    logByStatus(err, 404);
-    const last = consoleErrorSpy.mock.calls.at(-1);
-    expect(last).toBeTruthy();
-    const [msg] = last!;
-    expect(String(msg)).toContain("API GET /thing");
-    expect(String(msg)).toContain("404");
-    expect(String(msg)).toMatch(/Not found/i);
-  });
-
-  test("function falls back to default if error code is not covered", () => {
-    const errorMessages = [
-      { code: 599, msg: "Server" },
-      { code: 499, msg: "Client" },
-      { code: 299, msg: "Unexpected" },
-    ];
-    const errArr = errorMessages.map(
-      (status: { code: number; msg: string }) => {
-        const err = makeAxiosErr(status.code, "get", "/someUrl");
-        logByStatus(err, status.code);
-        const last = consoleErrorSpy.mock.calls.at(-1);
-        expect(last).toBeDefined();
-        const msg = last!;
-        expect(msg).toContain(
-          `[API GET /someUrl] ${status.code} – ${status.msg} error.`
-        );
-        return err;
-      }
-    );
-    expect(errArr).toBeDefined();
+  test("no status (network/CORS) -> error + specific message", () => {
+    const err = makeAxiosErr(undefined, "get", "/x");
+    const res = describeStatus(err);
+    expect(res).toEqual({
+      level: "error",
+      message: "No HTTP status (network/CORS?)",
+    });
   });
 });
+
 // ---------------------- statusOf ----------------------
 
 test("statusOf returns the HTTP status when present", () => {

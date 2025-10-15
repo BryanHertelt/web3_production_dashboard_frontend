@@ -60,77 +60,67 @@ export function extractMessage(
 }
 
 /**
- * logByStatus — centralized, status-aware logging for AxiosErrors.
- * Keeps axios-config short and easy to read.
- * Ignores 401
- * @const url is for visibility in logs, falls back to "(unknown url)".
- * @const method  falls back to "(unknown method)". Logs a concise, human-readable message for common status codes.
- * For truly unknown status codes, logs a generic message indicating client/server error or network issue.
- * @const baseMsg combines method, url, and status for clarity.
+ * Maps an AxiosError's HTTP status code to a log level and readable message.
+ *
+ * Used to classify errors for logging (warn vs error) and to provide
+ * meaningful descriptions for common client and server status codes.
+ *
+ * @param {AxiosError} err - The Axios error to analyze.
+ * @returns {{ level: "warn" | "error"; message: string }} Log level and descriptive message.
  */
-export function logByStatus(
-  err: AxiosError,
-  status: KnownHttpStatus | number | undefined
-) {
-  if (status === 401) return;
 
-  const url = err.config?.url || "(unknown url)";
-  const method =
-    (err.config?.method && err.config.method.toUpperCase()) ||
-    "(unknown method)";
-  const baseMsg = `[API ${method} ${url}] ${status || "no-status"}`;
+export function describeStatus(err: AxiosError): {
+  level: "warn" | "error";
+  message: string;
+} {
+  const status = statusOf(err);
+
+  if (!status)
+    return { level: "error", message: "No HTTP status (network/CORS?)" };
+
+  if (status >= 500) {
+    switch (status as KnownHttpStatus) {
+      case 502:
+        return {
+          level: "error",
+          message: "Bad Gateway (upstream down/misconfigured)",
+        };
+      case 503:
+        return {
+          level: "error",
+          message: "Service Unavailable (overloaded/maintenance)",
+        };
+      case 504:
+        return {
+          level: "error",
+          message: "Gateway Timeout (upstream slow/unreachable)",
+        };
+      case 500:
+        return { level: "error", message: "Internal Server Error" };
+      default:
+        return { level: "error", message: "Server error" };
+    }
+  }
 
   switch (status as KnownHttpStatus) {
-    case 404:
-      console.error(`${baseMsg} – Not found.`);
-      break;
-    case 502:
-      console.error(
-        `${baseMsg} – Bad Gateway (upstream down or misconfigured).`
-      );
-      break;
-    case 503:
-      console.error(
-        `${baseMsg} – Service Unavailable (overloaded/maintenance).`
-      );
-      break;
-    case 504:
-      console.error(
-        `${baseMsg} – Gateway Timeout (upstream slow/unreachable).`
-      );
-      break;
     case 400:
-      console.error(`${baseMsg} – Bad Request (invalid client input).`);
-      break;
+      return { level: "warn", message: "Bad Request (invalid client input)" };
+    case 401:
+      return { level: "warn", message: "Unauthorized" };
     case 403:
-      console.error(`${baseMsg} – Forbidden (insufficient permissions).`);
-      break;
+      return { level: "warn", message: "Forbidden (insufficient permissions)" };
+    case 404:
+      return { level: "warn", message: "Not Found" };
     case 409:
-      console.error(`${baseMsg} – Conflict (state/version clash).`);
-      break;
+      return { level: "warn", message: "Conflict (state/version clash)" };
     case 422:
-      console.error(`${baseMsg} – Unprocessable Entity (validation failed).`);
-      break;
+      return {
+        level: "warn",
+        message: "Unprocessable Entity (validation failed)",
+      };
     case 429:
-      console.error(`${baseMsg} – Too Many Requests (rate limited).`);
-      break;
-    case 500:
-      console.error(`${baseMsg} – Internal Server Error.`);
-      break;
-    default: {
-      if (typeof status === "number") {
-        if (status >= 500) {
-          console.error(`${baseMsg} – Server error.`);
-        } else if (status >= 400) {
-          console.error(`${baseMsg} – Client error.`);
-        } else {
-          console.error(`${baseMsg} – Unexpected error.`);
-        }
-      } else {
-        console.error(
-          `${baseMsg} – No HTTP status available (network error?).`
-        );
-      }
-    }
+      return { level: "warn", message: "Too Many Requests (rate limited)" };
+    default:
+      return { level: "warn", message: "Client error" };
   }
 }

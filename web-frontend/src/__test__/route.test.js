@@ -18,7 +18,8 @@ describe("POST /api/logging", () => {
       status: options.status || 200,
       text: jest.fn().mockResolvedValue(body),
     }));
-
+    // silence route error logs during tests
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {}); // add this
     // Set environment variables
     process.env.API_USERNAME = "testuser";
     process.env.API_KEY_LOKI = "testkey";
