@@ -14,7 +14,7 @@ describe("ApiError", () => {
   });
 
   it("sets optional status and details when provided", () => {
-    const details = { endpoint: "/users/1" };
+    const details = { endpoint: "/portfolio/1" };
     const err = new ApiError("Oops", 404, details);
     expect(err.status).toBe(404);
     expect(err.details).toBe(details);

@@ -4,12 +4,12 @@ import Table from "../widgets/table/ui/table";
 import "@testing-library/jest-dom";
 
 // IMPORTANT: import from the same paths the component uses
-import { UsersAPI } from "@/entities/users/api/users-api";
+import { CoinsAPI } from "@/entities/coins/api/coins-api";
 import { ApiError } from "@/shared/api-layer/index";
 
-// --- mock the UsersAPI from its real module path used by the component ---
-jest.mock("@/entities/users/api/users-api", () => ({
-  UsersAPI: { get: jest.fn() },
+// --- mock the CoinsAPI from its real module path used by the component ---
+jest.mock("@/entities/coins/api/coins-api", () => ({
+  CoinsAPI: { get: jest.fn() },
 }));
 
 // --- mock ApiError from the shared index (so `instanceof ApiError` matches) ---
@@ -56,7 +56,7 @@ describe("Table component", () => {
   });
 
   test("renders table headers correctly", async () => {
-    (UsersAPI.get as jest.Mock).mockResolvedValueOnce([]);
+    (CoinsAPI.get as jest.Mock).mockResolvedValueOnce([]);
     await renderWithAct(<Table tableConfig={defaultTableConfig} />);
     expect(screen.getByText("Coin")).toBeInTheDocument();
     expect(screen.getByText("Amount")).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe("Table component", () => {
   });
 
   test("renders custom table headers correctly", async () => {
-    (UsersAPI.get as jest.Mock).mockResolvedValueOnce([]);
+    (CoinsAPI.get as jest.Mock).mockResolvedValueOnce([]);
     const customConfig: TableProps = {
       headers: ["Symbol", "Quantity", "Price"],
     };
@@ -96,10 +96,11 @@ describe("Table component", () => {
       },
     ];
 
-    (UsersAPI.get as jest.Mock).mockResolvedValueOnce(mockData);
+    (CoinsAPI.get as jest.Mock).mockResolvedValueOnce(mockData);
 
     await renderWithAct(<Table tableConfig={defaultTableConfig} />);
 
+    // First row
     await waitFor(() => {
       expect(screen.getByText("Bitcoin")).toBeInTheDocument();
       expect(screen.getByText("1.5")).toBeInTheDocument();
@@ -108,6 +109,7 @@ describe("Table component", () => {
       expect(screen.getByText("+10000")).toBeInTheDocument();
     });
 
+    // Second row
     await waitFor(() => {
       expect(screen.getByText("Ethereum")).toBeInTheDocument();
       expect(screen.getByText("10")).toBeInTheDocument();
@@ -116,12 +118,12 @@ describe("Table component", () => {
       expect(screen.getByText("+5000")).toBeInTheDocument();
     });
 
-    expect(UsersAPI.get).toHaveBeenCalledTimes(1);
-    expect(UsersAPI.get).toHaveBeenCalledWith(undefined, true);
+    expect(CoinsAPI.get).toHaveBeenCalledTimes(1);
+    expect(CoinsAPI.get).toHaveBeenCalledWith(undefined, true);
   });
 
   test("shows ApiError message with status when API rejects with ApiError", async () => {
-    (UsersAPI.get as jest.Mock).mockRejectedValueOnce(
+    (CoinsAPI.get as jest.Mock).mockRejectedValueOnce(
       new ApiError("Service Unavailable", 503)
     );
 
@@ -135,7 +137,7 @@ describe("Table component", () => {
   });
 
   test("shows Error.message when a plain Error is thrown", async () => {
-    (UsersAPI.get as jest.Mock).mockRejectedValueOnce(
+    (CoinsAPI.get as jest.Mock).mockRejectedValueOnce(
       new Error("Network exploded")
     );
 
@@ -147,7 +149,7 @@ describe("Table component", () => {
   });
 
   test("shows 'Unknown error' for non-Error values", async () => {
-    (UsersAPI.get as jest.Mock).mockRejectedValueOnce("weird string");
+    (CoinsAPI.get as jest.Mock).mockRejectedValueOnce("weird string");
     await renderWithAct(<Table tableConfig={defaultTableConfig} />);
     await waitFor(() => {
       expect(screen.getByText("Error: Unknown error")).toBeInTheDocument();
@@ -155,8 +157,28 @@ describe("Table component", () => {
   });
 
   test("renders table title correctly", async () => {
-    (UsersAPI.get as jest.Mock).mockResolvedValueOnce([]);
+    (CoinsAPI.get as jest.Mock).mockResolvedValueOnce([]);
     await renderWithAct(<Table tableConfig={defaultTableConfig} />);
     expect(screen.getByText("Bought Coins")).toBeInTheDocument();
+  });
+
+  test("applies profitClass to Profit/Loss cell", async () => {
+    const mockData: TableRow[] = [
+      {
+        coin: "ADA",
+        amount: "1000",
+        buyPrice: "0.45",
+        currentPrice: "0.52",
+        profitLoss: "+70",
+        profitClass: "text-green-500",
+      },
+    ];
+    (CoinsAPI.get as jest.Mock).mockResolvedValueOnce(mockData);
+
+    await renderWithAct(<Table tableConfig={defaultTableConfig} />);
+
+    const profitCell = await screen.findByText("+70");
+    expect(profitCell).toBeInTheDocument();
+    expect(profitCell).toHaveClass("text-green-500");
   });
 });

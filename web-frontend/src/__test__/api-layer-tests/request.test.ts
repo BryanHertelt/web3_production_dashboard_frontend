@@ -17,7 +17,7 @@ describe("request()", () => {
     (instance.request as jest.Mock).mockResolvedValue({ data: { ok: true } });
 
     const result = await request<{ ok: boolean }>({
-      url: "/users",
+      url: "/portfolio",
       method: "GET",
     });
 
@@ -36,11 +36,11 @@ describe("request()", () => {
 
     // Check the thrown error is our ApiError
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toBeInstanceOf(ApiError);
     // Check important fields on the error
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toMatchObject({
       message: "Bad input",
       status: 400,
@@ -58,12 +58,12 @@ describe("request()", () => {
     (instance.request as jest.Mock).mockRejectedValue(notAxiosErr);
 
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toBeInstanceOf(ApiError);
 
     // Because guard returns false, we should hit the generic branch:
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toMatchObject({
       message: "Unknown error",
       status: undefined,
@@ -80,16 +80,16 @@ describe("request()", () => {
     (instance.request as jest.Mock).mockRejectedValue(axErr);
 
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toBeInstanceOf(ApiError);
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toHaveProperty("message", "Server issue");
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toHaveProperty("status", 500);
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toHaveProperty("details", {});
   });
 
@@ -102,13 +102,13 @@ describe("request()", () => {
     (instance.request as jest.Mock).mockRejectedValue(axErr);
 
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toHaveProperty("details", { canceled: true });
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toBeInstanceOf(ApiError);
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toMatchObject({ message: "Request canceled" });
   });
 
@@ -119,11 +119,11 @@ describe("request()", () => {
     );
 
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toBeInstanceOf(ApiError);
     // expect our generic message "Unknown error" when all checks fail to know it's not an AxiosError
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toHaveProperty("message", "Unknown error");
   });
 
@@ -132,7 +132,7 @@ describe("request()", () => {
     (instance.request as jest.Mock).mockRejectedValue(axErr);
 
     await expect(
-      request({ url: "/users", method: "GET" })
+      request({ url: "/portfolio", method: "GET" })
     ).rejects.toMatchObject({ message: "Network Error", status: undefined });
   });
 

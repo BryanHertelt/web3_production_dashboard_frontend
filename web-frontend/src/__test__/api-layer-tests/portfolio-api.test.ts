@@ -1,15 +1,10 @@
-// users-api.test.ts
-// Purpose: verify that UsersAPI correctly wires URL/method/query,
-// forwards (or not) an AbortSignal depending on `cancel`,
-// and propagates errors from the transport wrapper.
-
-import { UsersAPI } from "../../entities/users/api/users-api";
+import { PortfolioAPI } from "../../entities/portfolio/api/portfolio-api";
 import { request as realRequest } from "../../shared/api-layer/api/request";
-import type { Users } from "../../entities/users/model/types";
+import type { Portfolio } from "../../entities/portfolio/model/types";
 
 // --- Mock setup ---------------------------------------------------------------
 // We mock ONLY the transport wrapper. We do NOT mock the cancel-registry.
-// This keeps the tests focused on what UsersAPI passes to `request`.
+// This keeps the tests focused on what PortfolioAPI passes to `request`.
 jest.mock("../../shared/api-layer/api/request", () => ({
   request: jest.fn(),
 }));
@@ -17,31 +12,29 @@ jest.mock("../../shared/api-layer/api/request", () => ({
 // Strongly-typed handle to the mocked `request`.
 const request = realRequest as jest.MockedFunction<typeof realRequest>;
 
-describe("UsersAPI (wiring tests)", () => {
+describe("PortfolioAPI (wiring tests)", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   // ----------------------------- get ------------------------------------------
 
-  test("get (no args, cancel=false) → calls GET /users and does NOT pass a signal", async () => {
-    const data: Users[] = [
+  test("get (no args, cancel=false) → calls GET /portfolio and does NOT pass a signal", async () => {
+    const data: Portfolio[] = [
       {
-        coin: "BTC",
-        amount: 1,
-        buyPrice: 30000,
-        currentPrice: 35000,
-        profitLoss: 5000,
-        profitClass: "profit",
+        id: 1,
+        owner: "Nick Guber",
+        assets: "bitcoin",
+        joined: "2025-09-28T08:23:23.290333Z",
       },
     ];
     request.mockResolvedValueOnce(data);
 
-    const res = await UsersAPI.get(); // cancel=false default
+    const res = await PortfolioAPI.get(); // cancel=false default
 
     const [cfg, signal] = request.mock.calls[0];
     expect(cfg).toEqual({
-      url: "/users",
+      url: "/portfolio",
       method: "GET",
       // no query key when undefined
     });
@@ -52,30 +45,28 @@ describe("UsersAPI (wiring tests)", () => {
   test("get (cancel=true) → passes an AbortSignal", async () => {
     request.mockResolvedValueOnce([]);
 
-    await UsersAPI.get(undefined, true);
+    await PortfolioAPI.get(undefined, true);
 
     const [, signal] = request.mock.calls[0];
     expect(signal).toBeInstanceOf(AbortSignal);
   });
 
   test("get (with query, cancel=false) → includes query and no signal", async () => {
-    const data: Users[] = [
+    const data: Portfolio[] = [
       {
-        coin: "BTC",
-        amount: 1,
-        buyPrice: 30000,
-        currentPrice: 35000,
-        profitLoss: 5000,
-        profitClass: "profit",
+        id: 1,
+        owner: "Nick Guber",
+        assets: "bitcoin",
+        joined: "2025-09-28T08:23:23.290333Z",
       },
     ];
     request.mockResolvedValueOnce(data);
 
-    const res = await UsersAPI.get({ search: "btc", limit: 10 });
+    const res = await PortfolioAPI.get({ search: "btc", limit: 10 });
 
     const [cfg, signal] = request.mock.calls[0];
     expect(cfg).toEqual({
-      url: "/users",
+      url: "/portfolio",
       method: "GET",
       query: { search: "btc", limit: 10 },
     });
@@ -86,11 +77,11 @@ describe("UsersAPI (wiring tests)", () => {
   test("get (with query, cancel=true) → includes query and passes AbortSignal", async () => {
     request.mockResolvedValueOnce([]);
 
-    await UsersAPI.get({ search: "x" }, true);
+    await PortfolioAPI.get({ search: "x" }, true);
 
     const [cfg, signal] = request.mock.calls[0];
     expect(cfg).toEqual({
-      url: "/users",
+      url: "/portfolio",
       method: "GET",
       query: { search: "x" },
     });
@@ -101,6 +92,6 @@ describe("UsersAPI (wiring tests)", () => {
     const boom = new Error("transport failed");
     request.mockRejectedValueOnce(boom);
 
-    await expect(UsersAPI.get()).rejects.toBe(boom);
+    await expect(PortfolioAPI.get()).rejects.toBe(boom);
   });
 });

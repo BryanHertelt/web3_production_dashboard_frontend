@@ -10,31 +10,36 @@ import type {
 } from "axios";
 
 // ---- mock helper functions ----
-//  created our own mock functions with precise types:
 const isCancelMock = jest.fn<boolean, [unknown]>();
 const isAxiosErrMock = jest.fn<boolean, [unknown]>();
-const statusOfMock = jest.fn<number | undefined, [unknown]>();
-const logByStatusMock = jest.fn<void, [unknown, number | undefined]>();
+const describeStatusMock = jest.fn<
+  { level: "warn" | "error"; message: string },
+  [unknown]
+>();
 
-// then we mock the entire helpers module to use them:
 jest.mock("../../shared/api-layer/model/helpers", () => ({
   isCancel: (e: unknown) => isCancelMock(e),
   isAxiosErr: (e: unknown) => isAxiosErrMock(e),
-  statusOf: (e: unknown) => statusOfMock(e),
-  logByStatus: (err: unknown, status?: number) => logByStatusMock(err, status),
+  describeStatus: (e: unknown) => describeStatusMock(e),
 }));
 
-const mockConsoleError = jest
-  .spyOn(console, "error")
-  .mockImplementation(() => {}); // silence console output during tests
+// ---- mock logger (default export with .warn / .error) ----
+const loggerWarnMock = jest.fn<void, [unknown, string]>();
+const loggerErrorMock = jest.fn<void, [unknown, string]>();
+jest.mock("../../shared/logger/model/logger", () => ({
+  __esModule: true,
+  default: {
+    warn: (...args: [unknown, string]) => loggerWarnMock(...args),
+    error: (...args: [unknown, string]) => loggerErrorMock(...args),
+  },
+}));
 
-// A helper to build a minimal-but-valid Axios config for tests
+// Minimal-but-valid Axios shapes for typing
 function minimalConfig(): InternalAxiosRequestConfig {
   return {
-    headers: {} as AxiosHeaders, // satisfies the required shape
+    headers: {} as AxiosHeaders,
   } as InternalAxiosRequestConfig;
 }
-
 function minimalHeaders(): AxiosResponseHeaders {
   return {} as AxiosResponseHeaders;
 }
@@ -46,7 +51,6 @@ describe("axios-config", () => {
 
   // ---- Instance configuration ----
   test("instance has correct default settings", () => {
-    // These are the defaults we expect for every axios call
     expect(instance.defaults.baseURL).toBe(
       process.env.NEXT_PUBLIC_API_BASE_URL
     );
@@ -60,7 +64,6 @@ describe("axios-config", () => {
       data: { ok: true },
       status: 200,
       statusText: "OK",
-      // Axios v1 AxiosResponse type requires these fields so we had to mock them:
       headers: minimalHeaders(),
       config: minimalConfig(),
     } satisfies import("../../shared/api-layer/model/types").AxiosResponse<{
@@ -68,7 +71,7 @@ describe("axios-config", () => {
     }>;
 
     const result = onFulfilled(fakeResponse);
-    expect(result).toBe(fakeResponse); // should return the same object
+    expect(result).toBe(fakeResponse);
   });
 
   // ---- onRejected (cancel case) ----
@@ -77,30 +80,91 @@ describe("axios-config", () => {
     isCancelMock.mockReturnValue(true);
 
     await expect(onRejected(fakeError)).rejects.toBe(fakeError);
+
     expect(isCancelMock).toHaveBeenCalledWith(fakeError);
     expect(isAxiosErrMock).not.toHaveBeenCalled();
-    expect(logByStatusMock).not.toHaveBeenCalled();
-    expect(mockConsoleError).not.toHaveBeenCalled();
+    expect(describeStatusMock).not.toHaveBeenCalled();
+    expect(loggerWarnMock).not.toHaveBeenCalled();
+    expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  // ---- onRejected (axios error case) ----
-  test("onRejected logs axios errors by status and rethrows", async () => {
-    const fakeError = { response: { status: 404 } };
+  // ---- onRejected (axios error → warn) ----
+  test("onRejected logs axios errors using logger[level] (warn) and rethrows", async () => {
+    const fakeAxiosErr = {
+      name: "AxiosError",
+      message: "Not Found",
+      config: { method: "get", url: "/coins" },
+      response: { status: 404 },
+    };
+
     isCancelMock.mockReturnValue(false);
     isAxiosErrMock.mockReturnValue(true);
-    statusOfMock.mockReturnValue(404);
+    describeStatusMock.mockReturnValue({
+      level: "warn",
+      message: "Not Found",
+    });
 
-    await expect(onRejected(fakeError)).rejects.toBe(fakeError);
+    await expect(onRejected(fakeAxiosErr)).rejects.toBe(fakeAxiosErr);
 
-    expect(isAxiosErrMock).toHaveBeenCalledWith(fakeError);
-    expect(statusOfMock).toHaveBeenCalledWith(fakeError);
-    expect(logByStatusMock).toHaveBeenCalledWith(fakeError, 404);
-    expect(mockConsoleError).not.toHaveBeenCalled();
+    expect(isAxiosErrMock).toHaveBeenCalledWith(fakeAxiosErr);
+    expect(describeStatusMock).toHaveBeenCalledWith(fakeAxiosErr);
+
+    // Should use warn level with enriched error context and prefixed message
+    expect(loggerWarnMock).toHaveBeenCalledTimes(1);
+    const [objArg, msgArg] = loggerWarnMock.mock.calls[0];
+
+    expect(msgArg).toBe("[API] - Not Found Code - 404");
+    expect(objArg).toEqual({
+      err: {
+        message: "Not Found",
+        name: "AxiosError",
+        status: 404,
+        method: "GET", // should be uppercased by config
+        url: "/coins",
+      },
+    });
+
+    expect(loggerErrorMock).not.toHaveBeenCalled();
+  });
+
+  // ---- onRejected (axios error → error) ----
+  test("onRejected logs axios errors using logger[level] (error) and rethrows", async () => {
+    const fakeAxiosErr = {
+      name: "AxiosError",
+      message: "Internal Server Error",
+      config: { method: "post", url: "/portfolio" },
+      response: { status: 500 },
+    };
+
+    isCancelMock.mockReturnValue(false);
+    isAxiosErrMock.mockReturnValue(true);
+    describeStatusMock.mockReturnValue({
+      level: "error",
+      message: "Internal Server Error",
+    });
+
+    await expect(onRejected(fakeAxiosErr)).rejects.toBe(fakeAxiosErr);
+
+    expect(loggerErrorMock).toHaveBeenCalledTimes(1);
+    const [objArg, msgArg] = loggerErrorMock.mock.calls[0];
+
+    expect(msgArg).toBe("[API] - Internal Server Error Code - 500");
+    expect(objArg).toEqual({
+      err: {
+        message: "Internal Server Error",
+        name: "AxiosError",
+        status: 500,
+        method: "POST",
+        url: "/portfolio",
+      },
+    });
+
+    expect(loggerWarnMock).not.toHaveBeenCalled();
   });
 
   // ---- onRejected (unknown error case) ----
-  test("onRejected logs unknown errors once and rethrows", async () => {
-    const fakeError = { message: "something unexpected" };
+  test("onRejected logs unknown errors once via logger.error and rethrows", async () => {
+    const fakeError = { oh: "no" };
     isCancelMock.mockReturnValue(false);
     isAxiosErrMock.mockReturnValue(false);
 
@@ -108,10 +172,13 @@ describe("axios-config", () => {
 
     expect(isCancelMock).toHaveBeenCalledWith(fakeError);
     expect(isAxiosErrMock).toHaveBeenCalledWith(fakeError);
-    expect(logByStatusMock).not.toHaveBeenCalled();
+    expect(describeStatusMock).not.toHaveBeenCalled();
 
-    // Should log one readable message to console
-    expect(mockConsoleError).toHaveBeenCalledTimes(1);
-    expect(mockConsoleError.mock.calls[0][0]).toContain("[API]");
+    expect(loggerErrorMock).toHaveBeenCalledTimes(1);
+    const [objArg, msgArg] = loggerErrorMock.mock.calls[0];
+    expect(msgArg).toBe("[API] Unknown error object thrown");
+    expect(objArg).toEqual({ thrown: String(fakeError) });
+
+    expect(loggerWarnMock).not.toHaveBeenCalled();
   });
 });
