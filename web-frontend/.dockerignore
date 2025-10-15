@@ -1,0 +1,11 @@
+# Dependencies
+node_modules
+
+# Next.js build output
+.next
+
+# Git
+.git
+
+# Documentation
+README.md

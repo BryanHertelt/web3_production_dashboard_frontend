@@ -1,0 +1,51 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src"],
+  "entryPointStrategy": "expand",
+  "out": "docs",
+  "name": "Web Frontend Documentation",
+  "readme": "none",
+  "tsconfig": "./tsconfig.json",
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/__test__/**",
+    "node_modules/",
+    ".next/",
+    "out/"
+  ],
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "githubPages": false,
+  "theme": "default",
+  "categorizeByGroup": true,
+  "groupOrder": ["App", "Entities", "Features", "Shared", "Widgets", "*"],
+  "sort": ["source-order", "alphabetical"],
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true,
+    "includeFolders": true
+  },
+  "treatWarningsAsErrors": false,
+  "includeVersion": true,
+  "useTsLinkResolution": true,
+  "commentStyle": "block",
+  "searchInComments": true,
+  "cleanOutputDir": true,
+  "kindSortOrder": [
+    "Project",
+    "Module",
+    "Namespace",
+    "Enum",
+    "Class",
+    "Interface",
+    "TypeAlias",
+    "Constructor",
+    "Property",
+    "Method",
+    "Function",
+    "Accessor",
+    "Variable"
+  ]
+}
