@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Modern JS output
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true, // Allows JS files if needed
+    "skipLibCheck": true, // Skip type checking of dependencies
+    "strict": true, // Enable strict mode
+    "noEmit": true, // Do not emit JS (Next handles it)
+    "esModuleInterop": true, // Required for many commonjs libs
+    "module": "ESNext", // Module system for bundlers/ESM
+    "moduleResolution": "node", // Recommended for Node/Next.js
+    "resolveJsonModule": true, // Import JSON files
+    "isolatedModules": true, // For Next.js / Vite / Babel
+    "incremental": true, // Faster builds
+    "jsx": "preserve", // New JSX transform (React 17+)
+    "baseUrl": ".", // Base for path aliases
+    "paths": {
+      // Path alias for @/ → src/
+      "@/*": ["./src/*"]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      } // Next.js plugin for TS
+    ],
+    "types": ["node", "react", "react-dom", "jest"] // Ensure React & Node types are included
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "next.config.js",
+    "src" // Include src folder explicitly
+  ],
+  "exclude": ["node_modules"]
+}
