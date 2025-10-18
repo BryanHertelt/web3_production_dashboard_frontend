@@ -5,3 +5,6 @@
 For more instructions please read the documentation.
 
 Test the readme. 
+
+
+# This should work faster now.
