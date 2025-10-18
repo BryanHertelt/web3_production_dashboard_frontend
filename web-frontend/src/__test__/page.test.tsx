@@ -4,7 +4,7 @@ import CryptoDashboardPage from "../app/page";
 import "@testing-library/jest-dom";
 
 // Mock the entire CryptoDashboard component to avoid async issues
-jest.mock("@/pages/dashboard/dashboard-page", () => {
+jest.mock("@/pages/dashboard/ui/dashboard-page", () => {
   return function MockCryptoDashboard() {
     return (
       <div className="flex h-screen bg-gray-50 text-gray-900">

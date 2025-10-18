@@ -1,5 +1,5 @@
 {
-  "uuid": "a85f9b58-d77d-474e-a02e-97259049d2ff",
+  "uuid": "9d269ba5-5232-4afe-842e-f25e614c63dd",
   "lastMigration": 33,
   "name": "Demo",
   "endpointPrefix": "",
@@ -13,7 +13,7 @@
       "type": "http",
       "documentation": "",
       "method": "get",
-      "endpoint": "users",
+      "endpoint": "coins",
       "responses": [
         {
           "uuid": "f5daa608-0edb-450e-b8d0-9ecc15df2fac",
@@ -53,7 +53,7 @@
       "responses": [
         {
           "uuid": "c58a7ee6-6e80-4322-90cf-ad95ffe54d7e",
-          "body": "[\n  {\n    \"title\": \"Revenue\",\n    \"value\": 25.680,\n    \"change\": 8\n  },\n  {\n    \"title\": \"Transactions\",\n    \"value\": 18420,\n    \"change\": 5\n  },\n  {\n    \"title\": \"Refunds\",\n    \"value\": 3260,\n    \"change\": -2\n  },\n  {\n    \"title\": \"USD balance\",\n    \"value\": 25.680\n  },\n  {\n    \"title\": \"Pending payouts\",\n    \"value\": 12.340\n  }\n  ]",
+          "body": "[\n  {\n    \"title\": \"Revenue\",\n    \"value\": 25.680,\n    \"change\": 8\n  },\n  {\n    \"title\": \"Transactions\",\n    \"value\": 18420,\n    \"change\": 5\n  },\n  {\n    \"title\": \"Refunds\",\n    \"value\": 3260,\n    \"change\": -2\n  },\n  {\n    \"title\": \"USD balance\",\n    \"value\": 25.680\n  },\n  {\n    \"title\": \"Pending payouts\",\n    \"value\": 12.340\n  }\n]",
           "latency": 0,
           "statusCode": 200,
           "label": "",
@@ -87,7 +87,7 @@
     }
   ],
   "proxyMode": true,
-  "proxyHost": "http://host.docker.internal:8080",
+  "proxyHost": "http://localhost:8000",
   "proxyRemovePrefix": false,
   "tlsOptions": {
     "enabled": false,

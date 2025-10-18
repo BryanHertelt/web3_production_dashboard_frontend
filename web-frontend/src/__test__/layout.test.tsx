@@ -3,6 +3,13 @@ import { render, screen } from "@testing-library/react";
 import RootLayout from "../app/layout";
 import "@testing-library/jest-dom";
 
+jest.mock("@tanstack/react-query", () => ({
+  QueryClient: jest.fn().mockImplementation(() => ({})),
+  QueryClientProvider: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+}));
+
 describe("RootLayout component", () => {
   test("renders the root HTML structure", () => {
     render(
