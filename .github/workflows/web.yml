@@ -112,7 +112,9 @@ jobs:
 
       - name: Run ESLint
         working-directory: web-frontend
-        run: npm run lint
+        run: |
+          npm run lint
+          npx eslint . --format=node_modules/eslint-formatter-gitlab/index.js --output-file=gl-codequality.json || true
 
       - name: Upload code quality report
         if: always()
