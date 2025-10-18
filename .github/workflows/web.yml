@@ -19,15 +19,12 @@ jobs:
   install:
     name: Install dependencies
     runs-on: ubuntu-latest
+    container:
+      image: node:20
     timeout-minutes: 10
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Cache dependencies
         uses: actions/cache@v4
@@ -50,16 +47,13 @@ jobs:
   typescript-check:
     name: TypeScript type checking
     runs-on: ubuntu-latest
+    container:
+      image: node:20
     timeout-minutes: 3
     needs: install
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
@@ -81,16 +75,13 @@ jobs:
   eslint:
     name: ESLint
     runs-on: ubuntu-latest
+    container:
+      image: node:20
     timeout-minutes: 3
     needs: install
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
@@ -121,6 +112,8 @@ jobs:
   prettier-format:
     name: Prettier auto-format
     runs-on: ubuntu-latest
+    container:
+      image: node:20
     timeout-minutes: 5
     if: github.event_name == 'push'
     needs: install
@@ -130,11 +123,6 @@ jobs:
         with:
           token: ${{ GITHUB_TOKEN }}
           fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
@@ -174,16 +162,13 @@ jobs:
   test-jest:
     name: Jest tests
     runs-on: ubuntu-latest
+    container:
+      image: node:20
     timeout-minutes: 8
     needs: install
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
@@ -289,17 +274,13 @@ jobs:
   semgrep-scan:
     name: Semgrep security scanning
     runs-on: ubuntu-latest
+    container:
+      image: python:3.11-slim
     timeout-minutes: 8
     needs: install
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
 
       - name: Install Semgrep
         run: pip install semgrep
@@ -447,17 +428,14 @@ jobs:
   security-audit:
     name: npm security audit
     runs-on: ubuntu-latest
+    container:
+      image: node:20
     timeout-minutes: 5
     needs: install
     continue-on-error: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
@@ -479,17 +457,14 @@ jobs:
   generate-docs:
     name: Generate documentation
     runs-on: ubuntu-latest
+    container:
+      image: node:20
     timeout-minutes: 10
     if: (github.ref == 'refs/heads/dev' && github.event_name == 'push') || github.event_name == 'pull_request'
     needs: install
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
