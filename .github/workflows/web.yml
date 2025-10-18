@@ -222,6 +222,9 @@ jobs:
   docker-build:
     name: Build and push Docker image
     runs-on: ubuntu-latest
+    permissions: 
+      contents: read 
+      packages: write
     timeout-minutes: 20
     if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/pipeline-testing')
     steps:
@@ -261,7 +264,7 @@ jobs:
           build-args: |
             CI_COMMIT_SHA=${{ github.sha }}
             CI_COMMIT_REF_NAME=${{ github.ref_name }}
-            
+
       - name: Cleanup local Docker cache
         run: |
           docker image prune -af || true
