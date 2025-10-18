@@ -131,6 +131,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: node:20
+    permissions:
+      contents: write
     timeout-minutes: 5
     if: github.event_name == 'push'
     needs: install
