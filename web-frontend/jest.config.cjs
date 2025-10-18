@@ -24,6 +24,7 @@ const config = {
     "src/**/*.{js,jsx,ts,tsx}",
     "!src/**/*.d.ts",
     "!src/**/*.stories.{js,jsx,ts,tsx}",
+    "!src/**/types.ts",
     "!src/**/index.{js,jsx,ts,tsx}",
   ],
   coverageReporters: ["text", "lcov", "cobertura", "json-summary"],
