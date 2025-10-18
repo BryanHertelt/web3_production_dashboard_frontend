@@ -261,6 +261,11 @@ jobs:
           build-args: |
             CI_COMMIT_SHA=${{ github.sha }}
             CI_COMMIT_REF_NAME=${{ github.ref_name }}
+            
+      - name: Cleanup local Docker cache
+        run: |
+          docker image prune -af || true
+          docker builder prune -af || true
 
   # ---------------------------
   # Scan code base for secrets
