@@ -162,7 +162,6 @@ jobs:
             git add .
             git commit -m "style: Auto-format code with Prettier
 
-          Co-Authored-By: GitHub Actions <actions@github.com>"
             git push origin HEAD:${{ github.ref_name }}
             echo "Code formatted and committed successfully"
           else
@@ -198,7 +197,7 @@ jobs:
 
       - name: Run Jest tests
         working-directory: web-frontend
-        run: npm run test -- --ci --watchAll=false --passWithNoTests
+        run: npm run test -- --ci --watchAll=false
 
       - name: Upload coverage reports
         if: always()
