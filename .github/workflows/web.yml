@@ -18,7 +18,7 @@ jobs:
   # ---------------------------
   install:
     name: Install dependencies
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNNER_TYPE }}
     timeout-minutes: 10
     steps:
       - name: Checkout code
@@ -49,7 +49,7 @@ jobs:
   # ---------------------------
   typescript-check:
     name: TypeScript type checking
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNNER_TYPE }}
     container:
       image: node:20
     timeout-minutes: 3
@@ -84,7 +84,7 @@ jobs:
   # ---------------------------
   eslint:
     name: ESLint
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNNER_TYPE }}
     container:
       image: node:20
     timeout-minutes: 3
@@ -130,7 +130,7 @@ jobs:
   # ---------------------------
   prettier-format:
     name: Prettier auto-format
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNNER_TYPE }}
     container:
       image: node:20
     permissions:
@@ -189,7 +189,7 @@ jobs:
   # ---------------------------
   test-jest:
     name: Jest tests
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNNER_TYPE }}
     container:
       image: node:20
     timeout-minutes: 8
@@ -242,7 +242,7 @@ jobs:
   # ---------------------------
   docker-build:
     name: Build and push Docker image
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNNER_TYPE }}
     permissions: 
       contents: read 
       packages: write
@@ -296,7 +296,7 @@ jobs:
   # ---------------------------
   security-secrets:
     name: Gitleaks secret scanning
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNNER_TYPE }}
     timeout-minutes: 8
     steps:
       - name: Checkout code
@@ -408,7 +408,7 @@ jobs:
   # ---------------------------
   trivy-scan:
     name: Trivy container scanning
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNNER_TYPE }}
     timeout-minutes: 10
     if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/pipeline-testing')
     needs: docker-build
@@ -468,7 +468,7 @@ jobs:
   # ---------------------------
   security-audit:
     name: npm security audit
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNNER_TYPE }}
     container:
       image: node:20
     timeout-minutes: 5
@@ -504,7 +504,7 @@ jobs:
   # ---------------------------
   generate-docs:
     name: Generate documentation
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNNER_TYPE }}
     container:
       image: node:20
     timeout-minutes: 10
