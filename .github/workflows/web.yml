@@ -160,8 +160,7 @@ jobs:
           if ! git diff --quiet; then
             echo "Changes detected, committing and pushing to ${{ github.ref_name }}..."
             git add .
-            git commit -m "style: Auto-format code with Prettier
-
+            git commit -m "style: Auto-format code with Prettier."
             git push origin HEAD:${{ github.ref_name }}
             echo "Code formatted and committed successfully"
           else
