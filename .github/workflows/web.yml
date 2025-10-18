@@ -228,7 +228,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/zenetofficial/web-frontend
           tags: |
             type=sha,format=long
             type=raw,value=latest
@@ -241,8 +241,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: |
-            type=registry,ref=ghcr.io/${{ github.repository }}:cache
-            type=registry,ref=ghcr.io/${{ github.repository }}:latest
+            type=registry,ref=ghcr.io/zenetofficial/web-frontend:cache
+            type=registry,ref=ghcr.io/zenetofficial/web-frontend:latest
           cache-to: type=inline
           build-args: |
             BUILDKIT_INLINE_CACHE=1
@@ -393,7 +393,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+          image-ref: ghcr.io/zenetofficial/web-frontend:sha-${{ github.sha }}
           format: 'json'
           output: 'trivy-report.json'
           severity: 'HIGH,CRITICAL'
@@ -405,7 +405,7 @@ jobs:
       - name: Run Trivy scan (table format)
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+          image-ref: ghcr.io/zenetofficial/web-frontend:sha-${{ github.sha }}
           format: 'table'
           severity: 'HIGH,CRITICAL'
           ignore-unfixed: true
