@@ -1,19 +1,3 @@
-/**
- * Main export file for server-side API layer
- * 
- * Usage:
- * ```typescript
- * import { get, post, ServerApiError } from '@/lib/api-layer/server';
- * 
- * try {
- *   const users = await get<User[]>('/users');
- * } catch (error) {
- *   if (error instanceof ServerApiError) {
- *     console.error(error.toClientSafe());
- *   }
- * }
- * ```
- */
 
 // Main request functions
 export { serverRequest, get, post, put, patch, del } from './api/request';

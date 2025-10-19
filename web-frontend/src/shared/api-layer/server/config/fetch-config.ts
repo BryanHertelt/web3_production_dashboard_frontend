@@ -2,28 +2,96 @@
  * Server-side fetch configuration with timeout, retries, and Next.js cache control
  */
 
+/**
+ * The base URL for the API server, configurable via environment variable.
+ */
 export const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001';
+/**
+ * The default timeout for API requests in milliseconds.
+ *
+ * @type {15000}
+ */
 export const API_TIMEOUT = 15000; // 15 seconds
+/**
+ * The maximum number of retry attempts for failed requests.
+ *
+ * @type {3}
+ */
 export const MAX_RETRIES = 3;
+/**
+ * The base delay between retry attempts in milliseconds.
+ *
+ * @type {1000}
+ */
 export const RETRY_DELAY = 1000; // 1 second
+/**
+ * The maximum delay allowed for retry backoff in milliseconds.
+ *
+ * @type {10000}
+ */
 export const MAX_RETRY_DELAY = 10000; // 10 seconds max backoff
 
 // Extended RequestInit to include Next.js specific options
+/**
+ * Configuration options for server-side fetch requests, extending standard RequestInit with additional retry and timeout options.
+ *
+ * @export
+ * @interface ServerFetchConfig
+ * @typedef {ServerFetchConfig}
+ * @extends {RequestInit}
+ */
 export interface ServerFetchConfig extends RequestInit {
+  /**
+   * The timeout for the request in milliseconds.
+   *
+   * @type {?number}
+   */
   timeout?: number;
+  /**
+   * The number of retry attempts for failed requests.
+   *
+   * @type {?number}
+   */
   retries?: number;
+  /**
+   * The delay between retry attempts in milliseconds.
+   *
+   * @type {?number}
+   */
   retryDelay?: number;
 }
 
 // Separate Next.js config
+/**
+ * Configuration options specific to Next.js caching and revalidation.
+ *
+ * @export
+ * @interface NextConfig
+ * @typedef {NextConfig}
+ */
 export interface NextConfig {
+  /**
+   * The revalidation time in seconds for ISR, or false to disable revalidation.
+   *
+   * @type {?(number | false)}
+   */
   revalidate?: number | false;
+  /**
+   * Cache tags for on-demand revalidation.
+   *
+   * @type {?string[]}
+   */
   tags?: string[];
 }
 
 /**
- * Enhanced fetch with timeout and retry logic
- * Handles network failures, timeouts, and transient errors
+ * Performs a fetch request with enhanced timeout, retry logic, and Next.js caching support.
+ * Handles network failures, timeouts, and transient server errors with exponential backoff.
+ *
+ * @param url - The URL to fetch.
+ * @param config - The fetch configuration options, including timeout and retry settings.
+ * @param nextConfig - Optional Next.js specific configuration for caching and revalidation.
+ * @returns A Promise that resolves to the Response object.
  */
 export async function fetchWithTimeout(
   url: string,
@@ -89,7 +157,11 @@ export async function fetchWithTimeout(
 }
 
 /**
- * Calculate exponential backoff with jitter
+ * Calculates the delay for exponential backoff with jitter to prevent thundering herd problems.
+ *
+ * @param attempt - The current attempt number (starting from 0).
+ * @param baseDelay - The base delay in milliseconds.
+ * @returns The calculated delay in milliseconds, capped at MAX_RETRY_DELAY.
  */
 function calculateBackoff(attempt: number, baseDelay: number): number {
   const exponentialDelay = baseDelay * Math.pow(2, attempt);
@@ -98,7 +170,10 @@ function calculateBackoff(attempt: number, baseDelay: number): number {
 }
 
 /**
- * Parse Retry-After header (seconds or HTTP date)
+ * Parses the Retry-After header from HTTP responses, supporting both seconds and HTTP date formats.
+ *
+ * @param header - The Retry-After header value.
+ * @returns The retry delay in milliseconds, or null if parsing fails.
  */
 function parseRetryAfter(header: string | null): number | null {
   if (!header) return null;
@@ -119,7 +194,12 @@ function parseRetryAfter(header: string | null): number | null {
 }
 
 /**
- * Determine if request should be retried based on error type
+ * Determines whether a request should be retried based on the error type and remaining attempts.
+ *
+ * @param error - The error that occurred.
+ * @param attempt - The current attempt number.
+ * @param maxRetries - The maximum number of retry attempts allowed.
+ * @returns True if the request should be retried, false otherwise.
  */
 function shouldRetry(error: unknown, attempt: number, maxRetries: number): boolean {
   // No more attempts left
@@ -146,6 +226,12 @@ function shouldRetry(error: unknown, attempt: number, maxRetries: number): boole
   return false;
 }
 
+/**
+ * Creates a promise that resolves after a specified delay, used for implementing retry delays.
+ *
+ * @param ms - The delay in milliseconds.
+ * @returns A Promise that resolves after the specified delay.
+ */
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }

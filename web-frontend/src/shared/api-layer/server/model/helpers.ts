@@ -5,11 +5,16 @@
 import type { ErrorDetails } from './types';
 
 /**
- * Build full URL with query parameters
+ * Constructs a full URL by combining a base URL, path, and optional query parameters.
+ *
+ * @param baseUrl - The base URL (e.g., 'https://api.example.com').
+ * @param path - The API endpoint path (e.g., '/users' or 'users/123').
+ * @param query - An optional object of query parameters to append to the URL.
+ * @returns The fully constructed URL as a string.
  */
 export function buildUrl(
-  baseUrl: string, 
-  path: string, 
+  baseUrl: string,
+  path: string,
   query?: Record<string, unknown>
 ): string {
   // Ensure baseUrl doesn't end with slash and path starts with slash
@@ -35,7 +40,10 @@ export function buildUrl(
 }
 
 /**
- * Check if error is a fetch/network error
+ * Determines if the given error is a network-related error, such as connection failures or DNS issues.
+ *
+ * @param error - The error to check.
+ * @returns True if the error is network-related, false otherwise.
  */
 export function isNetworkError(error: unknown): boolean {
   if (error instanceof Error) {
@@ -53,7 +61,10 @@ export function isNetworkError(error: unknown): boolean {
 }
 
 /**
- * Check if error is a timeout
+ * Determines if the given error is a timeout error, such as request timeouts or aborted requests.
+ *
+ * @param error - The error to check.
+ * @returns True if the error is a timeout error, false otherwise.
  */
 export function isTimeoutError(error: unknown): boolean {
   if (error instanceof Error) {
@@ -67,7 +78,10 @@ export function isTimeoutError(error: unknown): boolean {
 }
 
 /**
- * Extract error details from various error types
+ * Extracts standardized error details from various types of errors, including standard Error instances and custom error objects.
+ *
+ * @param error - The error to extract details from.
+ * @returns An ErrorDetails object containing the extracted information.
  */
 export function extractErrorDetails(error: unknown): ErrorDetails {
   // Handle null/undefined
@@ -119,11 +133,15 @@ export function extractErrorDetails(error: unknown): ErrorDetails {
 }
 
 /**
- * Log error with context
+ * Logs an error with additional context and details, using appropriate log levels and including environment-specific handling.
+ *
+ * @param context - A string describing the context where the error occurred (e.g., 'API Request').
+ * @param error - The error to log.
+ * @param details - Optional additional details to include in the log.
  */
 export function logError(
-  context: string, 
-  error: unknown, 
+  context: string,
+  error: unknown,
   details?: Record<string, unknown>
 ): void {
   const errorDetails = extractErrorDetails(error);
@@ -161,7 +179,10 @@ export function logError(
 }
 
 /**
- * Determine HTTP status category
+ * Categorizes an HTTP status code into predefined categories for easier handling.
+ *
+ * @param status - The HTTP status code to categorize.
+ * @returns The category of the status code: 'success', 'redirect', 'client_error', 'server_error', or 'unknown'.
  */
 export function getStatusCategory(
   status: number
@@ -174,7 +195,10 @@ export function getStatusCategory(
 }
 
 /**
- * Sanitize sensitive data from objects (for logging)
+ * Removes or redacts sensitive information from objects before logging to prevent data leaks.
+ *
+ * @param data - The data to sanitize.
+ * @returns The sanitized data with sensitive fields redacted.
  */
 export function sanitizeForLogging(data: unknown): unknown {
   if (!data || typeof data !== 'object') return data;
@@ -201,7 +225,10 @@ export function sanitizeForLogging(data: unknown): unknown {
 }
 
 /**
- * Check if response is JSON
+ * Checks if the given Response object has a JSON content type.
+ *
+ * @param response - The Response object to check.
+ * @returns True if the response is JSON, false otherwise.
  */
 export function isJsonResponse(response: Response): boolean {
   const contentType = response.headers.get('content-type');
@@ -209,7 +236,12 @@ export function isJsonResponse(response: Response): boolean {
 }
 
 /**
- * Safely parse JSON with fallback
+ * Safely parses JSON from a Response object, providing a fallback value if parsing fails or the response is not JSON.
+ *
+ * @template T - The expected type of the parsed JSON.
+ * @param response - The Response object to parse.
+ * @param fallback - An optional fallback value to return if parsing fails.
+ * @returns A Promise that resolves to the parsed JSON or the fallback value.
  */
 export async function safeJsonParse<T>(
   response: Response,

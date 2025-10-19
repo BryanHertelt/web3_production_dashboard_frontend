@@ -158,7 +158,15 @@ export async function serverRequest<
 }
 
 /**
- * Handle non-2xx HTTP responses
+ * Processes HTTP error responses and throws appropriate ServerApiError subclasses based on the status code.
+ *
+ * @param response - The HTTP response object with a non-2xx status.
+ * @param url - The request URL.
+ * @param method - The HTTP method used.
+ * @throws {UnauthorizedError} For 401 responses.
+ * @throws {ForbiddenError} For 403 responses.
+ * @throws {RateLimitError} For 429 responses.
+ * @throws {ServerApiError} For other error status codes.
  */
 async function handleErrorResponse(
   response: Response,
@@ -195,7 +203,15 @@ async function handleErrorResponse(
 }
 
 /**
- * Handle request errors (network, timeout, etc.)
+ * Processes request errors that occur during fetch operations, converting them to appropriate ServerApiError subclasses.
+ *
+ * @param error - The error that occurred during the request.
+ * @param url - The request URL.
+ * @param method - The HTTP method used.
+ * @throws {ServerApiError} If the error is already a ServerApiError.
+ * @throws {TimeoutError} For timeout errors.
+ * @throws {ServerDownError} For network errors.
+ * @throws {ServerApiError} For unknown errors.
  */
 function handleRequestError(
   error: unknown,
@@ -255,7 +271,14 @@ function handleRequestError(
 }
 
 /**
- * Convenience wrapper for GET requests
+ * Performs a GET request to the specified URL with optional query parameters.
+ *
+ * @template TResponse - The expected response data type.
+ * @template TQuery - The type of query parameters.
+ * @param url - The API endpoint path.
+ * @param query - Optional query parameters to append to the URL.
+ * @param options - Additional request options.
+ * @returns A Promise that resolves to the response data.
  */
 export async function get<TResponse, TQuery = undefined>(
   url: string,
@@ -271,7 +294,14 @@ export async function get<TResponse, TQuery = undefined>(
 }
 
 /**
- * Convenience wrapper for POST requests
+ * Performs a POST request to the specified URL with an optional request body.
+ *
+ * @template TResponse - The expected response data type.
+ * @template TBody - The type of the request body.
+ * @param url - The API endpoint path.
+ * @param body - The request body data.
+ * @param options - Additional request options.
+ * @returns A Promise that resolves to the response data.
  */
 export async function post<TResponse, TBody = unknown>(
   url: string,
@@ -287,7 +317,14 @@ export async function post<TResponse, TBody = unknown>(
 }
 
 /**
- * Convenience wrapper for PUT requests
+ * Performs a PUT request to the specified URL with an optional request body.
+ *
+ * @template TResponse - The expected response data type.
+ * @template TBody - The type of the request body.
+ * @param url - The API endpoint path.
+ * @param body - The request body data.
+ * @param options - Additional request options.
+ * @returns A Promise that resolves to the response data.
  */
 export async function put<TResponse, TBody = unknown>(
   url: string,
@@ -303,7 +340,14 @@ export async function put<TResponse, TBody = unknown>(
 }
 
 /**
- * Convenience wrapper for PATCH requests
+ * Performs a PATCH request to the specified URL with an optional request body.
+ *
+ * @template TResponse - The expected response data type.
+ * @template TBody - The type of the request body.
+ * @param url - The API endpoint path.
+ * @param body - The request body data.
+ * @param options - Additional request options.
+ * @returns A Promise that resolves to the response data.
  */
 export async function patch<TResponse, TBody = unknown>(
   url: string,
@@ -319,7 +363,12 @@ export async function patch<TResponse, TBody = unknown>(
 }
 
 /**
- * Convenience wrapper for DELETE requests
+ * Performs a DELETE request to the specified URL.
+ *
+ * @template TResponse - The expected response data type.
+ * @param url - The API endpoint path.
+ * @param options - Additional request options.
+ * @returns A Promise that resolves to the response data.
  */
 export async function del<TResponse>(
   url: string,
