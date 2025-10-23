@@ -5,7 +5,7 @@
 /**
  * The base URL for the API server, configurable via environment variable.
  */
-export const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001';
+export const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3001";
 /**
  * The default timeout for API requests in milliseconds.
  *
@@ -122,7 +122,11 @@ export async function fetchWithTimeout(
       clearTimeout(timeoutId);
 
       // Retry on specific server errors (502, 503, 504)
-      if (response.status >= 502 && response.status <= 504 && attempt < retries - 1) {
+      if (
+        response.status >= 502 &&
+        response.status <= 504 &&
+        attempt < retries - 1
+      ) {
         const delay = calculateBackoff(attempt, retryDelay);
         await sleep(delay);
         continue;
@@ -130,7 +134,7 @@ export async function fetchWithTimeout(
 
       // Retry on 429 (rate limit) if Retry-After header is reasonable
       if (response.status === 429 && attempt < retries - 1) {
-        const retryAfter = parseRetryAfter(response.headers.get('Retry-After'));
+        const retryAfter = parseRetryAfter(response.headers.get("Retry-After"));
         if (retryAfter && retryAfter <= MAX_RETRY_DELAY) {
           await sleep(retryAfter);
           continue;
@@ -153,7 +157,7 @@ export async function fetchWithTimeout(
     }
   }
 
-  throw lastError || new Error('Request failed after retries');
+  throw lastError || new Error("Request failed after retries");
 }
 
 /**
@@ -201,23 +205,30 @@ function parseRetryAfter(header: string | null): number | null {
  * @param maxRetries - The maximum number of retry attempts allowed.
  * @returns True if the request should be retried, false otherwise.
  */
-function shouldRetry(error: unknown, attempt: number, maxRetries: number): boolean {
+function shouldRetry(
+  error: unknown,
+  attempt: number,
+  maxRetries: number
+): boolean {
   // No more attempts left
   if (attempt >= maxRetries - 1) return false;
 
   if (error instanceof Error) {
     // Timeout errors are retryable
-    if (error.name === 'AbortError') return true;
-    
+    if (error.name === "AbortError") return true;
+
     // Network errors are retryable (except connection refused which indicates server is down)
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+    if (error.name === "TypeError" && error.message.includes("fetch")) {
       // Don't retry if it's clearly a connection refused
-      if (error.message.includes('ECONNREFUSED')) return false;
+      if (error.message.includes("ECONNREFUSED")) return false;
       return true;
     }
-    
+
     // Other network errors
-    if (error.message.includes('network') || error.message.includes('ETIMEDOUT')) {
+    if (
+      error.message.includes("network") ||
+      error.message.includes("ETIMEDOUT")
+    ) {
       return true;
     }
   }
@@ -233,5 +244,5 @@ function shouldRetry(error: unknown, attempt: number, maxRetries: number): boole
  * @returns A Promise that resolves after the specified delay.
  */
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

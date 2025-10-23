@@ -1,5 +1,5 @@
-import { API_BASE_URL } from '../config/fetch-config';
-import { fetchWithTimeout } from '../config/fetch-config';
+import { API_BASE_URL } from "../config/fetch-config";
+import { fetchWithTimeout } from "../config/fetch-config";
 import {
   ServerApiError,
   NetworkError,
@@ -8,7 +8,7 @@ import {
   RateLimitError,
   UnauthorizedError,
   ForbiddenError,
-} from './errors';
+} from "./errors";
 import {
   buildUrl,
   isNetworkError,
@@ -19,24 +19,24 @@ import {
   sanitizeForLogging,
   isJsonResponse,
   safeJsonParse,
-} from '../model/helpers';
-import type { RequestOptions } from '../model/types';
+} from "../model/helpers";
+import type { RequestOptions } from "../model/types";
 
 /**
  * Server-side request function
- * 
+ *
  * @template TResponse - Expected response data type
  * @template TBody - Request body type
  * @template TQuery - Query parameters type
- * 
+ *
  * @param options - Request configuration
  * @returns Promise resolving to typed response data
- * 
+ *
  * @throws {ServerApiError} - For API errors with status codes
  * @throws {NetworkError} - For network/connectivity issues
  * @throws {TimeoutError} - For request timeouts
  * @throws {ServerDownError} - When API server is unreachable
- * 
+ *
  * @example
  * // GET request
  * const users = await serverRequest<User[]>({
@@ -44,7 +44,7 @@ import type { RequestOptions } from '../model/types';
  *   method: 'GET',
  *   query: { role: 'admin' }
  * });
- * 
+ *
  * @example
  * // POST request with error handling
  * try {
@@ -62,10 +62,8 @@ import type { RequestOptions } from '../model/types';
 export async function serverRequest<
   TResponse,
   TBody = undefined,
-  TQuery = undefined
->(
-  options: RequestOptions<TQuery, TBody>
-): Promise<TResponse> {
+  TQuery = undefined,
+>(options: RequestOptions<TQuery, TBody>): Promise<TResponse> {
   const {
     url,
     method,
@@ -81,10 +79,10 @@ export async function serverRequest<
 
   // Validate URL
   if (!url) {
-    throw new ServerApiError('URL is required', { 
-      status: 400, 
-      code: 'INVALID_URL',
-      isOperational: false 
+    throw new ServerApiError("URL is required", {
+      status: 400,
+      code: "INVALID_URL",
+      isOperational: false,
     });
   }
 
@@ -95,25 +93,28 @@ export async function serverRequest<
   const requestConfig: RequestInit = {
     method,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...headers,
     },
     cache,
   };
 
   // Add body for POST/PUT/PATCH requests
-  if (body && ['POST', 'PUT', 'PATCH'].includes(method)) {
+  if (body && ["POST", "PUT", "PATCH"].includes(method)) {
     requestConfig.body = JSON.stringify(body);
   }
 
   // Prepare Next.js config
-  const nextConfig = revalidate !== undefined || tags !== undefined ? {
-    revalidate,
-    tags,
-  } : undefined;
+  const nextConfig =
+    revalidate !== undefined || tags !== undefined
+      ? {
+          revalidate,
+          tags,
+        }
+      : undefined;
 
   // Log request in development
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     console.log(`[Server API] ${method} ${url}`, {
       query: sanitizeForLogging(query),
       body: sanitizeForLogging(body),
@@ -122,11 +123,15 @@ export async function serverRequest<
 
   try {
     // Make request with timeout and retry logic
-    const response = await fetchWithTimeout(fullUrl, {
-      ...requestConfig,
-      timeout,
-      retries,
-    }, nextConfig);
+    const response = await fetchWithTimeout(
+      fullUrl,
+      {
+        ...requestConfig,
+        timeout,
+        retries,
+      },
+      nextConfig
+    );
 
     // Handle non-2xx responses
     if (!response.ok) {
@@ -135,7 +140,7 @@ export async function serverRequest<
 
     // Parse response based on content type
     let data: TResponse;
-    
+
     if (isJsonResponse(response)) {
       data = await response.json();
     } else {
@@ -143,14 +148,13 @@ export async function serverRequest<
       const text = await response.text();
       data = text as unknown as TResponse; // Type assertion for non-JSON responses
     }
-    
+
     // Log successful request in development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       console.log(`[Server API] ${method} ${url} - ${response.status} OK`);
     }
 
     return data;
-
   } catch (error) {
     // Handle and log errors appropriately
     return handleRequestError(error, url, method);
@@ -174,7 +178,10 @@ async function handleErrorResponse(
   method: string
 ): Promise<never> {
   const errorData = await safeJsonParse<Record<string, unknown>>(response, {});
-  const message = typeof errorData?.message === 'string' ? errorData.message : `Request failed with status ${response.status}`;
+  const message =
+    typeof errorData?.message === "string"
+      ? errorData.message
+      : `Request failed with status ${response.status}`;
   const category = getStatusCategory(response.status);
 
   // Log error with details
@@ -191,13 +198,15 @@ async function handleErrorResponse(
     case 403:
       throw new ForbiddenError(message);
     case 429:
-      const retryAfter = response.headers.get('Retry-After');
-      const retryAfterSeconds = retryAfter ? parseInt(retryAfter, 10) : undefined;
+      const retryAfter = response.headers.get("Retry-After");
+      const retryAfterSeconds = retryAfter
+        ? parseInt(retryAfter, 10)
+        : undefined;
       throw new RateLimitError(message, retryAfterSeconds);
     default:
-      throw new ServerApiError(message, { 
-        status: response.status, 
-        details: errorData 
+      throw new ServerApiError(message, {
+        status: response.status,
+        details: errorData,
       });
   }
 }
@@ -230,7 +239,7 @@ function handleRequestError(
   // Timeout error
   if (isTimeoutError(error)) {
     const timeoutError = new TimeoutError(
-      'Request timeout exceeded',
+      "Request timeout exceeded",
       error as Error
     );
     logError(`${method} ${url}`, timeoutError, {
@@ -242,7 +251,7 @@ function handleRequestError(
   // Network error (connection refused, DNS failure, etc.)
   if (isNetworkError(error)) {
     const networkError = new ServerDownError(
-      'API server is not responding',
+      "API server is not responding",
       error as Error
     );
     logError(`${method} ${url}`, networkError, {
@@ -254,7 +263,7 @@ function handleRequestError(
   // Unknown error - wrap and log
   const details = extractErrorDetails(error);
   const unknownError = new ServerApiError(
-    details.message || 'Unknown error occurred',
+    details.message || "Unknown error occurred",
     {
       status: 500,
       details,
@@ -287,7 +296,7 @@ export async function get<TResponse, TQuery = undefined>(
 ): Promise<TResponse> {
   return serverRequest<TResponse, undefined, TQuery>({
     url,
-    method: 'GET',
+    method: "GET",
     query,
     ...options,
   });
@@ -310,7 +319,7 @@ export async function post<TResponse, TBody = unknown>(
 ): Promise<TResponse> {
   return serverRequest<TResponse, TBody, undefined>({
     url,
-    method: 'POST',
+    method: "POST",
     body,
     ...options,
   });
@@ -333,7 +342,7 @@ export async function put<TResponse, TBody = unknown>(
 ): Promise<TResponse> {
   return serverRequest<TResponse, TBody, undefined>({
     url,
-    method: 'PUT',
+    method: "PUT",
     body,
     ...options,
   });
@@ -356,7 +365,7 @@ export async function patch<TResponse, TBody = unknown>(
 ): Promise<TResponse> {
   return serverRequest<TResponse, TBody, undefined>({
     url,
-    method: 'PATCH',
+    method: "PATCH",
     body,
     ...options,
   });
@@ -376,7 +385,7 @@ export async function del<TResponse>(
 ): Promise<TResponse> {
   return serverRequest<TResponse, undefined, undefined>({
     url,
-    method: 'DELETE',
+    method: "DELETE",
     ...options,
   });
 }
