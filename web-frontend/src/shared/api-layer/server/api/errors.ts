@@ -43,14 +43,14 @@ export class ServerApiError extends Error {
    * Creates an instance of ServerApiError.
    *
    * @constructor
-   * @param {string} message 
+   * @param {string} message
    * @param {{
    *       status?: number;
    *       code?: string;
    *       details?: unknown;
    *       isOperational?: boolean;
    *       originalError?: Error;
-   *     }} [options={}] 
+   *     }} [options={}]
    */
   constructor(
     message: string,
@@ -63,9 +63,9 @@ export class ServerApiError extends Error {
     } = {}
   ) {
     super(message);
-    this.name = 'ServerApiError';
+    this.name = "ServerApiError";
     this.status = options.status;
-    this.code = options.code || 'API_ERROR';
+    this.code = options.code || "API_ERROR";
     this.details = options.details;
     this.isOperational = options.isOperational ?? true;
     this.originalError = options.originalError;
@@ -85,9 +85,9 @@ export class ServerApiError extends Error {
       status: this.status,
       code: this.code,
       // Only expose details in development
-      ...(process.env.NODE_ENV === 'development' && { 
+      ...(process.env.NODE_ENV === "development" && {
         details: this.details,
-        stack: this.stack
+        stack: this.stack,
       }),
     };
   }
@@ -115,16 +115,16 @@ export class NetworkError extends ServerApiError {
    * Creates an instance of NetworkError.
    *
    * @constructor
-   * @param {string} [message='Network request failed'] 
-   * @param {?Error} [originalError] 
+   * @param {string} [message='Network request failed']
+   * @param {?Error} [originalError]
    */
-  constructor(message = 'Network request failed', originalError?: Error) {
+  constructor(message = "Network request failed", originalError?: Error) {
     super(message, {
-      code: 'NETWORK_ERROR',
+      code: "NETWORK_ERROR",
       originalError,
       details: originalError?.message,
     });
-    this.name = 'NetworkError';
+    this.name = "NetworkError";
   }
 }
 
@@ -141,16 +141,16 @@ export class TimeoutError extends ServerApiError {
    * Creates an instance of TimeoutError.
    *
    * @constructor
-   * @param {string} [message='Request timeout'] 
-   * @param {?Error} [originalError] 
+   * @param {string} [message='Request timeout']
+   * @param {?Error} [originalError]
    */
-  constructor(message = 'Request timeout', originalError?: Error) {
+  constructor(message = "Request timeout", originalError?: Error) {
     super(message, {
       status: 408,
-      code: 'TIMEOUT',
+      code: "TIMEOUT",
       originalError,
     });
-    this.name = 'TimeoutError';
+    this.name = "TimeoutError";
   }
 }
 
@@ -167,16 +167,16 @@ export class ValidationError extends ServerApiError {
    * Creates an instance of ValidationError.
    *
    * @constructor
-   * @param {string} message 
-   * @param {?unknown} [details] 
+   * @param {string} message
+   * @param {?unknown} [details]
    */
   constructor(message: string, details?: unknown) {
     super(message, {
       status: 400,
-      code: 'VALIDATION_ERROR',
+      code: "VALIDATION_ERROR",
       details,
     });
-    this.name = 'ValidationError';
+    this.name = "ValidationError";
   }
 }
 
@@ -193,14 +193,14 @@ export class NotFoundError extends ServerApiError {
    * Creates an instance of NotFoundError.
    *
    * @constructor
-   * @param {string} resource 
+   * @param {string} resource
    */
   constructor(resource: string) {
     super(`${resource} not found`, {
       status: 404,
-      code: 'NOT_FOUND',
+      code: "NOT_FOUND",
     });
-    this.name = 'NotFoundError';
+    this.name = "NotFoundError";
   }
 }
 
@@ -217,16 +217,16 @@ export class ServerDownError extends ServerApiError {
    * Creates an instance of ServerDownError.
    *
    * @constructor
-   * @param {string} [message='API server is not responding'] 
-   * @param {?Error} [originalError] 
+   * @param {string} [message='API server is not responding']
+   * @param {?Error} [originalError]
    */
-  constructor(message = 'API server is not responding', originalError?: Error) {
+  constructor(message = "API server is not responding", originalError?: Error) {
     super(message, {
       status: 503,
-      code: 'SERVER_DOWN',
+      code: "SERVER_DOWN",
       originalError,
     });
-    this.name = 'ServerDownError';
+    this.name = "ServerDownError";
   }
 }
 
@@ -251,16 +251,16 @@ export class RateLimitError extends ServerApiError {
    * Creates an instance of RateLimitError.
    *
    * @constructor
-   * @param {string} [message='Rate limit exceeded'] 
-   * @param {?number} [retryAfter] 
+   * @param {string} [message='Rate limit exceeded']
+   * @param {?number} [retryAfter]
    */
-  constructor(message = 'Rate limit exceeded', retryAfter?: number) {
+  constructor(message = "Rate limit exceeded", retryAfter?: number) {
     super(message, {
       status: 429,
-      code: 'RATE_LIMIT',
+      code: "RATE_LIMIT",
       details: { retryAfter },
     });
-    this.name = 'RateLimitError';
+    this.name = "RateLimitError";
     this.retryAfter = retryAfter;
   }
 }
@@ -278,15 +278,15 @@ export class UnauthorizedError extends ServerApiError {
    * Creates an instance of UnauthorizedError.
    *
    * @constructor
-   * @param {string} [message='Unauthorized'] 
+   * @param {string} [message='Unauthorized']
    */
-  constructor(message = 'Unauthorized') {
+  constructor(message = "Unauthorized") {
     super(message, {
       status: 401,
-      code: 'UNAUTHORIZED',
+      code: "UNAUTHORIZED",
       isOperational: true,
     });
-    this.name = 'UnauthorizedError';
+    this.name = "UnauthorizedError";
   }
 }
 
@@ -303,14 +303,14 @@ export class ForbiddenError extends ServerApiError {
    * Creates an instance of ForbiddenError.
    *
    * @constructor
-   * @param {string} [message='Forbidden'] 
+   * @param {string} [message='Forbidden']
    */
-  constructor(message = 'Forbidden') {
+  constructor(message = "Forbidden") {
     super(message, {
       status: 403,
-      code: 'FORBIDDEN',
+      code: "FORBIDDEN",
       isOperational: true,
     });
-    this.name = 'ForbiddenError';
+    this.name = "ForbiddenError";
   }
 }
