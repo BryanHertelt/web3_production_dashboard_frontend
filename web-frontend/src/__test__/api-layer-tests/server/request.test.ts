@@ -1,6 +1,17 @@
-import { serverRequest, get, post, put, patch, del } from '../../../shared/api-layer/server/api/request';
-import { ServerApiError, TimeoutError, ServerDownError } from '../../../shared/api-layer/server/api/errors';
-import { fetchWithTimeout } from '../../../shared/api-layer/server/config/fetch-config';
+import {
+  serverRequest,
+  get,
+  post,
+  put,
+  patch,
+  del,
+} from "../../../shared/api-layer/server/api/request";
+import {
+  ServerApiError,
+  TimeoutError,
+  ServerDownError,
+} from "../../../shared/api-layer/server/api/errors";
+import { fetchWithTimeout } from "../../../shared/api-layer/server/config/fetch-config";
 
 // Mock fetch globally
 const fetchMock = jest.fn();
@@ -15,22 +26,24 @@ jest.mock("../../../shared/api-layer/server/config/fetch-config", () => ({
   fetchWithTimeout: jest.fn(),
 }));
 
-const mockedFetchWithTimeout = fetchWithTimeout as jest.MockedFunction<typeof fetchWithTimeout>;
+const mockedFetchWithTimeout = fetchWithTimeout as jest.MockedFunction<
+  typeof fetchWithTimeout
+>;
 
 // Helper function to create a proper mock Response
 const createMockResponse = (overrides: Partial<Response> = {}): Response => {
   const defaults: Partial<Response> = {
     ok: true,
     status: 200,
-    statusText: 'OK',
+    statusText: "OK",
     redirected: false,
-    type: 'basic',
-    url: 'http://localhost:3001/test',
-    headers: new Headers({ 'content-type': 'application/json' }),
+    type: "basic",
+    url: "http://localhost:3001/test",
+    headers: new Headers({ "content-type": "application/json" }),
     body: null,
     bodyUsed: false,
-    json: jest.fn().mockResolvedValue({ data: 'test' }),
-    text: jest.fn().mockResolvedValue(''),
+    json: jest.fn().mockResolvedValue({ data: "test" }),
+    text: jest.fn().mockResolvedValue(""),
     blob: jest.fn().mockResolvedValue(new Blob()),
     arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
     formData: jest.fn().mockResolvedValue(new FormData()),
@@ -40,14 +53,14 @@ const createMockResponse = (overrides: Partial<Response> = {}): Response => {
   return { ...defaults, ...overrides } as Response;
 };
 
-describe('serverRequest', () => {
+describe("serverRequest", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('makes a successful GET request', async () => {
+  it("makes a successful GET request", async () => {
     const mockResponse = createMockResponse({
-      json: jest.fn().mockResolvedValue({ data: 'test' }),
+      json: jest.fn().mockResolvedValue({ data: "test" }),
     });
 
     mockedFetchWithTimeout.mockResolvedValue(mockResponse);
@@ -57,9 +70,9 @@ describe('serverRequest', () => {
       method: "GET",
     });
 
-    expect(result).toEqual({ data: 'test' });
+    expect(result).toEqual({ data: "test" });
     expect(mockedFetchWithTimeout).toHaveBeenCalledWith(
-      'http://localhost:3001/test',
+      "http://localhost:3001/test",
       expect.objectContaining({
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -68,7 +81,7 @@ describe('serverRequest', () => {
     );
   });
 
-  it('makes a POST request with body', async () => {
+  it("makes a POST request with body", async () => {
     const mockResponse = createMockResponse({
       status: 201,
       json: jest.fn().mockResolvedValue({ id: 1 }),
@@ -85,7 +98,7 @@ describe('serverRequest', () => {
 
     expect(result).toEqual({ id: 1 });
     expect(mockedFetchWithTimeout).toHaveBeenCalledWith(
-      'http://localhost:3001/test',
+      "http://localhost:3001/test",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify(body),
@@ -94,10 +107,10 @@ describe('serverRequest', () => {
     );
   });
 
-  it('handles non-JSON responses', async () => {
+  it("handles non-JSON responses", async () => {
     const mockResponse = createMockResponse({
-      headers: new Headers({ 'content-type': 'text/plain' }),
-      text: jest.fn().mockResolvedValue('plain text'),
+      headers: new Headers({ "content-type": "text/plain" }),
+      text: jest.fn().mockResolvedValue("plain text"),
     });
 
     mockedFetchWithTimeout.mockResolvedValue(mockResponse);
@@ -110,11 +123,11 @@ describe('serverRequest', () => {
     expect(result).toBe("plain text");
   });
 
-  it('throws ServerApiError for non-2xx responses', async () => {
+  it("throws ServerApiError for non-2xx responses", async () => {
     const mockResponse = createMockResponse({
       ok: false,
       status: 404,
-      json: jest.fn().mockResolvedValue({ message: 'Not found' }),
+      json: jest.fn().mockResolvedValue({ message: "Not found" }),
     });
 
     mockedFetchWithTimeout.mockResolvedValue(mockResponse);
@@ -146,7 +159,7 @@ describe('serverRequest', () => {
       const mockResponse = createMockResponse({
         ok: false,
         status,
-        json: jest.fn().mockResolvedValue({ message: 'Error' }),
+        json: jest.fn().mockResolvedValue({ message: "Error" }),
       });
 
       mockedFetchWithTimeout.mockResolvedValue(mockResponse);
@@ -169,7 +182,7 @@ describe('serverRequest', () => {
     ).rejects.toThrow(ServerApiError);
   });
 
-  it('builds URL with query parameters', async () => {
+  it("builds URL with query parameters", async () => {
     const mockResponse = createMockResponse({
       json: jest.fn().mockResolvedValue({}),
     });
@@ -183,13 +196,13 @@ describe('serverRequest', () => {
     });
 
     expect(mockedFetchWithTimeout).toHaveBeenCalledWith(
-      'http://localhost:3001/test?param1=value1&param2=value2',
+      "http://localhost:3001/test?param1=value1&param2=value2",
       expect.any(Object),
       undefined
     );
   });
 
-  it('handles array query parameters', async () => {
+  it("handles array query parameters", async () => {
     const mockResponse = createMockResponse({
       json: jest.fn().mockResolvedValue({}),
     });
@@ -203,13 +216,13 @@ describe('serverRequest', () => {
     });
 
     expect(mockedFetchWithTimeout).toHaveBeenCalledWith(
-      'http://localhost:3001/test?tags=tag1&tags=tag2',
+      "http://localhost:3001/test?tags=tag1&tags=tag2",
       expect.any(Object),
       undefined
     );
   });
 
-  it('passes custom headers', async () => {
+  it("passes custom headers", async () => {
     const mockResponse = createMockResponse({
       json: jest.fn().mockResolvedValue({}),
     });
@@ -225,7 +238,7 @@ describe('serverRequest', () => {
     });
 
     expect(mockedFetchWithTimeout).toHaveBeenCalledWith(
-      'http://localhost:3001/test',
+      "http://localhost:3001/test",
       expect.objectContaining({
         headers: {
           "Content-Type": "application/json",
@@ -236,7 +249,7 @@ describe('serverRequest', () => {
     );
   });
 
-  it('passes Next.js config when provided', async () => {
+  it("passes Next.js config when provided", async () => {
     const mockResponse = createMockResponse({
       json: jest.fn().mockResolvedValue({}),
     });
@@ -263,9 +276,11 @@ describe('serverRequest', () => {
 describe("Convenience methods", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockedFetchWithTimeout.mockResolvedValue(createMockResponse({
-      json: jest.fn().mockResolvedValue({ data: 'success' }),
-    }));
+    mockedFetchWithTimeout.mockResolvedValue(
+      createMockResponse({
+        json: jest.fn().mockResolvedValue({ data: "success" }),
+      })
+    );
   });
 
   it("get method calls serverRequest with GET method", async () => {
@@ -297,9 +312,9 @@ describe("Convenience methods", () => {
   });
 });
 
-describe('Error handling', () => {
-  it('handles network errors', async () => {
-    mockedFetchWithTimeout.mockRejectedValue(new TypeError('fetch failed'));
+describe("Error handling", () => {
+  it("handles network errors", async () => {
+    mockedFetchWithTimeout.mockRejectedValue(new TypeError("fetch failed"));
 
     await expect(
       serverRequest({
@@ -309,9 +324,9 @@ describe('Error handling', () => {
     ).rejects.toThrow(ServerDownError);
   });
 
-  it('handles timeout errors', async () => {
-    const abortError = new Error('Request timeout');
-    abortError.name = 'AbortError';
+  it("handles timeout errors", async () => {
+    const abortError = new Error("Request timeout");
+    abortError.name = "AbortError";
     mockedFetchWithTimeout.mockRejectedValue(abortError);
 
     await expect(
@@ -322,8 +337,8 @@ describe('Error handling', () => {
     ).rejects.toThrow(TimeoutError);
   });
 
-  it('handles unknown errors', async () => {
-    mockedFetchWithTimeout.mockRejectedValue(new Error('Unknown error'));
+  it("handles unknown errors", async () => {
+    mockedFetchWithTimeout.mockRejectedValue(new Error("Unknown error"));
 
     await expect(
       serverRequest({
