@@ -1,7 +1,7 @@
-import { request } from "../../../shared/api-layer/api/request";
-import { defineCancelRegistry } from "../../../shared/api-layer/api/cancel-registry";
+import { request } from "../../../shared/api-layer/client/api/request";
+import { defineCancelRegistry } from "../../../shared/api-layer/client/api/cancel-registry";
 import type { Coins } from "../model/types";
-import type { searchQuery } from "../../../shared/api-layer/model/types";
+import type { searchQuery } from "../../../shared/api-layer/client/model/types";
 /**
  * Cancel registry for Portfolio calls.
  * Keeps abort controllers for each method.
