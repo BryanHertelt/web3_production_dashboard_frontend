@@ -1,4 +1,4 @@
-import * as loggerModule from "../shared/logger/model/logger.js";
+import * as loggerModule from "../shared/logger/client-logger/model/logger.js";
 
 describe("Module Initialization", () => {
   let batchRetryTimerId = null;

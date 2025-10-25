@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { AxiosInstance, AxiosResponse } from "../model/types";
 import { isCancel, isAxiosErr, describeStatus } from "../model/helpers";
-import logger from "@/shared/logger/model/logger";
+import logger from "@/shared/logger/client-logger/model/logger";
 
 export const instance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
