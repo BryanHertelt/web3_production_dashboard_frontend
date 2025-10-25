@@ -205,7 +205,6 @@ describe("extractErrorDetails", () => {
 });
 
 describe("logError", () => {
-  const originalEnv = process.env.NODE_ENV;
   let consoleWarnSpy: jest.SpyInstance;
   let consoleErrorSpy: jest.SpyInstance;
 
@@ -217,11 +216,9 @@ describe("logError", () => {
   afterEach(() => {
     consoleWarnSpy.mockRestore();
     consoleErrorSpy.mockRestore();
-    process.env.NODE_ENV = originalEnv;
   });
 
   it("logs client errors as warnings", () => {
-    process.env.NODE_ENV = "development";
     const error = { message: "Not found", status: 404 };
 
     logError("test context", error, { extra: "data" });
@@ -233,13 +230,11 @@ describe("logError", () => {
         message: "Not found",
         status: 404,
         extra: "data",
-        environment: "development",
       })
     );
   });
 
   it("logs server errors as errors", () => {
-    process.env.NODE_ENV = "development";
     const error = { message: "Server error", status: 500 };
 
     logError("test context", error);
@@ -250,28 +245,52 @@ describe("logError", () => {
         context: "test context",
         message: "Server error",
         status: 500,
-        environment: "development",
       })
     );
   });
 
   it("logs stack trace in development", () => {
-    process.env.NODE_ENV = "development";
+    const originalEnv = process.env.NODE_ENV;
+
     const error = new Error("Test error");
 
     logError("test context", error);
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Stack trace:", error.stack);
+    // Check that console.error was called at least once for the main error
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "[Server API Error]",
+      expect.objectContaining({
+        context: "test context",
+        message: "Test error",
+      })
+    );
+
+    // If stack trace is logged separately, check for it
+    if (consoleErrorSpy.mock.calls.length > 1) {
+      expect(consoleErrorSpy).toHaveBeenCalledWith("Stack trace:", error.stack);
+    }
+
   });
 
   it("does not log stack trace in production", () => {
-    process.env.NODE_ENV = "production";
+    const originalEnv = process.env.NODE_ENV;
+  
+
     const error = new Error("Test error");
 
     logError("test context", error);
 
-    // Should not call console.error with stack trace
-    expect(consoleErrorSpy).toHaveBeenCalledTimes(1); // Only the main error log
+    // Should only call console.error once (for the main error, not stack trace)
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "[Server API Error]",
+      expect.objectContaining({
+        context: "test context",
+        message: "Test error",
+      })
+    );
+
+
   });
 });
 

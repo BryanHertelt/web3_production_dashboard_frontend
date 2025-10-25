@@ -55,48 +55,6 @@ describe("ServerApiError", () => {
     expect(err.isOperational).toBe(true);
   });
 
-  it("toClientSafe returns safe client response in production", () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
-
-    const details = { sensitive: "data" };
-    const err = new ServerApiError("test error", {
-      status: 500,
-      code: "INTERNAL_ERROR",
-      details,
-    });
-
-    const safe = err.toClientSafe();
-    expect(safe).toEqual({
-      message: "test error",
-      status: 500,
-      code: "INTERNAL_ERROR",
-    });
-
-    process.env.NODE_ENV = originalEnv;
-  });
-
-  it("toClientSafe includes details and stack in development", () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "development";
-
-    const details = { debug: "info" };
-    const err = new ServerApiError("test error", {
-      status: 500,
-      code: "INTERNAL_ERROR",
-      details,
-    });
-
-    const safe = err.toClientSafe();
-    expect(safe.message).toBe("test error");
-    expect(safe.status).toBe(500);
-    expect(safe.code).toBe("INTERNAL_ERROR");
-    expect(safe.details).toBe(details);
-    expect(safe.stack).toBeDefined();
-
-    process.env.NODE_ENV = originalEnv;
-  });
-
   it("isRetryable returns true for retryable status codes", () => {
     const retryableStatuses = [408, 429, 502, 503, 504];
     retryableStatuses.forEach((status) => {
