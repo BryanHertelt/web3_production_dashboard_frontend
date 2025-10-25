@@ -385,7 +385,7 @@ describe("fetchWithTimeout - retry logic", () => {
 describe("Constants", () => {
   it("exports correct default values", () => {
     expect(API_BASE_URL).toBe("http://localhost:3001");
-    expect(API_TIMEOUT).toBe(15000);
+    expect(API_TIMEOUT).toBe(5000);
     expect(MAX_RETRIES).toBe(3);
     expect(RETRY_DELAY).toBe(1000);
     expect(MAX_RETRY_DELAY).toBe(10000);
