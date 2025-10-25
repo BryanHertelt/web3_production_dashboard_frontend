@@ -193,3 +193,56 @@ export interface ErrorResponse {
  * Generic API response (success or error)
  */
 export type ApiResult<T> = SuccessResponse<T> | ErrorResponse;
+
+// Extended RequestInit to include Next.js specific options
+/**
+ * Configuration options for server-side fetch requests, extending standard RequestInit with additional retry and timeout options.
+ *
+ * @export
+ * @interface ServerFetchConfig
+ * @typedef {ServerFetchConfig}
+ * @extends {RequestInit}
+ */
+export interface ServerFetchConfig extends RequestInit {
+  /**
+   * The timeout for the request in milliseconds.
+   *
+   * @type {?number}
+   */
+  timeout?: number;
+  /**
+   * The number of retry attempts for failed requests.
+   *
+   * @type {?number}
+   */
+  retries?: number;
+  /**
+   * The delay between retry attempts in milliseconds.
+   *
+   * @type {?number}
+   */
+  retryDelay?: number;
+}
+
+// Separate Next.js config
+/**
+ * Configuration options specific to Next.js caching and revalidation.
+ *
+ * @export
+ * @interface NextConfig
+ * @typedef {NextConfig}
+ */
+export interface NextConfig {
+  /**
+   * The revalidation time in seconds for ISR, or false to disable revalidation.
+   *
+   * @type {?(number | false)}
+   */
+  revalidate?: number | false;
+  /**
+   * Cache tags for on-demand revalidation.
+   *
+   * @type {?string[]}
+   */
+  tags?: string[];
+}
