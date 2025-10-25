@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import CryptoDashboard from "@/pages/dashboard/ui/dashboard-page";
 import "@testing-library/jest-dom";
-import { PortfolioAPI, ApiError } from "@/shared/api-layer";
+import { PortfolioAPI, ApiError } from "@/shared/api-layer/client";
 
 interface TableProps {
   headers: string[];
@@ -62,7 +62,7 @@ jest.mock("@/widgets/table/ui/table", () => {
   };
 });
 
-jest.mock("@/shared/api-layer", () => {
+jest.mock("@/shared/api-layer/client", () => {
   class ApiError extends Error {
     status?: number;
     constructor(message: string, status?: number) {
