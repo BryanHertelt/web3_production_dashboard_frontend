@@ -266,13 +266,10 @@ describe("logError", () => {
     );
 
     // If stack trace is logged separately, check for it
-    
-
   });
 
   it("does not log stack trace in production", () => {
     const originalEnv = process.env.NODE_ENV;
-  
 
     const error = new Error("Test error");
 
@@ -287,8 +284,6 @@ describe("logError", () => {
         message: "Test error",
       })
     );
-
-
   });
 });
 
