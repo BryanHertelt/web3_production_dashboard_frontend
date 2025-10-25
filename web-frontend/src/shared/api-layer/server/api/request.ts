@@ -2,7 +2,6 @@ import { API_BASE_URL } from "../config/fetch-config";
 import { fetchWithTimeout } from "../config/fetch-config";
 import {
   ServerApiError,
-  NetworkError,
   TimeoutError,
   ServerDownError,
   RateLimitError,
