@@ -209,6 +209,7 @@ describe("logError", () => {
   let serverLoggerErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { serverLogger } = require("../../../shared/logger/server-logger/model/logger");
     serverLoggerWarnSpy = jest.spyOn(serverLogger, "warn").mockResolvedValue(undefined);
     serverLoggerErrorSpy = jest.spyOn(serverLogger, "error").mockResolvedValue(undefined);
@@ -252,7 +253,7 @@ describe("logError", () => {
 
   it("logs stack trace in development", async () => {
     const originalEnv = process.env.NODE_ENV;
-    // @ts-ignore
+    // @ts-expect-error: Modifying NODE_ENV for testing purposes
     process.env.NODE_ENV = "development";
 
     const error = new Error("Test error");
@@ -276,13 +277,13 @@ describe("logError", () => {
       })
     );
 
-    // @ts-ignore
+    // @ts-expect-error: Restoring NODE_ENV after testing
     process.env.NODE_ENV = originalEnv;
   });
 
   it("does not log stack trace in production", async () => {
     const originalEnv = process.env.NODE_ENV;
-    // @ts-ignore
+    // @ts-expect-error: Modifying NODE_ENV for testing purposes
     process.env.NODE_ENV = "production";
 
     const error = new Error("Test error");
@@ -299,7 +300,7 @@ describe("logError", () => {
       })
     );
 
-    // @ts-ignore
+    // @ts-expect-error: Restoring NODE_ENV after testing
     process.env.NODE_ENV = originalEnv;
   });
 });

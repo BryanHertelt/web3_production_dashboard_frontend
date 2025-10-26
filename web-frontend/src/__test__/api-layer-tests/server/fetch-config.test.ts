@@ -197,12 +197,13 @@ describe("fetchWithTimeout", () => {
       customConfig
     );
     await jest.runAllTimersAsync();
-    await promise;
+    const result = await promise;
 
     expect(fetchMock).toHaveBeenCalledWith("http://example.com/api/test", {
       ...customConfig,
       signal: expect.any(AbortSignal),
     });
+    expect(result).toBe(mockResponse);
   });
 
   it("returns response after all retries exhausted", async () => {
@@ -220,7 +221,8 @@ describe("fetchWithTimeout", () => {
     await jest.runAllTimersAsync();
     const result = await promise;
 
-    expect(result).toBe(mockResponse502);
+    expect(result.status).toBe(502);
+    expect(result.ok).toBe(false);
   });
 
   it("retries on AbortError (timeout)", async () => {
@@ -283,6 +285,95 @@ describe("fetchWithTimeout", () => {
     await expect(promise).rejects.toThrow("Failed to fetch ECONNREFUSED");
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("retries POST requests on 502 status code", async () => {
+    const mockResponse502 = {
+      ok: false,
+      status: 502,
+      headers: new Headers(),
+    };
+
+    const mockResponse200 = {
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+    };
+
+    fetchMock
+      .mockResolvedValueOnce(mockResponse502)
+      .mockResolvedValueOnce(mockResponse200);
+
+    const promise = fetchWithTimeout("http://example.com/api/test", {
+      method: "POST",
+      retries: 2,
+    });
+    await jest.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledWith("http://example.com/api/test", {
+      method: "POST",
+      signal: expect.any(AbortSignal),
+    });
+    expect(result).toBe(mockResponse200);
+  });
+
+  it("retries PUT requests on network error", async () => {
+    const networkError = new TypeError("Failed to fetch");
+
+    const mockResponse = {
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+    };
+
+    fetchMock
+      .mockRejectedValueOnce(networkError)
+      .mockResolvedValueOnce(mockResponse);
+
+    const promise = fetchWithTimeout("http://example.com/api/test", {
+      method: "PUT",
+      retries: 2,
+    });
+    await jest.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledWith("http://example.com/api/test", {
+      method: "PUT",
+      signal: expect.any(AbortSignal),
+    });
+    expect(result).toBe(mockResponse);
+  });
+
+  it("retries DELETE requests on timeout", async () => {
+    const abortError = new Error("Request timeout");
+    abortError.name = "AbortError";
+
+    const mockResponse = {
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+    };
+
+    fetchMock
+      .mockRejectedValueOnce(abortError)
+      .mockResolvedValueOnce(mockResponse);
+
+    const promise = fetchWithTimeout("http://example.com/api/test", {
+      method: "DELETE",
+      retries: 2,
+    });
+    await jest.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledWith("http://example.com/api/test", {
+      method: "DELETE",
+      signal: expect.any(AbortSignal),
+    });
+    expect(result).toBe(mockResponse);
   });
 });
 
