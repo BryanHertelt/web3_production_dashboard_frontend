@@ -34,6 +34,16 @@ export const RETRY_DELAY = 1000; // 1 second
 export const MAX_RETRY_DELAY = 10000; // 10 seconds max backoff
 
 /**
+ * Determines if an HTTP method is idempotent (safe to retry without side effects).
+ *
+ * @param method - The HTTP method to check.
+ * @returns True if the method is idempotent (GET, HEAD), false otherwise.
+ */
+function isIdempotentMethod(method: string): boolean {
+  return method === "GET" || method === "HEAD";
+}
+
+/**
  * Performs a fetch request with enhanced timeout, retry logic, and Next.js caching support.
  * Handles network failures, timeouts, and transient server errors with exponential backoff.
  *
@@ -49,16 +59,27 @@ export async function fetchWithTimeout(
 ): Promise<Response> {
   const {
     timeout = API_TIMEOUT,
-    retries = MAX_RETRIES,
+    retries = isIdempotentMethod(config.method || "GET") ? MAX_RETRIES : 0,
     retryDelay = RETRY_DELAY,
+    signal,
     ...fetchConfig
   } = config;
 
   let lastError: Error | undefined;
 
-  for (let attempt = 0; attempt < retries; attempt++) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    // Listen to external signal and abort internal controller if it fires
+    if (signal) {
+      const abortHandler = () => controller.abort();
+      signal.addEventListener("abort", abortHandler);
+      // Clean up listener on controller abort or timeout
+      controller.signal.addEventListener("abort", () => {
+        signal.removeEventListener("abort", abortHandler);
+      });
+    }
 
     try {
       const response = await fetch(url, {
@@ -74,7 +95,7 @@ export async function fetchWithTimeout(
       if (
         response.status >= 502 &&
         response.status <= 504 &&
-        attempt < retries - 1
+        attempt < retries
       ) {
         const delay = calculateBackoff(attempt, retryDelay);
         await sleep(delay);
@@ -82,7 +103,7 @@ export async function fetchWithTimeout(
       }
 
       // Retry on 429 (rate limit) if Retry-After header is reasonable
-      if (response.status === 429 && attempt < retries - 1) {
+      if (response.status === 429 && attempt < retries) {
         const retryAfter = parseRetryAfter(response.headers.get("Retry-After"));
         if (retryAfter && retryAfter <= MAX_RETRY_DELAY) {
           await sleep(retryAfter);
@@ -96,8 +117,8 @@ export async function fetchWithTimeout(
       lastError = error as Error;
 
       // Don't retry on certain errors or last attempt
-      if (!shouldRetry(error, attempt, retries)) {
-        break;
+      if (attempt >= retries || !shouldRetry(error, attempt, retries)) {
+        throw lastError;
       }
 
       // Exponential backoff with jitter
