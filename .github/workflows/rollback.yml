@@ -1,0 +1,42 @@
+name: Rollback Web
+
+on:
+  workflow_dispatch:
+    inputs:
+      backup-filename:
+        description: 'Backup file to restore (optional - leave empty to skip DB restore)'
+        required: false
+        type: string
+        default: ''
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs: 
+  # ---------------------------
+  # Rollback web application
+  # ---------------------------
+  rollback:
+    name: Rollback to previous version.
+    runs-on: ${{vars.RUNNER_TYPE}}
+    timeout-minutes: 10 
+    permissions: 
+      contents: write 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
+      - name: Rollback application
+        uses: ZenetOfficial/infra/github/rollback@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
+        with:
+          backup-filename: ${{ inputs.backup-filename }}
+          ssh-key: ${{secrets.DEV_DEPLOY_SSH_KEY}}
+          ssh-known-hosts: ${{secrets.DEV_SSH_KNOWN_HOSTS}}
+          deploy-host: ${{vars.DEV_SERVER_HOST}}
+          deploy-user: ${{vars.DEV_SERVER_USER}}
+          deploy-path: ${{vars.DEV_SERVER_PATH}}
+          deploy-port: ${{vars.DEV_SERVER_SSH_PORT}}
+          postgres-password: ${{secrets.DEV_POSTGRES_PASSWORD}}
+          compose-file: 'docker-compose.yml'
