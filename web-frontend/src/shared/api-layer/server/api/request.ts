@@ -1,8 +1,6 @@
 import { API_BASE_URL } from "../config/fetch-config";
 import { fetchWithTimeout } from "../config/fetch-config";
-import {
-  ServerApiError,
-} from "./errors";
+import { ServerApiError } from "./errors";
 import {
   buildUrl,
   sanitizeForLogging,
@@ -145,7 +143,9 @@ export async function serverRequest<
 
     // Log successful request in development
     if (process.env.NODE_ENV === "development") {
-      await serverLogger.info(`[Server API] ${method} ${url} - ${response.status} OK`);
+      await serverLogger.info(
+        `[Server API] ${method} ${url} - ${response.status} OK`
+      );
     }
 
     return data;
@@ -154,8 +154,6 @@ export async function serverRequest<
     return handleRequestError(error, url, method);
   }
 }
-
-
 
 /**
  * Performs a GET request to the specified URL with optional query parameters.

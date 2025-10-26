@@ -183,7 +183,9 @@ export async function logError(
     process.env.NODE_ENV === "development" &&
     errorDetails.originalError?.stack
   ) {
-    await serverLogger.error("Stack trace:", { stack: errorDetails.originalError.stack });
+    await serverLogger.error("Stack trace:", {
+      stack: errorDetails.originalError.stack,
+    });
   }
 
   // In production, send to error tracking service
