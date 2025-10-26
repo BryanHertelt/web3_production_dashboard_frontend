@@ -9,6 +9,7 @@ import {
   isJsonResponse,
   safeJsonParse,
 } from "../../../shared/api-layer/server/model/helpers";
+import { serverLogger } from "../../../shared/logger/server-logger/model/logger";
 
 describe("buildUrl", () => {
   it("builds URL without query parameters", () => {
@@ -209,10 +210,6 @@ describe("logError", () => {
   let serverLoggerErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const {
-      serverLogger,
-    } = require("../../../shared/logger/server-logger/model/logger");
     serverLoggerWarnSpy = jest
       .spyOn(serverLogger, "warn")
       .mockResolvedValue(undefined);
