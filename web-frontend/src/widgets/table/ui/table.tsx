@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { TableRow, TableProps } from "@/widgets/table/model/table-model";
+import { ApiError } from "@/shared/api-layer/index";
+import { CoinsAPI } from "@/entities/coins/api/coins-api";
+import type { Coins } from "@/entities/coins/model/types";
+import type { TableProps } from "@/widgets/table/model/table-model";
 
 /**
  * Renders a table displaying data for bought coins, including columns for
@@ -10,28 +13,38 @@ import { TableRow, TableProps } from "@/widgets/table/model/table-model";
  *
  * @returns {JSX.Element} A React element containing the table with fetched data.
  */
+
 const Table = (props: { tableConfig: TableProps }) => {
-  const [data, setData] = useState<TableRow[]>([]);
+  const [data, setData] = useState<Coins[]>([]);
   const [error, setError] = useState<string | null>(null);
-
+  /**
+   * Fetches the user's portfolio on initial render.
+   *
+   * Handles API success and error cases:
+   * - On success: stores the fetched coins in state.
+   * - On error: extracts a readable message (supports ApiError from api-layer and generic Error).
+   * - clears the loading state when finished.
+   *
+   */
   useEffect(() => {
-    // Placeholder API URL - replace with actual endpoint
-    const fetchData = async () => {
+    async function loadData() {
       try {
-        const response = await fetch("http://localhost:3001/users");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+        const coins = await CoinsAPI.get(undefined, true);
+        if (coins) {
+          setData(coins);
         }
-        const result: TableRow[] = await response.json();
-        setData(result);
-        setError(null); // Clear error on success
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-        setError(`Error occured: ${error}`);
+      } catch (e: unknown) {
+        let msg = "Unknown error";
+        if (e instanceof ApiError) {
+          msg = e.status ? `${e.message} (status ${e.status})` : e.message;
+        } else if (e instanceof Error) {
+          msg = e.message;
+        }
+        setError(msg);
       }
-    };
+    }
 
-    fetchData();
+    loadData();
   }, []);
 
   return (
