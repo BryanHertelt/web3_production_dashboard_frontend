@@ -179,7 +179,7 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             echo "🔧 Formatting changes detected. Committing..."
             git add -A
-            git commit -m "style: Auto-format code with Ruff" || echo "No changes to commit"
+            git commit -m "style: Auto-format code with Prettier" || echo "No changes to commit"
             git push origin "HEAD:${BRANCH_NAME}"
           else
             echo "✅ No formatting changes detected."
