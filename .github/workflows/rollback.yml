@@ -18,7 +18,7 @@ jobs:
   # Rollback web application
   # ---------------------------
   rollback:
-    name: Rollback to previous version.
+    name: Rollback to previous version
     runs-on: ${{vars.RUNNER_TYPE}}
     timeout-minutes: 10 
     permissions: 

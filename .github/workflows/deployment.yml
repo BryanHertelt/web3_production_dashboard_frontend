@@ -1,0 +1,28 @@
+name: Deployment Web
+
+on: workflow_dispatch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+jobs: 
+  # ---------------------------
+  # Generate version label
+  # ---------------------------
+  version:
+    name: Generate version label
+    id: version-label
+    runs-on: ${{vars.RUNNER_TYPE}}
+    timeout-minutes: 10 
+    permissions: 
+      contents: write 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
+      - name: Label Images
+        uses: ZenetOfficial/infra/github/label-images@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
+        
