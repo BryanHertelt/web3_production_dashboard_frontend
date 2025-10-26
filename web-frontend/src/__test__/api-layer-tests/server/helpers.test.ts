@@ -252,9 +252,12 @@ describe("logError", () => {
   });
 
   it("logs stack trace in development", async () => {
-    const originalEnv = process.env.NODE_ENV;
-    // @ts-expect-error: Modifying NODE_ENV for testing purposes
-    process.env.NODE_ENV = "development";
+    const originalEnv = process.env;
+    Object.defineProperty(process, "env", {
+      value: { ...originalEnv, NODE_ENV: "development" },
+      writable: true,
+      configurable: true,
+    });
 
     const error = new Error("Test error");
 
@@ -277,14 +280,20 @@ describe("logError", () => {
       })
     );
 
-    // @ts-expect-error: Restoring NODE_ENV after testing
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(process, "env", {
+      value: originalEnv,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it("does not log stack trace in production", async () => {
-    const originalEnv = process.env.NODE_ENV;
-    // @ts-expect-error: Modifying NODE_ENV for testing purposes
-    process.env.NODE_ENV = "production";
+    const originalEnv = process.env;
+    Object.defineProperty(process, "env", {
+      value: { ...originalEnv, NODE_ENV: "production" },
+      writable: true,
+      configurable: true,
+    });
 
     const error = new Error("Test error");
 
@@ -300,8 +309,11 @@ describe("logError", () => {
       })
     );
 
-    // @ts-expect-error: Restoring NODE_ENV after testing
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(process, "env", {
+      value: originalEnv,
+      writable: true,
+      configurable: true,
+    });
   });
 });
 
