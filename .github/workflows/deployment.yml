@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0  
       - name: Label Images
         id: label
-        uses: ZenetOfficial/infra/github/label-images@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
+        uses: ZenetOfficial/infra/.github/label-images@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
   # ---------------------------
   # Build and push image
   # ---------------------------
@@ -227,7 +227,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Deploy application
-        uses: ZenetOfficial/infra/github/deploy@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
+        uses: ZenetOfficial/infra/.github/deploy@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
         with:
           tag: ${{ needs.version.outputs.version-tag }}
           ssh-key: ${{secrets.DEV_DEPLOY_SSH_KEY}}
