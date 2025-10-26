@@ -404,7 +404,7 @@ jobs:
     name: Generate documentation
     runs-on: ${{vars.RUNNER_TYPE}}
     timeout-minutes: 10
-    needs: docker-build
+    needs: ["typescript-check", "eslint", "prettier-format", "test-jest", "security-secrets", "semgrep-scan", "security-audit"]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
