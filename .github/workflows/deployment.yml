@@ -1,0 +1,244 @@
+name: Deployment Web
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - pipeline-testing
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+jobs: 
+  # ---------------------------
+  # Generate version label
+  # ---------------------------
+  version:
+    name: Generate version label
+    runs-on: ${{vars.RUNNER_TYPE}}
+    outputs:
+        version-tag: ${{ steps.label.outputs.tag }}
+    timeout-minutes: 10 
+    permissions: 
+      contents: write 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
+      - name: Label Images
+        id: label
+        uses: ZenetOfficial/infra/github/label-images@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
+  # ---------------------------
+  # Build and push image
+  # ---------------------------
+  docker-build:
+    name: Build docker image
+    runs-on: ${{vars.RUNNER_TYPE}}
+    needs: "version"
+    permissions:
+      contents: read
+      packages: read  # Read access for cache-from
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/zenetofficial/web-frontend
+          tags: |
+            type=raw,value=${{ needs.version.outputs.version-tag }}
+            type=sha,format=long
+            type=raw,value=latest
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./web-frontend
+          push: false
+          outputs: type=docker,dest=/tmp/image.tar
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: |
+            type=registry,ref=ghcr.io/zenetofficial/web-frontend:cache
+            type=registry,ref=ghcr.io/zenetofficial/web-frontend:latest
+          cache-to: type=inline
+          build-args: |
+            CI_COMMIT_SHA=${{ github.sha }}
+            CI_COMMIT_REF_NAME=${{ github.ref_name }}
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp/image.tar
+          retention-days: 1
+  # ---------------------------
+  # Scan image for vulnerabilities
+  # ---------------------------
+  image-scan-job:
+    name: Scan docker image
+    runs-on: ${{vars.RUNNER_TYPE}}
+    timeout-minutes: 15
+    needs: ["version", "docker-build"]
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp
+
+      - name: Trivy Scan (All Formats)
+        uses: aquasecurity/trivy-action@master
+        with:
+          input: /tmp/image.tar
+          format: json
+          output: trivy-image.json
+          exit-code: 1
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+
+      - name: Generate Additional Reports
+        run: |
+          trivy image --input /tmp/image.tar --format table --ignore-unfixed \
+            --severity HIGH,CRITICAL > trivy-report.txt
+          trivy image --input /tmp/image.tar --format cyclonedx \
+            --ignore-unfixed -o sbom.cdx.json
+
+      - name: Upload Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-scan-reports
+          path: |
+            trivy-report.txt
+            trivy-image.json
+            sbom.cdx.json
+          retention-days: 7
+  # ---------------------------
+  # Push image to registry (only after successful scan)
+  # ---------------------------
+  push-image:
+    name: Push verified image to registry
+    runs-on: ${{vars.RUNNER_TYPE}}
+    needs: ["version", "image-scan-job"]
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/zenetofficial/web-frontend
+          tags: |
+            type=raw,value=${{ needs.version.outputs.version-tag }}
+            type=sha,format=long
+            type=raw,value=latest
+
+      - name: Load Docker image
+        run: |
+          docker load -i /tmp/image.tar
+          echo "Image loaded successfully"
+          docker images
+
+      - name: Tag and push image
+        run: |
+          # Extract tags from metadata output (newline separated)
+          TAGS="${{ steps.meta.outputs.tags }}"
+
+          # Get the first tag (version tag) as the source
+          SOURCE_TAG=$(echo "$TAGS" | head -n1)
+          echo "Source tag: $SOURCE_TAG"
+
+          # Push all tags
+          for TAG in $TAGS; do
+            echo "Pushing $TAG..."
+            if [ "$TAG" != "$SOURCE_TAG" ]; then
+              docker tag "$SOURCE_TAG" "$TAG"
+            fi
+            docker push "$TAG"
+          done
+
+          echo "✅ All tags pushed successfully"
+
+      - name: Update registry cache
+        uses: docker/build-push-action@v5
+        with:
+          context: ./web-frontend
+          push: true
+          tags: ghcr.io/zenetofficial/web-frontend:cache
+          cache-from: type=registry,ref=ghcr.io/zenetofficial/web-frontend:latest
+          cache-to: type=registry,ref=ghcr.io/zenetofficial/web-frontend:cache,mode=max
+# ---------------------------
+# Deploy image to dev server
+# ---------------------------
+  deploy:
+    name: Deploy image to dev server
+    runs-on: ${{vars.RUNNER_TYPE}}
+    needs: ["version", "push-image"]
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Deploy application
+        uses: ZenetOfficial/infra/github/deploy@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
+        with:
+          tag: ${{ needs.version.outputs.version-tag }}
+          ssh-key: ${{secrets.DEV_DEPLOY_SSH_KEY}}
+          ssh-known-hosts: ${{secrets.DEV_SSH_KNOWN_HOSTS}}
+          deploy-host: ${{vars.DEV_SERVER_HOST}}
+          deploy-user: ${{vars.DEV_SERVER_USER}}
+          deploy-path: ${{vars.DEV_SERVER_PATH}}
+          deploy-port: ${{vars.DEV_SERVER_SSH_PORT}}
+          postgres-password: ${{secrets.DEV_POSTGRES_PASSWORD}}
+          grafana-password: ${{secrets.DEV_GRAFANA_PASSWORD}}
+          nginx-user: ${{secrets.DEV_NGINX_USER}}
+          nginx-password: ${{secrets.DEV_NGINX_PASSWORD}}
+          compose-file: 'docker-compose.yml'
+        
