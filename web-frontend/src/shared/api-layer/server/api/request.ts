@@ -66,6 +66,7 @@ export async function serverRequest<
     tags,
     timeout,
     retries,
+    signal,
   } = options;
 
   // Validate URL
@@ -118,8 +119,10 @@ export async function serverRequest<
       fullUrl,
       {
         ...requestConfig,
+        method,
         timeout,
         retries,
+        signal,
       },
       nextConfig
     );

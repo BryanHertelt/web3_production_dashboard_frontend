@@ -43,6 +43,9 @@ export interface RequestOptions<TQuery = unknown, TBody = unknown> {
 
   /** Number of retry attempts (default: 3) */
   retries?: number;
+
+  /** AbortSignal for cancelling the request */
+  signal?: AbortSignal;
 }
 
 /**
