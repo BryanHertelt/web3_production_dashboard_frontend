@@ -32,7 +32,7 @@ jobs:
         with:
           fetch-depth: 0  
       - name: Rollback application
-        uses: ZenetOfficial/infra/.github/rollback@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
+        uses: ZenetOfficial/infra/.github/actions/rollback@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
         with:
           backup-filename: ${{ inputs.backup-filename }}
           ssh-key: ${{secrets.DEV_DEPLOY_SSH_KEY}}
