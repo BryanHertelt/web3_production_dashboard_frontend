@@ -132,3 +132,34 @@ jobs:
             trivy-image.json
             sbom.cdx.json
           retention-days: 7
+# ---------------------------
+# Deploy image to dev server
+# ---------------------------
+  deploy:
+    name: Deploy image to dev server
+    runs-on: ${{vars.RUNNER_TYPE}}
+    needs: ["version", "image-scan-job"]
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Deploy application
+        uses: ZenetOfficial/infra/github/deploy@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
+        with:
+          tag: ${{ needs.version.outputs.version-tag }}
+          ssh-key: ${{secrets.DEV_DEPLOY_SSH_KEY}}
+          ssh-known-hosts: ${{secrets.DEV_SSH_KNOWN_HOSTS}}
+          deploy-host: ${{vars.DEV_SERVER_HOST}}
+          deploy-user: ${{vars.DEV_SERVER_USER}}
+          deploy-path: ${{vars.DEV_SERVER_PATH}}
+          deploy-port: ${{vars.DEV_SERVER_SSH_PORT}}
+          postgres-password: ${{secrets.DEV_POSTGRES_PASSWORD}}
+          grafana-password: ${{secrets.DEV_GRAFANA_PASSWORD}}
+          nginx-user: ${{secrets.DEV_NGINX_USER}}
+          nginx-password: ${{secrets.DEV_NGINX_PASSWORD}}
+          compose-file: 'docker-compose.yml'
+        
