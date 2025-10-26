@@ -209,9 +209,15 @@ describe("logError", () => {
   let serverLoggerErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    const { serverLogger } = require("../../../shared/logger/server-logger/model/logger");
-    serverLoggerWarnSpy = jest.spyOn(serverLogger, "warn").mockResolvedValue(undefined);
-    serverLoggerErrorSpy = jest.spyOn(serverLogger, "error").mockResolvedValue(undefined);
+    const {
+      serverLogger,
+    } = require("../../../shared/logger/server-logger/model/logger");
+    serverLoggerWarnSpy = jest
+      .spyOn(serverLogger, "warn")
+      .mockResolvedValue(undefined);
+    serverLoggerErrorSpy = jest
+      .spyOn(serverLogger, "error")
+      .mockResolvedValue(undefined);
   });
 
   afterEach(() => {
