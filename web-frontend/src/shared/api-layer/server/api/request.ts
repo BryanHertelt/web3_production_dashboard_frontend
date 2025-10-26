@@ -2,23 +2,15 @@ import { API_BASE_URL } from "../config/fetch-config";
 import { fetchWithTimeout } from "../config/fetch-config";
 import {
   ServerApiError,
-  TimeoutError,
-  ServerDownError,
-  RateLimitError,
-  UnauthorizedError,
-  ForbiddenError,
 } from "./errors";
 import {
   buildUrl,
-  isNetworkError,
-  isTimeoutError,
-  logError,
-  getStatusCategory,
-  extractErrorDetails,
   sanitizeForLogging,
   isJsonResponse,
-  safeJsonParse,
+  handleErrorResponse,
+  handleRequestError,
 } from "../model/helpers";
+import { serverLogger } from "../../../logger/server-logger/model/logger";
 import type { RequestOptions } from "../model/types";
 
 /**
@@ -114,7 +106,7 @@ export async function serverRequest<
 
   // Log request in development
   if (process.env.NODE_ENV === "development") {
-    console.log(`[Server API] ${method} ${url}`, {
+    await serverLogger.info(`[Server API] ${method} ${url}`, {
       query: sanitizeForLogging(query),
       body: sanitizeForLogging(body),
     });
@@ -150,7 +142,7 @@ export async function serverRequest<
 
     // Log successful request in development
     if (process.env.NODE_ENV === "development") {
-      console.log(`[Server API] ${method} ${url} - ${response.status} OK`);
+      await serverLogger.info(`[Server API] ${method} ${url} - ${response.status} OK`);
     }
 
     return data;
@@ -160,123 +152,7 @@ export async function serverRequest<
   }
 }
 
-/**
- * Processes HTTP error responses and throws appropriate ServerApiError subclasses based on the status code.
- *
- * @param response - The HTTP response object with a non-2xx status.
- * @param url - The request URL.
- * @param method - The HTTP method used.
- * @throws {UnauthorizedError} For 401 responses.
- * @throws {ForbiddenError} For 403 responses.
- * @throws {RateLimitError} For 429 responses.
- * @throws {ServerApiError} For other error status codes.
- */
-async function handleErrorResponse(
-  response: Response,
-  url: string,
-  method: string
-): Promise<never> {
-  const errorData = await safeJsonParse<Record<string, unknown>>(response, {});
-  const message =
-    typeof errorData?.message === "string"
-      ? errorData.message
-      : `Request failed with status ${response.status}`;
-  const category = getStatusCategory(response.status);
 
-  // Log error with details
-  logError(`${method} ${url}`, message, {
-    status: response.status,
-    category,
-    errorData: sanitizeForLogging(errorData),
-  });
-
-  // Throw specific error types based on status
-  switch (response.status) {
-    case 401:
-      throw new UnauthorizedError(message);
-    case 403:
-      throw new ForbiddenError(message);
-    case 429:
-      const retryAfter = response.headers.get("Retry-After");
-      const retryAfterSeconds = retryAfter
-        ? parseInt(retryAfter, 10)
-        : undefined;
-      throw new RateLimitError(message, retryAfterSeconds);
-    default:
-      throw new ServerApiError(message, {
-        status: response.status,
-        details: errorData,
-      });
-  }
-}
-
-/**
- * Processes request errors that occur during fetch operations, converting them to appropriate ServerApiError subclasses.
- *
- * @param error - The error that occurred during the request.
- * @param url - The request URL.
- * @param method - The HTTP method used.
- * @throws {ServerApiError} If the error is already a ServerApiError.
- * @throws {TimeoutError} For timeout errors.
- * @throws {ServerDownError} For network errors.
- * @throws {ServerApiError} For unknown errors.
- */
-function handleRequestError(
-  error: unknown,
-  url: string,
-  method: string
-): never {
-  // Already a ServerApiError - just log and rethrow
-  if (error instanceof ServerApiError) {
-    logError(`${method} ${url}`, error, {
-      status: error.status,
-      code: error.code,
-    });
-    throw error;
-  }
-
-  // Timeout error
-  if (isTimeoutError(error)) {
-    const timeoutError = new TimeoutError(
-      "Request timeout exceeded",
-      error as Error
-    );
-    logError(`${method} ${url}`, timeoutError, {
-      originalError: extractErrorDetails(error),
-    });
-    throw timeoutError;
-  }
-
-  // Network error (connection refused, DNS failure, etc.)
-  if (isNetworkError(error)) {
-    const networkError = new ServerDownError(
-      "API server is not responding",
-      error as Error
-    );
-    logError(`${method} ${url}`, networkError, {
-      originalError: extractErrorDetails(error),
-    });
-    throw networkError;
-  }
-
-  // Unknown error - wrap and log
-  const details = extractErrorDetails(error);
-  const unknownError = new ServerApiError(
-    details.message || "Unknown error occurred",
-    {
-      status: 500,
-      details,
-      isOperational: false,
-      originalError: error as Error,
-    }
-  );
-
-  logError(`${method} ${url}`, unknownError, {
-    originalError: details,
-  });
-
-  throw unknownError;
-}
 
 /**
  * Performs a GET request to the specified URL with optional query parameters.
