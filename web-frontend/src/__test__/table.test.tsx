@@ -5,7 +5,7 @@ import "@testing-library/jest-dom";
 
 // IMPORTANT: import from the same paths the component uses
 import { CoinsAPI } from "@/entities/coins/api/coins-api";
-import { ApiError } from "@/shared/api-layer/index";
+import { ApiError } from "@/shared/api-layer/client/index";
 
 // --- mock the CoinsAPI from its real module path used by the component ---
 jest.mock("@/entities/coins/api/coins-api", () => ({
@@ -13,7 +13,7 @@ jest.mock("@/entities/coins/api/coins-api", () => ({
 }));
 
 // --- mock ApiError from the shared index (so `instanceof ApiError` matches) ---
-jest.mock("@/shared/api-layer/index", () => {
+jest.mock("@/shared/api-layer/client/index", () => {
   return {
     ApiError: class ApiError extends Error {
       status?: number;
