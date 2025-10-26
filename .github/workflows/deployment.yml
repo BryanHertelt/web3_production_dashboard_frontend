@@ -1,6 +1,10 @@
 name: Deployment Web
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - pipeline-testing
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
