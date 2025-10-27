@@ -219,6 +219,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      packages: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -239,4 +240,6 @@ jobs:
           nginx-user: ${{secrets.DEV_NGINX_USER}}
           nginx-password: ${{secrets.DEV_NGINX_PASSWORD}}
           compose-file: 'docker-compose.yml'
+          registry-username: ${{ github.actor }}
+          registry-password: ${{secrets.GITHUB_TOKEN}}
         
