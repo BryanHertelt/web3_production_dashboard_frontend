@@ -8,9 +8,6 @@ on:
         required: false
         type: string
         default: ''
-  push:
-    branches:
-      - pipeline-testing
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,6 +23,7 @@ jobs:
     timeout-minutes: 10 
     permissions: 
       contents: write 
+      packages: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,3 +41,5 @@ jobs:
           deploy-port: ${{vars.DEV_SERVER_SSH_PORT}}
           postgres-password: ${{secrets.DEV_POSTGRES_PASSWORD}}
           compose-file: 'docker-compose.yml'
+          registry-username: ${{ github.actor }}          
+          registry-password: ${{ secrets.GITHUB_TOKEN }}

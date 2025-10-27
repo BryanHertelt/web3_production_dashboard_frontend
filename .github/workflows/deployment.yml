@@ -60,10 +60,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/zenetofficial/web-frontend
+          images: ghcr.io/zenetofficial/web
           tags: |
             type=raw,value=${{ needs.version.outputs.version-tag }}
-            type=sha,format=long
             type=raw,value=latest
 
       - name: Build Docker image
@@ -75,8 +74,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: |
-            type=registry,ref=ghcr.io/zenetofficial/web-frontend:cache
-            type=registry,ref=ghcr.io/zenetofficial/web-frontend:latest
+            type=registry,ref=ghcr.io/zenetofficial/web:cache
+            type=registry,ref=ghcr.io/zenetofficial/web:latest
           cache-to: type=inline
           build-args: |
             CI_COMMIT_SHA=${{ github.sha }}
@@ -171,10 +170,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/zenetofficial/web-frontend
+          images: ghcr.io/zenetofficial/web
           tags: |
             type=raw,value=${{ needs.version.outputs.version-tag }}
-            type=sha,format=long
             type=raw,value=latest
 
       - name: Load Docker image
@@ -208,9 +206,9 @@ jobs:
         with:
           context: ./web-frontend
           push: true
-          tags: ghcr.io/zenetofficial/web-frontend:cache
-          cache-from: type=registry,ref=ghcr.io/zenetofficial/web-frontend:latest
-          cache-to: type=registry,ref=ghcr.io/zenetofficial/web-frontend:cache,mode=max
+          tags: ghcr.io/zenetofficial/web:cache
+          cache-from: type=registry,ref=ghcr.io/zenetofficial/web:latest
+          cache-to: type=registry,ref=ghcr.io/zenetofficial/web:cache,mode=max
 # ---------------------------
 # Deploy image to dev server
 # ---------------------------
@@ -221,6 +219,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      packages: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -241,4 +240,6 @@ jobs:
           nginx-user: ${{secrets.DEV_NGINX_USER}}
           nginx-password: ${{secrets.DEV_NGINX_PASSWORD}}
           compose-file: 'docker-compose.yml'
+          registry-username: ${{ github.actor }}
+          registry-password: ${{secrets.GITHUB_TOKEN}}
         
