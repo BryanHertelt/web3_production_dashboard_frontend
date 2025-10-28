@@ -8,6 +8,9 @@ on:
         required: false
         type: string
         default: ''
+  push:
+    branches:
+      - pipeline-testing
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
