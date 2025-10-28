@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 10 
     permissions: 
       contents: write 
-      packages: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
