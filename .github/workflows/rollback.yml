@@ -2,6 +2,11 @@ name: Rollback Web
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to rollback to (e.g., v1.2.3, 2024.01.15-abc1234)'
+        required: true
+        type: string
 
 jobs: 
   # ---------------------------
@@ -22,7 +27,6 @@ jobs:
       - name: Rollback application
         uses: ZenetOfficial/infra/.github/actions/rollback@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
         with:
-          backup-filename: ${{ inputs.backup-filename }}
           ssh-key: ${{secrets.DEV_DEPLOY_SSH_KEY}}
           ssh-known-hosts: ${{secrets.DEV_SSH_KNOWN_HOSTS}}
           deploy-host: ${{vars.DEV_SERVER_HOST}}
@@ -31,5 +35,6 @@ jobs:
           deploy-port: ${{vars.DEV_SERVER_SSH_PORT}}
           postgres-password: ${{secrets.DEV_POSTGRES_PASSWORD}}
           compose-file: 'docker-compose.yml'
-          registry-username: ${{ github.actor }}          
+          registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-image: ${{ inputs.tag }}
