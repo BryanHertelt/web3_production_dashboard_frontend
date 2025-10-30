@@ -6,10 +6,6 @@ on:
     branches:
       - pipeline-testing
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 
 jobs: 
   # ---------------------------
@@ -63,7 +59,6 @@ jobs:
           images: ghcr.io/zenetofficial/web
           tags: |
             type=raw,value=${{ needs.version.outputs.version-tag }}
-            type=raw,value=latest
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -75,7 +70,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: |
             type=registry,ref=ghcr.io/zenetofficial/web:cache
-            type=registry,ref=ghcr.io/zenetofficial/web:latest
           cache-to: type=inline
           build-args: |
             CI_COMMIT_SHA=${{ github.sha }}
@@ -173,7 +167,6 @@ jobs:
           images: ghcr.io/zenetofficial/web
           tags: |
             type=raw,value=${{ needs.version.outputs.version-tag }}
-            type=raw,value=latest
 
       - name: Load Docker image
         run: |
@@ -183,23 +176,11 @@ jobs:
 
       - name: Tag and push image
         run: |
-          # Extract tags from metadata output (newline separated)
-          TAGS="${{ steps.meta.outputs.tags }}"
-
-          # Get the first tag (version tag) as the source
-          SOURCE_TAG=$(echo "$TAGS" | head -n1)
-          echo "Source tag: $SOURCE_TAG"
-
-          # Push all tags
-          for TAG in $TAGS; do
-            echo "Pushing $TAG..."
-            if [ "$TAG" != "$SOURCE_TAG" ]; then
-              docker tag "$SOURCE_TAG" "$TAG"
-            fi
-            docker push "$TAG"
-          done
-
-          echo "✅ All tags pushed successfully"
+          # Push the version-tagged image
+          IMAGE_TAG="${{ steps.meta.outputs.tags }}"
+          echo "Pushing $IMAGE_TAG..."
+          docker push "$IMAGE_TAG"
+          echo "✅ Image pushed successfully"
 
       - name: Update registry cache
         uses: docker/build-push-action@v5
@@ -207,7 +188,7 @@ jobs:
           context: ./web-frontend
           push: true
           tags: ghcr.io/zenetofficial/web:cache
-          cache-from: type=registry,ref=ghcr.io/zenetofficial/web:latest
+          cache-from: type=registry,ref=ghcr.io/zenetofficial/web:cache
           cache-to: type=registry,ref=ghcr.io/zenetofficial/web:cache,mode=max
 # ---------------------------
 # Deploy image to dev server
