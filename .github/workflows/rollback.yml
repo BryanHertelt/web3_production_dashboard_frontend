@@ -2,12 +2,6 @@ name: Rollback Web
 
 on:
   workflow_dispatch:
-    inputs:
-      backup-filename:
-        description: 'Backup file to restore (optional - leave empty to skip DB restore)'
-        required: false
-        type: string
-        default: ''
 
 jobs: 
   # ---------------------------
