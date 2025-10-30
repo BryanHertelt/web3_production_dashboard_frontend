@@ -176,23 +176,11 @@ jobs:
 
       - name: Tag and push image
         run: |
-          # Extract tags from metadata output (newline separated)
-          TAGS="${{ steps.meta.outputs.tags }}"
-
-          # Get the first tag (version tag) as the source
-          SOURCE_TAG=$(echo "$TAGS" | head -n1)
-          echo "Source tag: $SOURCE_TAG"
-
-          # Push all tags
-          for TAG in $TAGS; do
-            echo "Pushing $TAG..."
-            if [ "$TAG" != "$SOURCE_TAG" ]; then
-              docker tag "$SOURCE_TAG" "$TAG"
-            fi
-            docker push "$TAG"
-          done
-
-          echo "✅ All tags pushed successfully"
+          # Push the version-tagged image
+          IMAGE_TAG="${{ steps.meta.outputs.tags }}"
+          echo "Pushing $IMAGE_TAG..."
+          docker push "$IMAGE_TAG"
+          echo "✅ Image pushed successfully"
 
       - name: Update registry cache
         uses: docker/build-push-action@v5
