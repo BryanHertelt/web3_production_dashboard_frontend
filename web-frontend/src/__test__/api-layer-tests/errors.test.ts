@@ -1,4 +1,4 @@
-import { ApiError } from "../../shared/api-layer/api/errors";
+import { ApiError } from "../../shared/api-layer/client/api/errors";
 
 describe("ApiError", () => {
   it("is an instance of ApiError and Error", () => {

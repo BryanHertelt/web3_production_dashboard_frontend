@@ -1,11 +1,11 @@
 import { CoinsAPI } from "../../entities/coins/api/coins-api";
-import { request as realRequest } from "../../shared/api-layer/api/request";
+import { request as realRequest } from "../../shared/api-layer/client/api/request";
 import type { Coins } from "../../entities/coins/model/types";
 
 // --- Mock setup ---------------------------------------------------------------
 // We mock ONLY the transport wrapper. We do NOT mock the cancel-registry.
 // This keeps the tests focused on what CoinsAPI passes to `request`.
-jest.mock("../../shared/api-layer/api/request", () => ({
+jest.mock("../../shared/api-layer/client/api/request", () => ({
   request: jest.fn(),
 }));
 

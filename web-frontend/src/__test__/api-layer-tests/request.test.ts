@@ -1,10 +1,10 @@
 // request.test.ts
-import { request } from "../../shared/api-layer/api/request"; // the wrapper we are testing
-import { ApiError } from "../../shared/api-layer/api/errors"; // our custom error
-import { instance } from "../../shared/api-layer/configs/axios-config"; // mocked axios instance
+import { request } from "../../shared/api-layer/client/api/request"; // the wrapper we are testing
+import { ApiError } from "../../shared/api-layer/client/api/errors"; // our custom error
+import { instance } from "../../shared/api-layer/client/configs/axios-config"; // mocked axios instance
 
 // Replace the real api from axios config with a mock
-jest.mock("../../shared/api-layer/configs/axios-config", () => ({
+jest.mock("../../shared/api-layer/client/configs/axios-config", () => ({
   instance: { request: jest.fn() },
 }));
 
