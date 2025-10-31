@@ -6,7 +6,7 @@ import TimeRange from "@/features/select-time-range/ui/select-time-range";
 import InfoBox from "@/shared/info-box/ui/info-box";
 import PlaceholderChart from "@/widgets/charts/ui/charts";
 import Table from "@/widgets/table/ui/table";
-import { PortfolioAPI, ApiError, Portfolio } from "@/shared/api-layer";
+import { PortfolioAPI, ApiError, Portfolio } from "@/shared/api-layer/client";
 
 /**
  * Renders the main dashboard page for the crypto application, including the sidebar

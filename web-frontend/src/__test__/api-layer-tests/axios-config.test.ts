@@ -2,7 +2,7 @@ import {
   instance,
   onFulfilled,
   onRejected,
-} from "../../shared/api-layer/configs/axios-config";
+} from "../../shared/api-layer/client/configs/axios-config";
 import type {
   AxiosHeaders,
   InternalAxiosRequestConfig,
@@ -17,7 +17,7 @@ const describeStatusMock = jest.fn<
   [unknown]
 >();
 
-jest.mock("../../shared/api-layer/model/helpers", () => ({
+jest.mock("../../shared/api-layer/client/model/helpers", () => ({
   isCancel: (e: unknown) => isCancelMock(e),
   isAxiosErr: (e: unknown) => isAxiosErrMock(e),
   describeStatus: (e: unknown) => describeStatusMock(e),
@@ -65,7 +65,7 @@ describe("axios-config", () => {
       statusText: "OK",
       headers: minimalHeaders(),
       config: minimalConfig(),
-    } satisfies import("../../shared/api-layer/model/types").AxiosResponse<{
+    } satisfies import("../../shared/api-layer/client/model/types").AxiosResponse<{
       ok: boolean;
     }>;
 

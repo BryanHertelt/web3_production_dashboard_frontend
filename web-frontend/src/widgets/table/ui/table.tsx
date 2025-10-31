@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ApiError } from "@/shared/api-layer/index";
+import { ApiError } from "@/shared/api-layer/client/index";
 import { CoinsAPI } from "@/entities/coins/api/coins-api";
 import type { Coins } from "@/entities/coins/model/types";
 import type { TableProps } from "@/widgets/table/model/table-model";
