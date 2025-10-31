@@ -40,4 +40,5 @@ jobs:
           compose-file: 'docker-compose.yml'
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
-          pull-request-image: "Boltzmann.7.0_dev"
+          pull-request-image: "Boltzmann.6.0_dev"
+          runner-type: ${{ vars.RUNNER_TYPE }}

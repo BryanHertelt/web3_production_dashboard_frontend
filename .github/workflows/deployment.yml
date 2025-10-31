@@ -223,4 +223,5 @@ jobs:
           compose-file: 'docker-compose.yml'
           registry-username: ${{ github.actor }}
           registry-password: ${{secrets.GITHUB_TOKEN}}
+          runner-type: ${{ vars.RUNNER_TYPE }}
         
