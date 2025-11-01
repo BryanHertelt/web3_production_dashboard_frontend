@@ -33,7 +33,7 @@ jobs:
     needs: "version"
     permissions:
       contents: read
-      packages: read  # Read access for cache-from
+      packages: write
     timeout-minutes: 20
     steps:
       - name: Checkout code
