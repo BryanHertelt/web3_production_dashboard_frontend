@@ -1,0 +1,41 @@
+name: Rollback Web
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to rollback to (e.g., v1.2.3, 2024.01.15-abc1234)'
+        required: true
+        type: string
+
+jobs: 
+  # ---------------------------
+  # Rollback web application
+  # ---------------------------
+  rollback:
+    name: Rollback to previous version
+    runs-on: self-hosted
+    timeout-minutes: 10 
+    permissions: 
+      contents: write 
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
+      - name: Rollback application
+        uses: ZenetOfficial/infra/.github/actions/rollback@ZEN-106/create-actions-for-deployment  # TODO: Change to @main for production
+        with:
+          ssh-key: ${{secrets.DEV_DEPLOY_SSH_KEY}}
+          ssh-known-hosts: ${{secrets.DEV_SSH_KNOWN_HOSTS}}
+          deploy-host: ${{vars.DEV_SERVER_HOST}}
+          deploy-user: ${{vars.DEV_SERVER_USER}}
+          deploy-path: ${{vars.DEV_SERVER_PATH}}
+          deploy-port: ${{vars.DEV_SERVER_SSH_PORT}}
+          postgres-password: ${{secrets.DEV_POSTGRES_PASSWORD}}
+          compose-file: 'docker-compose.yml'
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-image: "Boltzmann.6.0_dev"
+          runner-type: ${{ vars.RUNNER_TYPE }}

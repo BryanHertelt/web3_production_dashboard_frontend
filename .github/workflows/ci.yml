@@ -1,0 +1,447 @@
+name: CI pipeline Web
+
+on:
+  pull_request:
+    branches: 
+      - dev
+  push:
+    branches:
+      - dev
+
+env:
+  NODE_OPTIONS: "--max-old-space-size=2048"
+  DOCKER_IMAGE_NAME: ${{ github.event.repository.name }}
+
+jobs:
+  # ---------------------------
+  # Install dependencies
+  # ---------------------------
+  install:
+    name: Install dependencies
+    runs-on: ${{vars.RUNNER_TYPE}}
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            web-frontend/.npm/
+            web-frontend/.next/cache/
+            web-frontend/node_modules/
+          key: ${{ runner.os }}-npm-${{ hashFiles('web-frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        working-directory: web-frontend
+        run: npm ci --cache .npm --prefer-offline
+
+  # ---------------------------
+  # TypeScript type checking
+  # ---------------------------
+  typescript-check:
+    name: Check types
+    runs-on: ${{vars.RUNNER_TYPE}}
+    timeout-minutes: 3
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            web-frontend/.npm/
+            web-frontend/.next/cache/
+            web-frontend/node_modules/
+          key: ${{ runner.os }}-npm-${{ hashFiles('web-frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies if cache miss
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: web-frontend
+        run: npm ci --cache .npm --prefer-offline
+
+      - name: Run TypeScript check
+        working-directory: web-frontend
+        run: npx tsc --noEmit
+
+  # ---------------------------
+  # ESLint code quality check
+  # ---------------------------
+  eslint:
+    name: Lint code
+    runs-on: ${{vars.RUNNER_TYPE}}
+    timeout-minutes: 3
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            web-frontend/.npm/
+            web-frontend/.next/cache/
+            web-frontend/node_modules/
+          key: ${{ runner.os }}-npm-${{ hashFiles('web-frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies if cache miss
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: web-frontend
+        run: npm ci --cache .npm --prefer-offline
+
+      - name: Run ESLint
+        working-directory: web-frontend
+        run: |
+          npm run lint
+
+  # ---------------------------
+  # Auto-format code and commit changes
+  # ---------------------------
+  prettier-format:
+    name: Auto-format code and commit changes
+    runs-on: ${{vars.RUNNER_TYPE}}
+    permissions:
+      contents: write
+    timeout-minutes: 5
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            web-frontend/.npm/
+            web-frontend/.next/cache/
+            web-frontend/node_modules/
+          key: ${{ runner.os }}-npm-${{ hashFiles('web-frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies if cache miss
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: web-frontend
+        run: npm ci --cache .npm --prefer-offline
+
+      - name: Configure Git
+        run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+          git config --global user.email "actions@github.com"
+          git config --global user.name "github-actions"
+
+      - name: Run Prettier format
+        working-directory: web-frontend
+        run: npm run format:write || true
+
+      - name: Commit and push changes (if any)
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "🔧 Formatting changes detected. Committing..."
+            git add -A
+            git commit -m "style: Auto-format code with Prettier" || echo "No changes to commit"
+            git push origin "HEAD:${BRANCH_NAME}"
+          else
+            echo "✅ No formatting changes detected."
+          fi
+
+  # ---------------------------
+  # Run Jest tests with coverage
+  # ---------------------------
+  test-jest:
+    name: Execute unit tests
+    runs-on: ${{vars.RUNNER_TYPE}}
+    timeout-minutes: 8
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            web-frontend/.npm/
+            web-frontend/.next/cache/
+            web-frontend/node_modules/
+          key: ${{ runner.os }}-npm-${{ hashFiles('web-frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies if cache miss
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: web-frontend
+        run: npm ci --cache .npm --prefer-offline
+
+      - name: Run Jest tests
+        working-directory: web-frontend
+        run: npm run test -- --ci --watchAll=false
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            web-frontend/coverage/
+          retention-days: 5
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: web-frontend/coverage/junit.xml
+          retention-days: 5
+
+
+  # ---------------------------
+  # Scan code base for secrets
+  # ---------------------------
+  security-secrets:
+    name: Scan for secrets with gitleaks
+    runs-on: ${{vars.RUNNER_TYPE}}
+    needs: install
+    timeout-minutes: 8
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v1.6.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ---------------------------
+  # Semgrep scanning
+  # ---------------------------
+  semgrep-scan:
+    name: Scan security with semgrep
+    runs-on: ${{vars.RUNNER_TYPE}}
+    timeout-minutes: 8
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep scan
+        working-directory: web-frontend
+        run: |
+          echo "Running Semgrep security scanner on JavaScript/TypeScript files..."
+          semgrep --config=auto --config=p/security-audit --config=p/owasp-top-ten --config=p/react src/ --exclude="*/__test__/*" --exclude="*/tests/*" --exclude="*.test.*" --json --output semgrep-report.json || true
+
+      - name: Evaluate security results
+        working-directory: web-frontend
+        run: |
+          python3 -c "
+          import json
+          import sys
+
+          total_issues = 0
+          critical_issues = []
+
+          # Check Semgrep results
+          try:
+              with open('semgrep-report.json', 'r') as f:
+                  semgrep_data = json.load(f)
+
+              semgrep_results = semgrep_data.get('results', [])
+              semgrep_critical = [r for r in semgrep_results if r.get('extra', {}).get('severity') == 'ERROR']
+              semgrep_warnings = [r for r in semgrep_results if r.get('extra', {}).get('severity') == 'WARNING']
+              total_issues += len(semgrep_results)
+              critical_issues.extend(semgrep_critical)
+
+              print(f'Semgrep: {len(semgrep_results)} total issues found')
+              print(f'  - {len(semgrep_critical)} critical (ERROR)')
+              print(f'  - {len(semgrep_warnings)} warnings (WARNING)')
+              print(f'  - {len(semgrep_results) - len(semgrep_critical) - len(semgrep_warnings)} info/other')
+
+              if semgrep_critical:
+                  print()
+                  print('=== Critical Security Issues (ERROR) ===')
+                  for issue in semgrep_critical:
+                      extra = issue.get('extra', {})
+                      print(f'  🔴 [{extra.get(\"severity\", \"ERROR\")}] {extra.get(\"message\", \"\")}')
+                      print(f'     Rule: {issue.get(\"check_id\", \"\")}')
+                      print(f'     File: {issue.get(\"path\", \"\")}:{issue.get(\"start\", {}).get(\"line\", \"\")}')
+                      if extra.get('references'):
+                          print(f'     References: {extra.get(\"references\", [])}')
+                      print()
+
+              if semgrep_warnings:
+                  print('=== Security Warnings (WARNING) ===')
+                  for issue in semgrep_warnings[:5]:  # Show first 5 warnings
+                      extra = issue.get('extra', {})
+                      print(f'  🟡 [{extra.get(\"severity\", \"WARNING\")}] {extra.get(\"message\", \"\")}')
+                      print(f'     Rule: {issue.get(\"check_id\", \"\")}')
+                      print(f'     File: {issue.get(\"path\", \"\")}:{issue.get(\"start\", {}).get(\"line\", \"\")}')
+                  if len(semgrep_warnings) > 5:
+                      print(f'  ... and {len(semgrep_warnings) - 5} more warnings')
+                  print()
+
+          except Exception as e:
+              print(f'Semgrep parsing error: {e}')
+              sys.exit(1)
+
+          print(f'Total security issues found: {total_issues}')
+          print(f'Critical issues requiring immediate attention: {len(critical_issues)}')
+
+          if critical_issues:
+              print('❌ Pipeline failing due to critical security issues')
+              sys.exit(1)
+          else:
+              print('✅ No critical security issues found')
+          "
+
+      - name: Upload Semgrep results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: web-frontend/semgrep-report.json
+          retention-days: 7
+
+  # ---------------------------
+  # Security audit
+  # ---------------------------
+  security-audit:
+    name: Audit with npm
+    runs-on: ${{vars.RUNNER_TYPE}}
+    timeout-minutes: 5
+    needs: install
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            web-frontend/.npm/
+            web-frontend/.next/cache/
+            web-frontend/node_modules/
+          key: ${{ runner.os }}-npm-${{ hashFiles('web-frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies if cache miss
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: web-frontend
+        run: npm ci --cache .npm --prefer-offline
+
+      - name: Run npm audit
+        working-directory: web-frontend
+        run: npm audit --audit-level=moderate
+
+  # ---------------------------
+  # Generate and store documentation
+  # ---------------------------
+  generate-docs:
+    name: Generate documentation
+    runs-on: ${{vars.RUNNER_TYPE}}
+    timeout-minutes: 10
+    needs: ["typescript-check", "eslint", "prettier-format", "test-jest", "security-secrets", "semgrep-scan", "security-audit"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            web-frontend/.npm/
+            web-frontend/.next/cache/
+            web-frontend/node_modules/
+          key: ${{ runner.os }}-npm-${{ hashFiles('web-frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies if cache miss
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: web-frontend
+        run: npm ci --cache .npm --prefer-offline
+
+      - name: Generate documentation
+        working-directory: web-frontend
+        run: npm run docs
+
+      - name: Prepare documentation artifact
+        run: |
+          mkdir -p public
+          cp -r web-frontend/docs/* public/
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: public/
+          retention-days: 30
