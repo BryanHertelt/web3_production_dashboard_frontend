@@ -14,7 +14,7 @@ jobs:
   # ---------------------------
   rollback:
     name: Rollback to previous version
-    runs-on: self-hosted
+    runs-on: ${{vars.RUNNER_TYPE}}
     timeout-minutes: 10 
     permissions: 
       contents: write 
