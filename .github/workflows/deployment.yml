@@ -33,6 +33,7 @@ jobs:
     needs: "version"
     permissions:
       contents: read
+      packages: read  # Read access for cache-from
     timeout-minutes: 20
     steps:
       - name: Checkout code
@@ -64,8 +65,8 @@ jobs:
           outputs: type=docker,dest=/tmp/image.tar
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=inline
-          cache-to: type=inline
+          cache-from: type=registry,ref=ghcr.io/zenetofficial/web:cache
+          cache-to: type=registry,ref=ghcr.io/zenetofficial/web:cache,mode=max
           build-args: |
             CI_COMMIT_SHA=${{ github.sha }}
             CI_COMMIT_REF_NAME=${{ github.ref_name }}
