@@ -10,11 +10,11 @@ jobs:
   # ---------------------------
   version:
     name: Generate version label
-    runs-on: self-hosted
+    runs-on: ${{vars.RUNNER_TYPE}}
     outputs:
         version-tag: ${{ steps.label.outputs.tag }}
-    timeout-minutes: 10 
-    permissions: 
+    timeout-minutes: 10
+    permissions:
       contents: write 
     steps:
       - name: Checkout code
@@ -33,7 +33,6 @@ jobs:
     needs: "version"
     permissions:
       contents: read
-      packages: read  # Read access for cache-from
     timeout-minutes: 20
     steps:
       - name: Checkout code
@@ -65,8 +64,7 @@ jobs:
           outputs: type=docker,dest=/tmp/image.tar
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: |
-            type=registry,ref=ghcr.io/zenetofficial/web:cache
+          cache-from: type=inline
           cache-to: type=inline
           build-args: |
             CI_COMMIT_SHA=${{ github.sha }}
@@ -83,7 +81,7 @@ jobs:
   # ---------------------------
   image-scan-job:
     name: Scan docker image
-    runs-on: self-hosted
+    runs-on: ${{vars.RUNNER_TYPE}}
     timeout-minutes: 15
     needs: ["version", "docker-build"]
     permissions:
@@ -131,12 +129,12 @@ jobs:
   # ---------------------------
   push-image:
     name: Push verified image to registry
-    runs-on: self-hosted
+    runs-on: ${{vars.RUNNER_TYPE}}
     needs: ["version", "image-scan-job"]
     permissions:
       contents: read
       packages: write
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -178,21 +176,12 @@ jobs:
           echo "Pushing $IMAGE_TAG..."
           docker push "$IMAGE_TAG"
           echo "✅ Image pushed successfully"
-
-      - name: Update registry cache
-        uses: docker/build-push-action@v5
-        with:
-          context: ./web-frontend
-          push: true
-          tags: ghcr.io/zenetofficial/web:cache
-          cache-from: type=registry,ref=ghcr.io/zenetofficial/web:cache
-          cache-to: type=registry,ref=ghcr.io/zenetofficial/web:cache,mode=max
 # ---------------------------
 # Deploy image to dev server
 # ---------------------------
   deploy:
     name: Deploy image to dev server
-    runs-on: self-hosted
+    runs-on: ${{vars.RUNNER_TYPE}}
     needs: ["version", "push-image"]
     timeout-minutes: 10
     permissions:
