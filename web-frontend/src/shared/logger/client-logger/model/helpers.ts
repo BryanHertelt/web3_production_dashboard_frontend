@@ -37,10 +37,18 @@ export function formatTimestamp(timestamp?: number): string {
  * Sanitize sensitive data from log payload
  * Recursively redacts fields containing sensitive keywords (password, token, secret, etc.)
  * @param obj - Object to sanitize
+ * @param visited - WeakSet to track visited objects and prevent circular reference loops
  * @returns Sanitized object with sensitive fields replaced with '[REDACTED]'
  */
-export function sanitizePayload<T extends Record<string, unknown>>(obj: T): T {
+export function sanitizePayload<T>(
+  obj: T,
+  visited = new WeakSet<object>()
+): T {
   if (!obj || typeof obj !== "object") return obj;
+
+  // Prevent circular reference infinite loop
+  if (visited.has(obj as object)) return obj;
+  visited.add(obj as object);
 
   const sensitive = [
     "password",
@@ -50,17 +58,28 @@ export function sanitizePayload<T extends Record<string, unknown>>(obj: T): T {
     "auth",
     "credential",
   ];
-  const sanitized = { ...obj };
+
+  // Handle arrays separately to preserve array type
+  if (Array.isArray(obj)) {
+    return obj.map((item) => {
+      if (typeof item === "object" && item !== null) {
+        return sanitizePayload(item, visited);
+      }
+      return item;
+    }) as T;
+  }
+
+  const sanitized = { ...obj } as Record<string, any>;
 
   Object.keys(sanitized).forEach((key) => {
     if (typeof sanitized[key] === "object" && sanitized[key] !== null) {
-      (sanitized as any)[key] = sanitizePayload(sanitized[key] as Record<string, unknown>);
+      sanitized[key] = sanitizePayload(sanitized[key], visited);
     } else if (sensitive.some((s) => key.toLowerCase().includes(s))) {
-      (sanitized as any)[key] = "[REDACTED]";
+      sanitized[key] = "[REDACTED]";
     }
   });
 
-  return sanitized;
+  return sanitized as T;
 }
 
 /**
