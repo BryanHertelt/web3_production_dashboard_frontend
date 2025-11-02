@@ -31,11 +31,19 @@ const createMockLogPayload = (overrides?: Partial<LogPayload>): LogPayload => ({
 
 describe("helpers.ts", () => {
   let originalRandomUUID: typeof crypto.randomUUID;
+  let consoleErrorSpy: jest.SpyInstance;
+  let consoleWarnSpy: jest.SpyInstance;
+  let consoleLogSpy: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.clearAllTimers();
     jest.useFakeTimers();
+
+    // Suppress all console output globally for tests
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
 
     // Mock crypto.randomUUID
     originalRandomUUID = global.crypto.randomUUID;
@@ -58,6 +66,12 @@ describe("helpers.ts", () => {
 
   afterEach(() => {
     jest.useRealTimers();
+    
+    // Restore console methods
+    consoleErrorSpy.mockRestore();
+    consoleWarnSpy.mockRestore();
+    consoleLogSpy.mockRestore();
+    
     Object.defineProperty(global.crypto, 'randomUUID', {
       value: originalRandomUUID,
       writable: true,
@@ -229,7 +243,9 @@ describe("helpers.ts", () => {
         .mockRejectedValueOnce(new Error("Network error"))
         .mockResolvedValueOnce({ ok: true, status: 200 });
 
-      const promise = sendLogWithRetry(mockPayload);
+      const promise = sendLogWithRetry(mockPayload).catch(() => {
+        // Handle potential errors
+      });
 
       // Wait for first call to complete
       await Promise.resolve();
@@ -249,7 +265,10 @@ describe("helpers.ts", () => {
         new Error("Network error")
       );
 
-      const promise = sendLogWithRetry(mockPayload);
+      // Wrap in try-catch to prevent unhandled rejection warnings
+      const promise = sendLogWithRetry(mockPayload).catch(() => {
+        // Silently catch the error - this is expected behavior
+      });
 
       // Fast-forward through all retries
       for (let i = 0; i < LOG_CONFIG.MAX_RETRIES; i++) {
@@ -280,7 +299,9 @@ describe("helpers.ts", () => {
         })
         .mockResolvedValueOnce({ ok: true, status: 200 });
 
-      const promise = sendLogWithRetry(mockPayload);
+      const promise = sendLogWithRetry(mockPayload).catch(() => {
+        // Handle potential errors
+      });
 
       // Wait for first call to complete
       await Promise.resolve();
