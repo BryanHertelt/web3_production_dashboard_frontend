@@ -2,7 +2,12 @@ name: Deployment Web
 
 on:
   workflow_dispatch:
-
+    inputs:
+      database-backup:
+        description: "Boolean to decide whether to create a backup file for the database or not."
+        required: false
+        default: true
+        type: boolean
 
 jobs: 
   # ---------------------------
@@ -211,4 +216,4 @@ jobs:
           registry-username: ${{ github.actor }}
           registry-password: ${{secrets.GITHUB_TOKEN}}
           runner-type: ${{ vars.RUNNER_TYPE }}
-        
+          database-backup: ${{ github.event.inputs.database-backup }}
