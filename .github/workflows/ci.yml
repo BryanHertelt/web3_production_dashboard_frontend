@@ -1,4 +1,4 @@
-name: CI/CD Pipeline Web
+name: CI pipeline Web
 
 on:
   pull_request:
@@ -179,7 +179,7 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             echo "🔧 Formatting changes detected. Committing..."
             git add -A
-            git commit -m "style: Auto-format code with Ruff" || echo "No changes to commit"
+            git commit -m "style: Auto-format code with Prettier" || echo "No changes to commit"
             git push origin "HEAD:${BRANCH_NAME}"
           else
             echo "✅ No formatting changes detected."
@@ -239,57 +239,6 @@ jobs:
           name: test-results
           path: web-frontend/coverage/junit.xml
           retention-days: 5
-
-  # ---------------------------
-  # Build Docker image
-  # ---------------------------
-  docker-build:
-    name: Build and push docker image
-    runs-on: ${{vars.RUNNER_TYPE}}
-    needs: ["prettier-format", "test-jest", "typescript-check", "eslint", "security-secrets", "semgrep-scan", "security-audit", "security-secrets"]
-    permissions: 
-      contents: read 
-      packages: write
-    timeout-minutes: 20
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/zenetofficial/web-frontend
-          tags: |
-            type=sha,format=long
-            type=raw,value=latest
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./web-frontend
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: |
-            type=registry,ref=ghcr.io/zenetofficial/web-frontend:cache
-            type=registry,ref=ghcr.io/zenetofficial/web-frontend:latest
-          cache-to: |
-            type=inline
-            type=registry,ref=ghcr.io/zenetofficial/web-frontend:cache,mode=max
-          build-args: |
-            CI_COMMIT_SHA=${{ github.sha }}
-            CI_COMMIT_REF_NAME=${{ github.ref_name }}
 
 
   # ---------------------------
@@ -409,60 +358,6 @@ jobs:
           retention-days: 7
 
   # ---------------------------
-  # Trivy security scanning
-  # ---------------------------
-  image-scan-job:
-    name: Scan docker image 
-    runs-on: ${{vars.RUNNER_TYPE}}
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      packages: write
-    needs: docker-build
-
-    env:
-      REGISTRY: ghcr.io
-      IMAGE_REF: ghcr.io/zenetofficial/web-frontend:latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Trivy Scan (All Formats)
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{env.IMAGE_REF}}
-          format: json
-          output: trivy-image.json
-          exit-code: 1
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: HIGH,CRITICAL
-
-      - name: Generate Additional Reports
-        run: |
-          trivy image --format table --ignore-unfixed \
-            --severity HIGH,CRITICAL "${{ env.IMAGE_REF }}" > trivy-report.txt
-          trivy image --format cyclonedx \
-            --ignore-unfixed "${{ env.IMAGE_REF }}" -o sbom.cdx.json
-
-      - name: Upload Reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-scan-reports
-          path: |
-            trivy-report.txt
-            trivy-image.json
-            sbom.cdx.json
-          retention-days: 7
-  # ---------------------------
   # Security audit
   # ---------------------------
   security-audit:
@@ -508,7 +403,7 @@ jobs:
     name: Generate documentation
     runs-on: ${{vars.RUNNER_TYPE}}
     timeout-minutes: 10
-    needs: docker-build
+    needs: ["typescript-check", "eslint", "prettier-format", "test-jest", "security-secrets", "semgrep-scan", "security-audit"]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
