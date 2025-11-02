@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Image tag to rollback to (e.g., v1.2.3, 2024.01.15-abc1234)'
+        description: 'Image tag to rollback from.'
         required: true
         type: string
 
