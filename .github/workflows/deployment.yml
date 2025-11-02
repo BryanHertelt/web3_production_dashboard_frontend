@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       database-backup:
-        description: "Boolean to decide whether to create a backup file for the database or not."
+        description: "Create database backup file."
         required: false
         default: true
         type: boolean
