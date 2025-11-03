@@ -1,4 +1,9 @@
-import type { LogPayload, LogFields, UserContext, FailedLogEntry } from "./types";
+import type {
+  LogPayload,
+  LogFields,
+  UserContext,
+  FailedLogEntry,
+} from "./types";
 
 // Configuration constants
 export const LOG_CONFIG = {
@@ -40,10 +45,7 @@ export function formatTimestamp(timestamp?: number): string {
  * @param visited - WeakSet to track visited objects and prevent circular reference loops
  * @returns Sanitized object with sensitive fields replaced with '[REDACTED]'
  */
-export function sanitizePayload<T>(
-  obj: T,
-  visited = new WeakSet<object>()
-): T {
+export function sanitizePayload<T>(obj: T, visited = new WeakSet<object>()): T {
   if (!obj || typeof obj !== "object") return obj;
 
   // Prevent circular reference infinite loop
@@ -103,7 +105,10 @@ export function shouldSampleLog(logData: LogPayload): boolean {
  * @param payload - Log payload to send
  * @param attempt - Current attempt number (1-indexed)
  */
-export async function sendLogWithRetry(payload: LogPayload, attempt = 1): Promise<void> {
+export async function sendLogWithRetry(
+  payload: LogPayload,
+  attempt = 1
+): Promise<void> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
@@ -138,7 +143,7 @@ export async function sendLogWithRetry(payload: LogPayload, attempt = 1): Promis
         error.message
       );
 
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
       return sendLogWithRetry(payload, attempt + 1);
     } else {
       console.error(
@@ -264,10 +269,7 @@ export function endOperation(): void {
 export function getUserContext(): UserContext {
   let sessionId: string | null = null;
 
-  if (
-    typeof window !== "undefined" &&
-    typeof sessionStorage !== "undefined"
-  ) {
+  if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
     sessionId = sessionStorage.getItem("sessionId");
   }
 

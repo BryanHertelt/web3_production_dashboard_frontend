@@ -31,7 +31,10 @@ export interface LogPayload {
 
 export interface ClientLogger extends Logger {
   withSampleRate(sampleRate: number, context?: LogFields): ClientLogger;
-  startOperation(operationName: string, context?: LogFields): ClientLogger & { endOperation: () => void };
+  startOperation(
+    operationName: string,
+    context?: LogFields
+  ): ClientLogger & { endOperation: () => void };
 }
 
 export type Redactable = unknown;

@@ -41,13 +41,13 @@ describe("helpers.ts", () => {
     jest.useFakeTimers();
 
     // Suppress all console output globally for tests
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+    consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation();
+    consoleLogSpy = jest.spyOn(console, "log").mockImplementation();
 
     // Mock crypto.randomUUID
     originalRandomUUID = global.crypto.randomUUID;
-    Object.defineProperty(global.crypto, 'randomUUID', {
+    Object.defineProperty(global.crypto, "randomUUID", {
       value: jest.fn(() => mockUUID),
       writable: true,
     });
@@ -66,13 +66,13 @@ describe("helpers.ts", () => {
 
   afterEach(() => {
     jest.useRealTimers();
-    
+
     // Restore console methods
     consoleErrorSpy.mockRestore();
     consoleWarnSpy.mockRestore();
     consoleLogSpy.mockRestore();
-    
-    Object.defineProperty(global.crypto, 'randomUUID', {
+
+    Object.defineProperty(global.crypto, "randomUUID", {
       value: originalRandomUUID,
       writable: true,
     });
@@ -98,7 +98,7 @@ describe("helpers.ts", () => {
     it("should format timestamp in CET/CEST format", () => {
       const timestamp = new Date("2024-03-15T10:30:00Z").getTime();
       const result = formatTimestamp(timestamp);
-      
+
       // Result should be in YYYY-MM-DDTHH:mm:ss format
       expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/);
     });
@@ -111,7 +111,7 @@ describe("helpers.ts", () => {
     it("should handle Europe/Berlin timezone", () => {
       const timestamp = new Date("2024-06-15T12:00:00Z").getTime();
       const result = formatTimestamp(timestamp);
-      
+
       // Should contain valid date and time
       expect(result).toContain("2024-06-15");
     });
@@ -249,7 +249,7 @@ describe("helpers.ts", () => {
 
       // Wait for first call to complete
       await Promise.resolve();
-      
+
       // Fast-forward through first retry delay
       await jest.advanceTimersByTimeAsync(LOG_CONFIG.RETRY_DELAY);
 
@@ -261,9 +261,7 @@ describe("helpers.ts", () => {
     it("should store failed logs after max retries", async () => {
       const mockPayload = createMockLogPayload();
 
-      (global.fetch as jest.Mock).mockRejectedValue(
-        new Error("Network error")
-      );
+      (global.fetch as jest.Mock).mockRejectedValue(new Error("Network error"));
 
       // Wrap in try-catch to prevent unhandled rejection warnings
       const promise = sendLogWithRetry(mockPayload).catch(() => {
@@ -305,7 +303,7 @@ describe("helpers.ts", () => {
 
       // Wait for first call to complete
       await Promise.resolve();
-      
+
       // Fast-forward to trigger retry
       await jest.advanceTimersByTimeAsync(LOG_CONFIG.RETRY_DELAY);
 
@@ -336,8 +334,14 @@ describe("helpers.ts", () => {
 
     it("should send all failed logs", async () => {
       const mockLogs = [
-        { payload: createMockLogPayload({ msg: "log1" }), timestamp: Date.now() },
-        { payload: createMockLogPayload({ msg: "log2", level: "ERROR" }), timestamp: Date.now() },
+        {
+          payload: createMockLogPayload({ msg: "log1" }),
+          timestamp: Date.now(),
+        },
+        {
+          payload: createMockLogPayload({ msg: "log2", level: "ERROR" }),
+          timestamp: Date.now(),
+        },
       ];
 
       if (typeof window !== "undefined") {
@@ -349,7 +353,7 @@ describe("helpers.ts", () => {
       await sendBatchRetry();
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
-      
+
       if (typeof window !== "undefined") {
         expect((window as any).__failedLogs).toEqual([]);
       }
@@ -377,7 +381,7 @@ describe("helpers.ts", () => {
       const operationId = startOperation("test-operation");
 
       expect(operationId).toBe(mockUUID);
-      
+
       if (typeof window !== "undefined") {
         expect((window as any).__currentOperationId).toBe(mockUUID);
         expect((window as any).__currentOperationName).toBe("test-operation");
@@ -423,8 +427,13 @@ describe("helpers.ts", () => {
     });
 
     it("should return existing session and user IDs", () => {
-      if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
-        (sessionStorage.getItem as jest.Mock).mockReturnValue("existing-session");
+      if (
+        typeof window !== "undefined" &&
+        typeof sessionStorage !== "undefined"
+      ) {
+        (sessionStorage.getItem as jest.Mock).mockReturnValue(
+          "existing-session"
+        );
         (localStorage.getItem as jest.Mock).mockReturnValue("user-123");
       }
 
@@ -435,7 +444,10 @@ describe("helpers.ts", () => {
     });
 
     it("should create new session ID if none exists", () => {
-      if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
+      if (
+        typeof window !== "undefined" &&
+        typeof sessionStorage !== "undefined"
+      ) {
         (sessionStorage.getItem as jest.Mock).mockReturnValue(null);
         (localStorage.getItem as jest.Mock).mockReturnValue("user-123");
       }
@@ -446,12 +458,18 @@ describe("helpers.ts", () => {
       expect(context.user_id).toBe("user-123");
 
       if (typeof sessionStorage !== "undefined") {
-        expect(sessionStorage.setItem).toHaveBeenCalledWith("sessionId", mockUUID);
+        expect(sessionStorage.setItem).toHaveBeenCalledWith(
+          "sessionId",
+          mockUUID
+        );
       }
     });
 
     it("should return anonymous user if no userId in localStorage", () => {
-      if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
+      if (
+        typeof window !== "undefined" &&
+        typeof sessionStorage !== "undefined"
+      ) {
         (sessionStorage.getItem as jest.Mock).mockReturnValue("session-123");
         (localStorage.getItem as jest.Mock).mockReturnValue(null);
       }

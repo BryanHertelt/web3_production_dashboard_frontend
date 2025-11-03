@@ -134,7 +134,10 @@ const baseLogger = pino({
  * const sampledLogger = logger.withSampleRate(0.1, { component: 'highFrequency' });
  * sampledLogger.info('This log has a 10% chance of being sent');
  */
-(baseLogger as any).withSampleRate = (sampleRate: number, context: LogFields = {}): ClientLogger => {
+(baseLogger as any).withSampleRate = (
+  sampleRate: number,
+  context: LogFields = {}
+): ClientLogger => {
   return baseLogger.child({
     sample_rate: sampleRate,
     ...sanitizePayload(context),
@@ -154,7 +157,10 @@ const baseLogger = pino({
  * // ... do work ...
  * opLogger.endOperation();
  */
-(baseLogger as any).startOperation = (operationName: string, context: LogFields = {}): ClientLogger & { endOperation: () => void } => {
+(baseLogger as any).startOperation = (
+  operationName: string,
+  context: LogFields = {}
+): ClientLogger & { endOperation: () => void } => {
   const operationId = startOperation(operationName);
 
   const operationLogger = baseLogger.child({
