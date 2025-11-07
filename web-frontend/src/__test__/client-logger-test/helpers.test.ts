@@ -50,13 +50,13 @@ describe("helpers.ts", () => {
     jest.useFakeTimers();
 
     // Suppress all console output globally for tests
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+    consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation();
+    consoleLogSpy = jest.spyOn(console, "log").mockImplementation();
 
     // Mock crypto.randomUUID
     originalRandomUUID = global.crypto.randomUUID;
-    Object.defineProperty(global.crypto, 'randomUUID', {
+    Object.defineProperty(global.crypto, "randomUUID", {
       value: jest.fn(() => mockUUID),
       writable: true,
     });
@@ -76,13 +76,13 @@ describe("helpers.ts", () => {
 
   afterEach(() => {
     jest.useRealTimers();
-    
+
     // Restore console methods
     consoleErrorSpy.mockRestore();
     consoleWarnSpy.mockRestore();
     consoleLogSpy.mockRestore();
-    
-    Object.defineProperty(global.crypto, 'randomUUID', {
+
+    Object.defineProperty(global.crypto, "randomUUID", {
       value: originalRandomUUID,
       writable: true,
     });
@@ -108,7 +108,7 @@ describe("helpers.ts", () => {
     it("should format timestamp in CET/CEST format", () => {
       const timestamp = new Date("2024-03-15T10:30:00Z").getTime();
       const result = formatTimestamp(timestamp);
-      
+
       // Result should be in YYYY-MM-DDTHH:mm:ss format
       expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/);
     });
@@ -121,7 +121,7 @@ describe("helpers.ts", () => {
     it("should handle Europe/Berlin timezone", () => {
       const timestamp = new Date("2024-06-15T12:00:00Z").getTime();
       const result = formatTimestamp(timestamp);
-      
+
       // Should contain valid date and time
       expect(result).toContain("2024-06-15");
     });
@@ -259,7 +259,7 @@ describe("helpers.ts", () => {
 
       // Wait for first call to complete
       await Promise.resolve();
-      
+
       // Fast-forward through first retry delay
       await jest.advanceTimersByTimeAsync(LOG_CONFIG.RETRY_DELAY);
 
@@ -276,9 +276,7 @@ describe("helpers.ts", () => {
 
       const mockPayload = createMockLogPayload();
 
-      (global.fetch as jest.Mock).mockRejectedValue(
-        new Error("Network error")
-      );
+      (global.fetch as jest.Mock).mockRejectedValue(new Error("Network error"));
 
       // Wrap in try-catch to prevent unhandled rejection warnings
       const promise = sendLogWithRetry(mockPayload).catch(() => {
@@ -318,7 +316,7 @@ describe("helpers.ts", () => {
 
       // Wait for first call to complete
       await Promise.resolve();
-      
+
       // Fast-forward to trigger retry
       await jest.advanceTimersByTimeAsync(LOG_CONFIG.RETRY_DELAY);
 
@@ -358,8 +356,14 @@ describe("helpers.ts", () => {
       }
 
       const mockLogs = [
-        { payload: createMockLogPayload({ msg: "log1" }), timestamp: Date.now() },
-        { payload: createMockLogPayload({ msg: "log2", level: "ERROR" }), timestamp: Date.now() },
+        {
+          payload: createMockLogPayload({ msg: "log1" }),
+          timestamp: Date.now(),
+        },
+        {
+          payload: createMockLogPayload({ msg: "log2", level: "ERROR" }),
+          timestamp: Date.now(),
+        },
       ];
 
       const win = window as unknown as WindowWithLogState;

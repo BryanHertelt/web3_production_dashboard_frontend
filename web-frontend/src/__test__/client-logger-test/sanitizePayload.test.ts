@@ -18,12 +18,12 @@ describe("sanitizePayload", () => {
     });
 
     it("should handle nested circular references without looping", () => {
-      const obj: CircularObject = { 
+      const obj: CircularObject = {
         name: "parent",
         child: {
           name: "child",
-          value: 456
-        } as CircularObject
+          value: 456,
+        },
       };
       (obj.child as CircularObject).parent = obj; // Nested circular reference
 
@@ -54,7 +54,7 @@ describe("sanitizePayload", () => {
     it("should complete within reasonable time for deep circular structures", () => {
       const obj: CircularObject = { level: 0 };
       let current: CircularObject = obj;
-      
+
       // Create a deep nested structure
       for (let i = 1; i < 100; i++) {
         current.next = { level: i };
@@ -77,7 +77,7 @@ describe("sanitizePayload", () => {
       const obj = {
         username: "john",
         password: "secret123",
-        userPassword: "secret456"
+        userPassword: "secret456",
       };
 
       const result = sanitizePayload(obj);
@@ -91,7 +91,7 @@ describe("sanitizePayload", () => {
       const obj = {
         data: "public",
         apiToken: "abc123",
-        authToken: "xyz789"
+        authToken: "xyz789",
       };
 
       const result = sanitizePayload(obj);
@@ -106,7 +106,7 @@ describe("sanitizePayload", () => {
         secretKey: "secret",
         apiKey: "key123",
         authHeader: "Bearer token",
-        userCredential: "cred"
+        userCredential: "cred",
       };
 
       const result = sanitizePayload(obj);
@@ -121,11 +121,11 @@ describe("sanitizePayload", () => {
       const obj = {
         user: {
           name: "john",
-          password: "secret"
+          password: "secret",
         },
         config: {
-          apiKey: "key123"
-        }
+          apiKey: "key123",
+        },
       };
 
       const result = sanitizePayload(obj);
@@ -139,7 +139,7 @@ describe("sanitizePayload", () => {
       const obj = {
         PASSWORD: "secret",
         ApiToken: "token",
-        SECRET_KEY: "key"
+        SECRET_KEY: "key",
       };
 
       const result = sanitizePayload(obj);
@@ -166,7 +166,7 @@ describe("sanitizePayload", () => {
     it("should handle arrays", () => {
       const obj = {
         items: [1, 2, 3],
-        users: [{ name: "john", password: "secret" }]
+        users: [{ name: "john", password: "secret" }],
       };
 
       const result = sanitizePayload(obj);
@@ -185,7 +185,7 @@ describe("sanitizePayload", () => {
     it("should not modify original object", () => {
       const obj = {
         name: "test",
-        password: "secret"
+        password: "secret",
       };
 
       const result = sanitizePayload(obj);
@@ -208,8 +208,8 @@ describe("sanitizePayload", () => {
         name: "user",
         password: "secret123",
         config: {
-          apiKey: "key456"
-        } as CircularObject
+          apiKey: "key456",
+        },
       };
       obj.self = obj;
       (obj.config as CircularObject).parent = obj;
@@ -230,10 +230,10 @@ describe("sanitizePayload", () => {
           level2: {
             password: "pass",
             level3: {
-              apiKey: "key"
-            }
-          }
-        } as CircularObject
+              apiKey: "key",
+            },
+          },
+        },
       };
       (((obj.level1 as CircularObject).level2 as CircularObject).level3 as CircularObject).backToRoot = obj;
 
