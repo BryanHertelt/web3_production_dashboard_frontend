@@ -131,8 +131,12 @@ describe("sanitizePayload", () => {
       const result = sanitizePayload(obj);
 
       expect((result.user as Record<string, unknown>).name).toBe("john");
-      expect((result.user as Record<string, unknown>).password).toBe("[REDACTED]");
-      expect((result.config as Record<string, unknown>).apiKey).toBe("[REDACTED]");
+      expect((result.user as Record<string, unknown>).password).toBe(
+        "[REDACTED]"
+      );
+      expect((result.config as Record<string, unknown>).apiKey).toBe(
+        "[REDACTED]"
+      );
     });
 
     it("should handle case-insensitive sensitive field names", () => {
@@ -172,8 +176,12 @@ describe("sanitizePayload", () => {
       const result = sanitizePayload(obj);
 
       expect(result.items).toEqual([1, 2, 3]);
-      expect(((result.users as Array<Record<string, unknown>>)[0]).name).toBe("john");
-      expect(((result.users as Array<Record<string, unknown>>)[0]).password).toBe("[REDACTED]");
+      expect((result.users as Array<Record<string, unknown>>)[0].name).toBe(
+        "john"
+      );
+      expect((result.users as Array<Record<string, unknown>>)[0].password).toBe(
+        "[REDACTED]"
+      );
     });
 
     it("should handle empty objects", () => {
@@ -195,10 +203,18 @@ describe("sanitizePayload", () => {
     });
 
     it("should handle non-object inputs gracefully", () => {
-      expect(sanitizePayload(null as unknown as Record<string, unknown>)).toBeNull();
-      expect(sanitizePayload(undefined as unknown as Record<string, unknown>)).toBeUndefined();
-      expect(sanitizePayload("string" as unknown as Record<string, unknown>)).toBe("string");
-      expect(sanitizePayload(123 as unknown as Record<string, unknown>)).toBe(123);
+      expect(
+        sanitizePayload(null as unknown as Record<string, unknown>)
+      ).toBeNull();
+      expect(
+        sanitizePayload(undefined as unknown as Record<string, unknown>)
+      ).toBeUndefined();
+      expect(
+        sanitizePayload("string" as unknown as Record<string, unknown>)
+      ).toBe("string");
+      expect(sanitizePayload(123 as unknown as Record<string, unknown>)).toBe(
+        123
+      );
     });
   });
 
@@ -235,14 +251,29 @@ describe("sanitizePayload", () => {
           },
         },
       };
-      (((obj.level1 as CircularObject).level2 as CircularObject).level3 as CircularObject).backToRoot = obj;
+      (
+        ((obj.level1 as CircularObject).level2 as CircularObject)
+          .level3 as CircularObject
+      ).backToRoot = obj;
 
       const result = sanitizePayload(obj);
 
       expect((result.level1 as CircularObject).token).toBe("[REDACTED]");
-      expect(((result.level1 as CircularObject).level2 as CircularObject).password).toBe("[REDACTED]");
-      expect((((result.level1 as CircularObject).level2 as CircularObject).level3 as CircularObject).apiKey).toBe("[REDACTED]");
-      expect((((result.level1 as CircularObject).level2 as CircularObject).level3 as CircularObject).backToRoot).toBeDefined();
+      expect(
+        ((result.level1 as CircularObject).level2 as CircularObject).password
+      ).toBe("[REDACTED]");
+      expect(
+        (
+          ((result.level1 as CircularObject).level2 as CircularObject)
+            .level3 as CircularObject
+        ).apiKey
+      ).toBe("[REDACTED]");
+      expect(
+        (
+          ((result.level1 as CircularObject).level2 as CircularObject)
+            .level3 as CircularObject
+        ).backToRoot
+      ).toBeDefined();
     });
   });
 });

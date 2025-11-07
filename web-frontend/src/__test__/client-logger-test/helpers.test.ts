@@ -10,7 +10,10 @@ import {
   endOperation,
   getUserContext,
 } from "../../shared/logger/client-logger/model/helpers";
-import type { LogPayload, FailedLogEntry } from "../../shared/logger/client-logger/model/types";
+import type {
+  LogPayload,
+  FailedLogEntry,
+} from "../../shared/logger/client-logger/model/types";
 
 // Mock crypto.randomUUID
 const mockUUID = "550e8400-e29b-41d4-a716-446655440000";
@@ -182,13 +185,21 @@ describe("helpers.ts", () => {
     });
 
     it("should handle null and undefined", () => {
-      expect(sanitizePayload(null as unknown as Record<string, unknown>)).toBeNull();
-      expect(sanitizePayload(undefined as unknown as Record<string, unknown>)).toBeUndefined();
+      expect(
+        sanitizePayload(null as unknown as Record<string, unknown>)
+      ).toBeNull();
+      expect(
+        sanitizePayload(undefined as unknown as Record<string, unknown>)
+      ).toBeUndefined();
     });
 
     it("should handle non-object inputs", () => {
-      expect(sanitizePayload("string" as unknown as Record<string, unknown>)).toBe("string");
-      expect(sanitizePayload(123 as unknown as Record<string, unknown>)).toBe(123);
+      expect(
+        sanitizePayload("string" as unknown as Record<string, unknown>)
+      ).toBe("string");
+      expect(sanitizePayload(123 as unknown as Record<string, unknown>)).toBe(
+        123
+      );
     });
   });
 
@@ -329,9 +340,10 @@ describe("helpers.ts", () => {
       const mockPayload = createMockLogPayload();
 
       (global.fetch as jest.Mock).mockImplementation(
-        () => new Promise(() => {
-          // Never resolves
-        })
+        () =>
+          new Promise(() => {
+            // Never resolves
+          })
       );
 
       sendLogWithRetry(mockPayload);
@@ -468,7 +480,7 @@ describe("helpers.ts", () => {
 
     it("should return server-side defaults in non-browser environment", () => {
       const context = getUserContext();
-      
+
       // Skip detailed checks if in browser
       if (isBrowser() && typeof sessionStorage !== "undefined") {
         return;
@@ -506,7 +518,10 @@ describe("helpers.ts", () => {
 
       expect(context.session_id).toBe(mockUUID);
       expect(context.user_id).toBe("user-123");
-      expect(sessionStorage.setItem).toHaveBeenCalledWith("sessionId", mockUUID);
+      expect(sessionStorage.setItem).toHaveBeenCalledWith(
+        "sessionId",
+        mockUUID
+      );
     });
 
     it("should return anonymous user if no userId in localStorage", () => {

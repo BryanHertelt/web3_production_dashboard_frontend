@@ -31,10 +31,12 @@ const baseLogger = pino({
       send: async (level: string | number, logEvent: LogEvent) => {
         try {
           // Check sampling from logEvent (merged from obj) or bindings
-          const bindings = (Array.isArray(logEvent.bindings) && logEvent.bindings.length > 0 
-            ? logEvent.bindings[0] 
-            : {}) as Record<string, unknown>;
-          
+          const bindings = (
+            Array.isArray(logEvent.bindings) && logEvent.bindings.length > 0
+              ? logEvent.bindings[0]
+              : {}
+          ) as Record<string, unknown>;
+
           // Extract and process bindings
           const {
             attempt_num = 1,
@@ -62,7 +64,11 @@ const baseLogger = pino({
                 msgParts.push(String(msgObj.message));
               }
               // Merge all other properties as context
-              const { msg: msgProp, message: messageProp, ...otherProps } = msgObj;
+              const {
+                msg: msgProp,
+                message: messageProp,
+                ...otherProps
+              } = msgObj;
               // Silence unused variable warnings
               void msgProp;
               void messageProp;
@@ -139,7 +145,10 @@ const baseLogger = pino({
 
 interface LoggerWithExtensions extends ClientLogger {
   withSampleRate: (sampleRate: number, context?: LogFields) => ClientLogger;
-  startOperation: (operationName: string, context?: LogFields) => ClientLogger & { endOperation: () => void };
+  startOperation: (
+    operationName: string,
+    context?: LogFields
+  ) => ClientLogger & { endOperation: () => void };
 }
 
 /**
@@ -152,7 +161,10 @@ interface LoggerWithExtensions extends ClientLogger {
  * const sampledLogger = logger.withSampleRate(0.1, { component: 'highFrequency' });
  * sampledLogger.info('This log has a 10% chance of being sent');
  */
-(baseLogger as unknown as LoggerWithExtensions).withSampleRate = (sampleRate: number, context: LogFields = {}): ClientLogger => {
+(baseLogger as unknown as LoggerWithExtensions).withSampleRate = (
+  sampleRate: number,
+  context: LogFields = {}
+): ClientLogger => {
   return baseLogger.child({
     sample_rate: sampleRate,
     ...sanitizePayload(context),
@@ -172,7 +184,10 @@ interface LoggerWithExtensions extends ClientLogger {
  * // ... do work ...
  * opLogger.endOperation();
  */
-(baseLogger as unknown as LoggerWithExtensions).startOperation = (operationName: string, context: LogFields = {}): ClientLogger & { endOperation: () => void } => {
+(baseLogger as unknown as LoggerWithExtensions).startOperation = (
+  operationName: string,
+  context: LogFields = {}
+): ClientLogger & { endOperation: () => void } => {
   const operationId = startOperation(operationName);
 
   const operationLogger = baseLogger.child({
@@ -182,7 +197,9 @@ interface LoggerWithExtensions extends ClientLogger {
   }) as ClientLogger;
 
   // Add endOperation method
-  (operationLogger as ClientLogger & { endOperation: () => void }).endOperation = () => {
+  (
+    operationLogger as ClientLogger & { endOperation: () => void }
+  ).endOperation = () => {
     endOperation();
   };
 
