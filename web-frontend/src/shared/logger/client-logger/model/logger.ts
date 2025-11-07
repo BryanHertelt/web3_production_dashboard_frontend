@@ -1,6 +1,7 @@
 "use client";
 
 import pino from "pino";
+import type { LogEvent } from "pino";
 import {
   formatTimestamp,
   sanitizePayload,
@@ -13,6 +14,10 @@ import {
 } from "./helpers";
 import type { LogPayload, LogFields, ClientLogger } from "./types";
 
+interface WindowWithOperation extends Window {
+  __currentOperationName?: string;
+}
+
 /**
  * Pino logger instance configured for browser use
  * Automatically transmits logs to backend API with structured metadata
@@ -23,10 +28,13 @@ const baseLogger = pino({
   browser: {
     asObject: true,
     transmit: {
-      send: async (level: string | number, logEvent: any) => {
+      send: async (level: string | number, logEvent: LogEvent) => {
         try {
           // Check sampling from logEvent (merged from obj) or bindings
-          const bindings = logEvent.bindings?.[0] || {};
+          const bindings = (Array.isArray(logEvent.bindings) && logEvent.bindings.length > 0 
+            ? logEvent.bindings[0] 
+            : {}) as Record<string, unknown>;
+          
           // Extract and process bindings
           const {
             attempt_num = 1,
@@ -38,21 +46,26 @@ const baseLogger = pino({
           const userContext = getUserContext();
 
           // Process messages
-          let msgParts: string[] = [];
+          const msgParts: string[] = [];
           let contextFromMessages: LogFields = {};
 
-          for (const msg of logEvent.messages) {
+          const messages = (logEvent.messages || []) as unknown[];
+          for (const msg of messages) {
             if (typeof msg === "string") {
               msgParts.push(msg);
             } else if (typeof msg === "object" && msg !== null) {
+              const msgObj = msg as Record<string, unknown>;
               // Extract message string
-              if (msg.msg) {
-                msgParts.push(msg.msg);
-              } else if (msg.message) {
-                msgParts.push(msg.message);
+              if (msgObj.msg) {
+                msgParts.push(String(msgObj.msg));
+              } else if (msgObj.message) {
+                msgParts.push(String(msgObj.message));
               }
               // Merge all other properties as context
-              const { msg: _, message: __, ...otherProps } = msg;
+              const { msg: msgProp, message: messageProp, ...otherProps } = msgObj;
+              // Silence unused variable warnings
+              void msgProp;
+              void messageProp;
               contextFromMessages = { ...contextFromMessages, ...otherProps };
             }
           }
@@ -64,16 +77,16 @@ const baseLogger = pino({
               typeof level === "string"
                 ? level
                 : pino.levels.labels[level] || "info",
-            time: formatTimestamp(logEvent.ts),
+            time: formatTimestamp(logEvent.ts as number | undefined),
             msg: msgParts.join(" ") || "Log entry",
 
             // Request tracking
-            request_id,
+            request_id: request_id as string,
             operation_name:
               typeof window !== "undefined"
-                ? (window as any).__currentOperationName
+                ? (window as WindowWithOperation).__currentOperationName
                 : undefined,
-            attempt_num,
+            attempt_num: attempt_num as number,
 
             // User context
             ...userContext,
@@ -124,6 +137,11 @@ const baseLogger = pino({
   },
 });
 
+interface LoggerWithExtensions extends ClientLogger {
+  withSampleRate: (sampleRate: number, context?: LogFields) => ClientLogger;
+  startOperation: (operationName: string, context?: LogFields) => ClientLogger & { endOperation: () => void };
+}
+
 /**
  * Create a child logger with a specific sample rate
  * Useful for reducing log volume on high-frequency operations
@@ -134,7 +152,7 @@ const baseLogger = pino({
  * const sampledLogger = logger.withSampleRate(0.1, { component: 'highFrequency' });
  * sampledLogger.info('This log has a 10% chance of being sent');
  */
-(baseLogger as any).withSampleRate = (sampleRate: number, context: LogFields = {}): ClientLogger => {
+(baseLogger as unknown as LoggerWithExtensions).withSampleRate = (sampleRate: number, context: LogFields = {}): ClientLogger => {
   return baseLogger.child({
     sample_rate: sampleRate,
     ...sanitizePayload(context),
@@ -154,7 +172,7 @@ const baseLogger = pino({
  * // ... do work ...
  * opLogger.endOperation();
  */
-(baseLogger as any).startOperation = (operationName: string, context: LogFields = {}): ClientLogger & { endOperation: () => void } => {
+(baseLogger as unknown as LoggerWithExtensions).startOperation = (operationName: string, context: LogFields = {}): ClientLogger & { endOperation: () => void } => {
   const operationId = startOperation(operationName);
 
   const operationLogger = baseLogger.child({
@@ -164,11 +182,11 @@ const baseLogger = pino({
   }) as ClientLogger;
 
   // Add endOperation method
-  (operationLogger as any).endOperation = () => {
+  (operationLogger as ClientLogger & { endOperation: () => void }).endOperation = () => {
     endOperation();
   };
 
   return operationLogger as ClientLogger & { endOperation: () => void };
 };
 
-export const logger: ClientLogger = baseLogger as ClientLogger;
+export const logger: ClientLogger = baseLogger as unknown as ClientLogger;

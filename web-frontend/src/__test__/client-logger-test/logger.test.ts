@@ -3,12 +3,44 @@ import * as helpers from '../../shared/logger/client-logger/model/helpers';
 // Mock helpers module
 jest.mock('../../shared/logger/client-logger/model/helpers');
 
+// Define types for our mocks
+interface MockLogger {
+  info: jest.Mock;
+  debug: jest.Mock;
+  warn: jest.Mock;
+  error: jest.Mock;
+  fatal: jest.Mock;
+  child: jest.Mock;
+  level?: string;
+}
+
+interface MockPinoConfig {
+  browser?: {
+    transmit?: {
+      send?: (level: string | number, logEvent: LogEvent) => void;
+    };
+  };
+}
+
+interface LogEvent {
+  ts: number;
+  messages: unknown[];
+  bindings: Record<string, unknown>[];
+}
+
+type TransmitSendFn = (level: string | number, logEvent: LogEvent) => Promise<void>;
+
 // Create a shared state object that persists across module reloads
-const mockState = {
-  lastTransmitSendFn: null as any,
-  mockChild: null as any,
-  mockBaseLogger: null as any,
-  mockPino: null as any,
+const mockState: {
+  lastTransmitSendFn: TransmitSendFn | null;
+  mockChild: MockLogger | null;
+  mockBaseLogger: MockLogger | null;
+  mockPino: jest.Mock & { levels?: { labels: Record<number, string> } } | null;
+} = {
+  lastTransmitSendFn: null,
+  mockChild: null,
+  mockBaseLogger: null,
+  mockPino: null,
 };
 
 // Mock pino module
@@ -19,7 +51,7 @@ jest.mock('pino', () => {
     warn: jest.fn(),
     error: jest.fn(),
     fatal: jest.fn(),
-    child: jest.fn(function(this: any) {
+    child: jest.fn(function(this: MockLogger) {
       return this;
     }),
   };
@@ -34,9 +66,9 @@ jest.mock('pino', () => {
     level: 'info',
   };
 
-  mockState.mockPino = jest.fn((config: any) => {
+  mockState.mockPino = jest.fn((config: MockPinoConfig) => {
     if (config?.browser?.transmit?.send) {
-      mockState.lastTransmitSendFn = config.browser.transmit.send;
+      mockState.lastTransmitSendFn = config.browser.transmit.send as TransmitSendFn;
     }
     return mockState.mockBaseLogger;
   });
@@ -55,7 +87,7 @@ jest.mock('pino', () => {
 });
 
 // Helper function to setup mocks - can accept a custom helpers module for isolateModules
-const setupHelperMocks = (helpersModule: any = helpers) => {
+const setupHelperMocks = (helpersModule: typeof helpers = helpers) => {
   (helpersModule.formatTimestamp as jest.Mock).mockReturnValue('2025-11-01T12:00:00');
   (helpersModule.sanitizePayload as jest.Mock).mockImplementation((payload) => payload);
   (helpersModule.shouldSampleLog as jest.Mock).mockReturnValue(true);
@@ -73,6 +105,7 @@ describe('logger.ts', () => {
   beforeAll(() => {
     // Ensure mockPino is initialized
     if (!mockState.mockPino) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       mockState.mockPino = require('pino');
     }
   });
@@ -89,9 +122,9 @@ describe('logger.ts', () => {
   });
 
   afterEach(() => {
-    delete (global as any).window;
-    delete (global as any).document;
-    delete (global as any).performance;
+    delete (global as Record<string, unknown>).window;
+    delete (global as Record<string, unknown>).document;
+    delete (global as Record<string, unknown>).performance;
   });
 
   describe('Logger initialization', () => {
@@ -105,31 +138,33 @@ describe('logger.ts', () => {
       
       try {
         // Set NODE_ENV to development
-        delete (process.env as any).NODE_ENV;
-        (process.env as any).NODE_ENV = 'development';
+        delete (process.env as Record<string, unknown>).NODE_ENV;
+        (process.env as Record<string, string>).NODE_ENV = 'development';
 
         // Clear all module caches completely
         jest.resetModules();
         
         // Clear pino mock
-        mockState.mockPino.mockClear();
+        mockState.mockPino?.mockClear();
         
         // Load with development environment
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const localHelpers = require('../../shared/logger/client-logger/model/helpers');
         setupHelperMocks(localHelpers);
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require('../../shared/logger/client-logger');
 
         // Check that pino was called with debug level
-        const calls = mockState.mockPino.mock.calls;
-        const config = calls[calls.length - 1][0];
+        const calls = mockState.mockPino?.mock.calls;
+        const config = calls?.[calls.length - 1]?.[0];
         
         expect(config.level).toBe('debug');
         expect(config.browser).toBeDefined();
         expect(config.browser.asObject).toBe(true);
         expect(config.browser.transmit.send).toBeInstanceOf(Function);
       } finally {
-        delete (process.env as any).NODE_ENV;
-        (process.env as any).NODE_ENV = originalEnv;
+        delete (process.env as Record<string, unknown>).NODE_ENV;
+        (process.env as Record<string, string>).NODE_ENV = originalEnv;
       }
     });
 
@@ -143,10 +178,11 @@ describe('logger.ts', () => {
           configurable: true,
         });
 
-        mockState.mockPino.mockClear();
+        mockState.mockPino?.mockClear();
 
         jest.isolateModules(() => {
           setupHelperMocks();
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
           require('../../shared/logger/client-logger');
         });
 
@@ -166,49 +202,51 @@ describe('logger.ts', () => {
   });
 
   describe('transmit.send function', () => {
-    let isolatedHelpers: any;
+    let isolatedHelpers: typeof helpers;
 
     beforeEach(() => {
       // Delete existing properties first
-      delete (global as any).window;
-      delete (global as any).document;
-      delete (global as any).performance;
+      delete (global as Record<string, unknown>).window;
+      delete (global as Record<string, unknown>).document;
+      delete (global as Record<string, unknown>).performance;
       
       // Setup window object BEFORE loading the module
-      global.window = {
+      (global as Record<string, unknown>).window = {
         location: { href: 'https://example.com/test' },
         navigator: { userAgent: 'test-agent' },
         __currentOperationName: undefined,
-      } as any;
+      };
 
-      global.document = {
+      (global as Record<string, unknown>).document = {
         title: 'Test Page',
         referrer: 'https://referrer.com',
-      } as any;
+      };
 
-      global.performance = {
+      (global as Record<string, unknown>).performance = {
         timing: {
           loadEventEnd: 2000,
           navigationStart: 1000,
         },
-      } as any;
+      };
       
       // Load the logger module to capture transmitSendFn
       jest.isolateModules(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         isolatedHelpers = require('../../shared/logger/client-logger/model/helpers');
         setupHelperMocks(isolatedHelpers);
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require('../../shared/logger/client-logger');
       });
     });
 
     it('should process string messages correctly', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test message'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -221,13 +259,13 @@ describe('logger.ts', () => {
     });
 
     it('should process object messages with msg property', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: [{ msg: 'Object message', extra: 'data' }],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn(30, logEvent);
+      await mockState.lastTransmitSendFn?.(30, logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -239,13 +277,13 @@ describe('logger.ts', () => {
     });
 
     it('should process object messages with message property', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: [{ message: 'Alternative message', context: 'value' }],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn(40, logEvent);
+      await mockState.lastTransmitSendFn?.(40, logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -257,13 +295,13 @@ describe('logger.ts', () => {
     });
 
     it('should handle multiple messages', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['First', 'Second', { msg: 'Third' }],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('error', logEvent);
+      await mockState.lastTransmitSendFn?.('error', logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -273,13 +311,13 @@ describe('logger.ts', () => {
     });
 
     it('should use default message when no messages provided', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: [],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -289,7 +327,7 @@ describe('logger.ts', () => {
     });
 
     it('should extract bindings correctly', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [
@@ -301,7 +339,7 @@ describe('logger.ts', () => {
         ],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -313,13 +351,13 @@ describe('logger.ts', () => {
     });
 
     it('should use default values when bindings are missing', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(isolatedHelpers.getCurrentOperationId).toHaveBeenCalled();
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
@@ -331,19 +369,19 @@ describe('logger.ts', () => {
     });
 
     it('should include page context when window is available', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       // Get the actual call to check what was captured
       const calls = (isolatedHelpers.sendLogWithRetry as jest.Mock).mock.calls;
       expect(calls.length).toBeGreaterThan(0);
       
-      const logPayload = calls[0][0];
+      const logPayload = calls[0][0] as Record<string, unknown>;
       
       // Verify that page context fields exist (jsdom may override values)
       expect(logPayload).toHaveProperty('page_url');
@@ -358,42 +396,46 @@ describe('logger.ts', () => {
 
     it('should handle missing referrer with "direct"', async () => {
       // Need to delete window and recreate it with empty referrer
-      delete (global as any).window;
-      delete (global as any).document;
+      delete (global as Record<string, unknown>).window;
+      delete (global as Record<string, unknown>).document;
       
-      global.window = {
+      (global as Record<string, unknown>).window = {
         location: { href: 'https://example.com/test' },
         navigator: { userAgent: 'test-agent' },
         __currentOperationName: undefined,
-      } as any;
+      };
 
-      global.document = {
+      (global as Record<string, unknown>).document = {
         title: 'Test Page',
         referrer: '',
-      } as any;
+      };
 
-      global.performance = {
+      (global as Record<string, unknown>).performance = {
         timing: {
           loadEventEnd: 2000,
           navigationStart: 1000,
         },
-      } as any;
+      };
 
       // Reload module with new globals
-      let localHelpers: any;
-      jest.isolateModules(() => {
-        localHelpers = require('../../shared/logger/client-logger/model/helpers');
-        setupHelperMocks(localHelpers);
-        require('../../shared/logger/client-logger');
+      const localHelpers = await new Promise<typeof helpers>((resolve) => {
+        jest.isolateModules(() => {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const helpers = require('../../shared/logger/client-logger/model/helpers');
+          setupHelperMocks(helpers);
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          require('../../shared/logger/client-logger');
+          resolve(helpers);
+        });
       });
 
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(localHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -404,47 +446,51 @@ describe('logger.ts', () => {
 
     it('should include operation_name from window', async () => {
       // Need to recreate window with operation name
-      delete (global as any).window;
-      delete (global as any).document;
-      delete (global as any).performance;
+      delete (global as Record<string, unknown>).window;
+      delete (global as Record<string, unknown>).document;
+      delete (global as Record<string, unknown>).performance;
       
-      global.window = {
+      (global as Record<string, unknown>).window = {
         location: { href: 'https://example.com/test' },
         navigator: { userAgent: 'test-agent' },
         __currentOperationName: 'testOperation',
-      } as any;
+      };
 
-      global.document = {
+      (global as Record<string, unknown>).document = {
         title: 'Test Page',
         referrer: 'https://referrer.com',
-      } as any;
+      };
 
-      global.performance = {
+      (global as Record<string, unknown>).performance = {
         timing: {
           loadEventEnd: 2000,
           navigationStart: 1000,
         },
-      } as any;
+      };
 
       // Reload module with new globals
-      let localHelpers: any;
-      jest.isolateModules(() => {
-        localHelpers = require('../../shared/logger/client-logger/model/helpers');
-        setupHelperMocks(localHelpers);
-        require('../../shared/logger/client-logger');
+      const localHelpers = await new Promise<typeof helpers>((resolve) => {
+        jest.isolateModules(() => {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const helpers = require('../../shared/logger/client-logger/model/helpers');
+          setupHelperMocks(helpers);
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          require('../../shared/logger/client-logger');
+          resolve(helpers);
+        });
       });
 
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       // Get the actual call
       const calls = (localHelpers.sendLogWithRetry as jest.Mock).mock.calls;
-      const logPayload = calls[0][0];
+      const logPayload = calls[0][0] as Record<string, unknown>;
       
       // The operation_name property should exist
       expect(logPayload).toHaveProperty('operation_name');
@@ -454,13 +500,13 @@ describe('logger.ts', () => {
     });
 
     it('should include performance timing when available', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -473,37 +519,41 @@ describe('logger.ts', () => {
 
     it('should handle missing performance.timing', async () => {
       // Need to recreate globals without performance.timing
-      delete (global as any).window;
-      delete (global as any).performance;
+      delete (global as Record<string, unknown>).window;
+      delete (global as Record<string, unknown>).performance;
       
-      global.window = {
+      (global as Record<string, unknown>).window = {
         location: { href: 'https://example.com/test' },
         navigator: { userAgent: 'test-agent' },
         __currentOperationName: undefined,
-      } as any;
+      };
 
-      global.document = {
+      (global as Record<string, unknown>).document = {
         title: 'Test Page',
         referrer: 'https://referrer.com',
-      } as any;
+      };
 
-      global.performance = {} as any;
+      (global as Record<string, unknown>).performance = {};
 
       // Reload module with new globals
-      let localHelpers: any;
-      jest.isolateModules(() => {
-        localHelpers = require('../../shared/logger/client-logger/model/helpers');
-        setupHelperMocks(localHelpers);
-        require('../../shared/logger/client-logger');
+      const localHelpers = await new Promise<typeof helpers>((resolve) => {
+        jest.isolateModules(() => {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const helpers = require('../../shared/logger/client-logger/model/helpers');
+          setupHelperMocks(helpers);
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          require('../../shared/logger/client-logger');
+          resolve(helpers);
+        });
       });
 
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(localHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -515,25 +565,25 @@ describe('logger.ts', () => {
     it('should not send log when shouldSampleLog returns false', async () => {
       (isolatedHelpers.shouldSampleLog as jest.Mock).mockReturnValue(false);
 
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).not.toHaveBeenCalled();
     });
 
     it('should handle numeric log levels', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn(50, logEvent);
+      await mockState.lastTransmitSendFn?.(50, logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -543,13 +593,13 @@ describe('logger.ts', () => {
     });
 
     it('should fallback to "info" for unknown numeric levels', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn(999, logEvent);
+      await mockState.lastTransmitSendFn?.(999, logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -566,13 +616,13 @@ describe('logger.ts', () => {
         new Error('Network error')
       );
 
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('error', logEvent);
+      await mockState.lastTransmitSendFn?.('error', logEvent);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Critical logging failure:',
@@ -588,13 +638,13 @@ describe('logger.ts', () => {
     });
 
     it('should handle null messages in object', async () => {
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: [{ msg: null, extra: 'data' }],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -606,25 +656,29 @@ describe('logger.ts', () => {
 
     it('should handle window undefined for operation_name', async () => {
       // Delete window completely before loading module
-      delete (global as any).window;
-      delete (global as any).document;
-      delete (global as any).performance;
+      delete (global as Record<string, unknown>).window;
+      delete (global as Record<string, unknown>).document;
+      delete (global as Record<string, unknown>).performance;
 
       // Reload module without window
-      let localHelpers: any;
-      jest.isolateModules(() => {
-        localHelpers = require('../../shared/logger/client-logger/model/helpers');
-        setupHelperMocks(localHelpers);
-        require('../../shared/logger/client-logger');
+      const localHelpers = await new Promise<typeof helpers>((resolve) => {
+        jest.isolateModules(() => {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const helpers = require('../../shared/logger/client-logger/model/helpers');
+          setupHelperMocks(helpers);
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          require('../../shared/logger/client-logger');
+          resolve(helpers);
+        });
       });
 
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(localHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -635,46 +689,50 @@ describe('logger.ts', () => {
 
     it('should handle navigator undefined', async () => {
       // Recreate window without navigator
-      delete (global as any).window;
-      delete (global as any).document;
-      delete (global as any).performance;
+      delete (global as Record<string, unknown>).window;
+      delete (global as Record<string, unknown>).document;
+      delete (global as Record<string, unknown>).performance;
       
-      global.window = {
+      (global as Record<string, unknown>).window = {
         location: { href: 'https://example.com/test' },
         __currentOperationName: undefined,
-      } as any;
+      };
 
-      global.document = {
+      (global as Record<string, unknown>).document = {
         title: 'Test Page',
         referrer: 'https://referrer.com',
-      } as any;
+      };
 
-      global.performance = {
+      (global as Record<string, unknown>).performance = {
         timing: {
           loadEventEnd: 2000,
           navigationStart: 1000,
         },
-      } as any;
+      };
 
       // Reload module with new globals
-      let localHelpers: any;
-      jest.isolateModules(() => {
-        localHelpers = require('../../shared/logger/client-logger/model/helpers');
-        setupHelperMocks(localHelpers);
-        require('../../shared/logger/client-logger');
+      const localHelpers = await new Promise<typeof helpers>((resolve) => {
+        jest.isolateModules(() => {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const helpers = require('../../shared/logger/client-logger/model/helpers');
+          setupHelperMocks(helpers);
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          require('../../shared/logger/client-logger');
+          resolve(helpers);
+        });
       });
 
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       // Get the actual call
       const calls = (localHelpers.sendLogWithRetry as jest.Mock).mock.calls;
-      const logPayload = calls[0][0];
+      const logPayload = calls[0][0] as Record<string, unknown>;
       
       // Verify user_agent field exists
       expect(logPayload).toHaveProperty('user_agent');
@@ -684,67 +742,75 @@ describe('logger.ts', () => {
 
     it('should handle performance undefined', async () => {
       // Recreate globals without performance
-      delete (global as any).window;
-      delete (global as any).performance;
+      delete (global as Record<string, unknown>).window;
+      delete (global as Record<string, unknown>).performance;
       
-      global.window = {
+      (global as Record<string, unknown>).window = {
         location: { href: 'https://example.com/test' },
         navigator: { userAgent: 'test-agent' },
         __currentOperationName: undefined,
-      } as any;
+      };
 
-      global.document = {
+      (global as Record<string, unknown>).document = {
         title: 'Test Page',
         referrer: 'https://referrer.com',
-      } as any;
+      };
 
       // Reload module with new globals
-      let localHelpers: any;
-      jest.isolateModules(() => {
-        localHelpers = require('../../shared/logger/client-logger/model/helpers');
-        setupHelperMocks(localHelpers);
-        require('../../shared/logger/client-logger');
+      const localHelpers = await new Promise<typeof helpers>((resolve) => {
+        jest.isolateModules(() => {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const helpers = require('../../shared/logger/client-logger/model/helpers');
+          setupHelperMocks(helpers);
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          require('../../shared/logger/client-logger');
+          resolve(helpers);
+        });
       });
 
-      const logEvent = {
+      const logEvent: LogEvent = {
         ts: Date.now(),
         messages: ['Test'],
         bindings: [{}],
       };
 
-      await mockState.lastTransmitSendFn('info', logEvent);
+      await mockState.lastTransmitSendFn?.('info', logEvent);
 
       expect(localHelpers.sendLogWithRetry).toHaveBeenCalled();
     });
   });
 
   describe('withSampleRate', () => {
-    let testLogger: any;
-    let isolatedHelpers: any;
+    let testLogger: {
+      withSampleRate: (rate: number, context?: Record<string, unknown>) => unknown;
+    };
+    let isolatedHelpers: typeof helpers;
 
     beforeEach(() => {
       // Setup standard globals
-      global.window = {
+      (global as Record<string, unknown>).window = {
         location: { href: 'https://example.com/test' },
         navigator: { userAgent: 'test-agent' },
         __currentOperationName: undefined,
-      } as any;
+      };
 
-      global.document = {
+      (global as Record<string, unknown>).document = {
         title: 'Test Page',
         referrer: 'https://referrer.com',
-      } as any;
+      };
 
-      global.performance = {
+      (global as Record<string, unknown>).performance = {
         timing: {
           loadEventEnd: 2000,
           navigationStart: 1000,
         },
-      } as any;
+      };
 
       jest.isolateModules(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         isolatedHelpers = require('../../shared/logger/client-logger/model/helpers');
         setupHelperMocks(isolatedHelpers);
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const loggerModule = require('../../shared/logger/client-logger');
         testLogger = loggerModule.logger;
       });
@@ -776,32 +842,36 @@ describe('logger.ts', () => {
   });
 
   describe('startOperation', () => {
-    let testLogger: any;
-    let isolatedHelpers: any;
+    let testLogger: {
+      startOperation: (name: string, context?: Record<string, unknown>) => { endOperation: () => void };
+    };
+    let isolatedHelpers: typeof helpers;
 
     beforeEach(() => {
       // Setup standard globals
-      global.window = {
+      (global as Record<string, unknown>).window = {
         location: { href: 'https://example.com/test' },
         navigator: { userAgent: 'test-agent' },
         __currentOperationName: undefined,
-      } as any;
+      };
 
-      global.document = {
+      (global as Record<string, unknown>).document = {
         title: 'Test Page',
         referrer: 'https://referrer.com',
-      } as any;
+      };
 
-      global.performance = {
+      (global as Record<string, unknown>).performance = {
         timing: {
           loadEventEnd: 2000,
           navigationStart: 1000,
         },
-      } as any;
+      };
 
       jest.isolateModules(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         isolatedHelpers = require('../../shared/logger/client-logger/model/helpers');
         setupHelperMocks(isolatedHelpers);
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const loggerModule = require('../../shared/logger/client-logger');
         testLogger = loggerModule.logger;
       });
@@ -843,33 +913,38 @@ describe('logger.ts', () => {
   });
 
   describe('Logger export', () => {
-    it('should export logger instance', () => {
-      let testLogger: any;
-      
+    it('should export logger instance', async () => {
       // Setup standard globals
-      global.window = {
+      (global as Record<string, unknown>).window = {
         location: { href: 'https://example.com/test' },
         navigator: { userAgent: 'test-agent' },
         __currentOperationName: undefined,
-      } as any;
+      };
 
-      global.document = {
+      (global as Record<string, unknown>).document = {
         title: 'Test Page',
         referrer: 'https://referrer.com',
-      } as any;
+      };
 
-      global.performance = {
+      (global as Record<string, unknown>).performance = {
         timing: {
           loadEventEnd: 2000,
           navigationStart: 1000,
         },
-      } as any;
+      };
       
-      jest.isolateModules(() => {
-        const localHelpers = require('../../shared/logger/client-logger/model/helpers');
-        setupHelperMocks(localHelpers);
-        const loggerModule = require('../../shared/logger/client-logger');
-        testLogger = loggerModule.logger;
+      const testLogger = await new Promise<{
+        withSampleRate: (rate: number, context?: Record<string, unknown>) => unknown;
+        startOperation: (name: string, context?: Record<string, unknown>) => unknown;
+      }>((resolve) => {
+        jest.isolateModules(() => {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const localHelpers = require('../../shared/logger/client-logger/model/helpers');
+          setupHelperMocks(localHelpers);
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const loggerModule = require('../../shared/logger/client-logger');
+          resolve(loggerModule.logger);
+        });
       });
 
       expect(testLogger).toBeDefined();

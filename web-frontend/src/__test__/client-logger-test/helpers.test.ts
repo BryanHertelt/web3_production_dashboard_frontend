@@ -10,7 +10,7 @@ import {
   endOperation,
   getUserContext,
 } from "../../shared/logger/client-logger/model/helpers";
-import type { LogPayload } from "../../shared/logger/client-logger/model/types";
+import type { LogPayload, FailedLogEntry } from "../../shared/logger/client-logger/model/types";
 
 // Mock crypto.randomUUID
 const mockUUID = "550e8400-e29b-41d4-a716-446655440000";
@@ -28,6 +28,15 @@ const createMockLogPayload = (overrides?: Partial<LogPayload>): LogPayload => ({
   timestamp: Date.now(),
   ...overrides,
 });
+
+interface WindowWithLogState extends Window {
+  __failedLogs?: FailedLogEntry[];
+  __currentOperationId?: string;
+  __currentOperationName?: string;
+}
+
+// Helper to check if we're in a browser environment
+const isBrowser = () => typeof window !== "undefined";
 
 describe("helpers.ts", () => {
   let originalRandomUUID: typeof crypto.randomUUID;
@@ -53,15 +62,16 @@ describe("helpers.ts", () => {
     });
 
     // Clear window properties
-    if (typeof window !== "undefined") {
-      delete (window as any).__failedLogs;
-      delete (window as any).__currentOperationId;
-      delete (window as any).__currentOperationName;
+    if (isBrowser()) {
+      const win = window as unknown as WindowWithLogState;
+      delete win.__failedLogs;
+      delete win.__currentOperationId;
+      delete win.__currentOperationName;
     }
 
     // Clear global properties
-    delete (global as any).batchRetryTimerId;
-    delete (global as any).sendLogWithRetry;
+    delete (global as Record<string, unknown>).batchRetryTimerId;
+    delete (global as Record<string, unknown>).sendLogWithRetry;
   });
 
   afterEach(() => {
@@ -172,13 +182,13 @@ describe("helpers.ts", () => {
     });
 
     it("should handle null and undefined", () => {
-      expect(sanitizePayload(null as any)).toBeNull();
-      expect(sanitizePayload(undefined as any)).toBeUndefined();
+      expect(sanitizePayload(null as unknown as Record<string, unknown>)).toBeNull();
+      expect(sanitizePayload(undefined as unknown as Record<string, unknown>)).toBeUndefined();
     });
 
     it("should handle non-object inputs", () => {
-      expect(sanitizePayload("string" as any)).toBe("string");
-      expect(sanitizePayload(123 as any)).toBe(123);
+      expect(sanitizePayload("string" as unknown as Record<string, unknown>)).toBe("string");
+      expect(sanitizePayload(123 as unknown as Record<string, unknown>)).toBe(123);
     });
   });
 
@@ -258,7 +268,12 @@ describe("helpers.ts", () => {
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
 
-    it("should store failed logs after max retries", async () => {
+    it("should store failed logs after max retries in browser", async () => {
+      // Skip this test in non-browser environments
+      if (!isBrowser()) {
+        return;
+      }
+
       const mockPayload = createMockLogPayload();
 
       (global.fetch as jest.Mock).mockRejectedValue(
@@ -281,11 +296,9 @@ describe("helpers.ts", () => {
 
       expect(global.fetch).toHaveBeenCalledTimes(LOG_CONFIG.MAX_RETRIES);
 
-      // Check if failed log was stored
-      if (typeof window !== "undefined") {
-        expect((window as any).__failedLogs).toBeDefined();
-        expect((window as any).__failedLogs.length).toBeGreaterThan(0);
-      }
+      const win = window as unknown as WindowWithLogState;
+      expect(win.__failedLogs).toBeDefined();
+      expect(win.__failedLogs).toHaveLength(1);
     });
 
     it("should handle HTTP error responses", async () => {
@@ -318,13 +331,17 @@ describe("helpers.ts", () => {
       const mockPayload = createMockLogPayload();
 
       (global.fetch as jest.Mock).mockImplementation(
-        () => new Promise(() => {}) // Never resolves
+        () => new Promise(() => {
+          // Never resolves
+        })
       );
 
-      const promise = sendLogWithRetry(mockPayload);
+      sendLogWithRetry(mockPayload);
 
       await jest.advanceTimersByTimeAsync(10000); // Timeout is 10 seconds
       await Promise.resolve();
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -334,33 +351,39 @@ describe("helpers.ts", () => {
       expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it("should send all failed logs", async () => {
+    it("should send all failed logs in browser", async () => {
+      // Skip this test in non-browser environments
+      if (!isBrowser()) {
+        return;
+      }
+
       const mockLogs = [
         { payload: createMockLogPayload({ msg: "log1" }), timestamp: Date.now() },
         { payload: createMockLogPayload({ msg: "log2", level: "ERROR" }), timestamp: Date.now() },
       ];
 
-      if (typeof window !== "undefined") {
-        (window as any).__failedLogs = mockLogs;
-      }
+      const win = window as unknown as WindowWithLogState;
+      win.__failedLogs = mockLogs;
 
       (global.fetch as jest.Mock).mockResolvedValue({ ok: true, status: 200 });
 
       await sendBatchRetry();
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
-      
-      if (typeof window !== "undefined") {
-        expect((window as any).__failedLogs).toEqual([]);
-      }
+      expect(win.__failedLogs).toEqual([]);
     });
   });
 
   describe("getCurrentOperationId", () => {
-    it("should return stored operation ID if available", () => {
-      if (typeof window !== "undefined") {
-        (window as any).__currentOperationId = "existing-id";
+    it("should return stored operation ID if available in browser", () => {
+      // Skip this test in non-browser environments
+      if (!isBrowser()) {
+        return;
       }
+
+      // Browser: should return stored ID
+      const win = window as unknown as WindowWithLogState;
+      win.__currentOperationId = "existing-id";
 
       const result = getCurrentOperationId();
       expect(result).toBe("existing-id");
@@ -373,38 +396,55 @@ describe("helpers.ts", () => {
   });
 
   describe("startOperation", () => {
-    it("should create and store new operation ID", () => {
+    it("should create and store new operation ID in browser", () => {
       const operationId = startOperation("test-operation");
-
       expect(operationId).toBe(mockUUID);
-      
-      if (typeof window !== "undefined") {
-        expect((window as any).__currentOperationId).toBe(mockUUID);
-        expect((window as any).__currentOperationName).toBe("test-operation");
+
+      // Skip window checks in non-browser environments
+      if (!isBrowser()) {
+        return;
       }
+
+      const win = window as unknown as WindowWithLogState;
+      expect(win.__currentOperationId).toBe(mockUUID);
+      expect(win.__currentOperationName).toBe("test-operation");
+    });
+
+    it("should create new operation ID", () => {
+      const operationId = startOperation("test-operation");
+      expect(operationId).toBe(mockUUID);
     });
   });
 
   describe("endOperation", () => {
-    it("should clear operation ID and name", () => {
-      if (typeof window !== "undefined") {
-        (window as any).__currentOperationId = "test-id";
-        (window as any).__currentOperationName = "test-op";
+    it("should clear operation ID and name in browser", () => {
+      // Skip this test in non-browser environments
+      if (!isBrowser()) {
+        // In non-browser, endOperation does nothing but shouldn't error
+        endOperation();
+        return;
       }
+
+      const win = window as unknown as WindowWithLogState;
+      win.__currentOperationId = "test-id";
+      win.__currentOperationName = "test-op";
 
       endOperation();
 
-      if (typeof window !== "undefined") {
-        expect((window as any).__currentOperationId).toBeUndefined();
-        expect((window as any).__currentOperationName).toBeUndefined();
-      }
+      expect(win.__currentOperationId).toBeUndefined();
+      expect(win.__currentOperationName).toBeUndefined();
+    });
+
+    it("should not error in non-browser environment", () => {
+      // This test works in both environments
+      expect(() => endOperation()).not.toThrow();
     });
   });
 
   describe("getUserContext", () => {
     beforeEach(() => {
       // Mock sessionStorage and localStorage
-      if (typeof window !== "undefined") {
+      if (isBrowser()) {
         Object.defineProperty(window, "sessionStorage", {
           value: {
             getItem: jest.fn(),
@@ -422,11 +462,26 @@ describe("helpers.ts", () => {
       }
     });
 
-    it("should return existing session and user IDs", () => {
-      if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
-        (sessionStorage.getItem as jest.Mock).mockReturnValue("existing-session");
-        (localStorage.getItem as jest.Mock).mockReturnValue("user-123");
+    it("should return server-side defaults in non-browser environment", () => {
+      const context = getUserContext();
+      
+      // Skip detailed checks if in browser
+      if (isBrowser() && typeof sessionStorage !== "undefined") {
+        return;
       }
+
+      expect(context.session_id).toBe("server_session");
+      expect(context.user_id).toBe("server_side_user");
+    });
+
+    it("should return existing session and user IDs in browser", () => {
+      // Skip in non-browser
+      if (!isBrowser() || typeof sessionStorage === "undefined") {
+        return;
+      }
+
+      (sessionStorage.getItem as jest.Mock).mockReturnValue("existing-session");
+      (localStorage.getItem as jest.Mock).mockReturnValue("user-123");
 
       const context = getUserContext();
 
@@ -434,27 +489,30 @@ describe("helpers.ts", () => {
       expect(context.user_id).toBe("user-123");
     });
 
-    it("should create new session ID if none exists", () => {
-      if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
-        (sessionStorage.getItem as jest.Mock).mockReturnValue(null);
-        (localStorage.getItem as jest.Mock).mockReturnValue("user-123");
+    it("should create new session ID if none exists in browser", () => {
+      // Skip in non-browser
+      if (!isBrowser() || typeof sessionStorage === "undefined") {
+        return;
       }
+
+      (sessionStorage.getItem as jest.Mock).mockReturnValue(null);
+      (localStorage.getItem as jest.Mock).mockReturnValue("user-123");
 
       const context = getUserContext();
 
       expect(context.session_id).toBe(mockUUID);
       expect(context.user_id).toBe("user-123");
-
-      if (typeof sessionStorage !== "undefined") {
-        expect(sessionStorage.setItem).toHaveBeenCalledWith("sessionId", mockUUID);
-      }
+      expect(sessionStorage.setItem).toHaveBeenCalledWith("sessionId", mockUUID);
     });
 
     it("should return anonymous user if no userId in localStorage", () => {
-      if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
-        (sessionStorage.getItem as jest.Mock).mockReturnValue("session-123");
-        (localStorage.getItem as jest.Mock).mockReturnValue(null);
+      // Skip in non-browser
+      if (!isBrowser() || typeof sessionStorage === "undefined") {
+        return;
       }
+
+      (sessionStorage.getItem as jest.Mock).mockReturnValue("session-123");
+      (localStorage.getItem as jest.Mock).mockReturnValue(null);
 
       const context = getUserContext();
 

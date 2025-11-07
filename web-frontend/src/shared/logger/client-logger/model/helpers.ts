@@ -1,4 +1,4 @@
-import type { LogPayload, LogFields, UserContext, FailedLogEntry } from "./types";
+import type { LogPayload, UserContext, FailedLogEntry } from "./types";
 
 // Configuration constants
 export const LOG_CONFIG = {
@@ -69,7 +69,7 @@ export function sanitizePayload<T>(
     }) as T;
   }
 
-  const sanitized = { ...obj } as Record<string, any>;
+  const sanitized = { ...obj } as Record<string, unknown>;
 
   Object.keys(sanitized).forEach((key) => {
     if (typeof sanitized[key] === "object" && sanitized[key] !== null) {
@@ -95,6 +95,17 @@ export function shouldSampleLog(logData: LogPayload): boolean {
 
   // Standard: alle Logs senden
   return true;
+}
+
+interface WindowWithLogState extends Window {
+  __failedLogs?: FailedLogEntry[];
+  __currentOperationId?: string;
+  __currentOperationName?: string;
+}
+
+interface GlobalWithLogState {
+  batchRetryTimerId?: NodeJS.Timeout | null;
+  sendLogWithRetry?: (payload: LogPayload, attempt: number) => Promise<void>;
 }
 
 /**
@@ -148,8 +159,9 @@ export async function sendLogWithRetry(payload: LogPayload, attempt = 1): Promis
 
       // Store failed logs in memory for potential retry
       if (typeof window !== "undefined") {
-        (window as any).__failedLogs = (window as any).__failedLogs || [];
-        (window as any).__failedLogs.push({ payload, timestamp: Date.now() });
+        const win = window as WindowWithLogState;
+        win.__failedLogs = win.__failedLogs || [];
+        win.__failedLogs.push({ payload, timestamp: Date.now() });
 
         // Start timer if not already started
         if (!batchRetryTimerId) {
@@ -159,13 +171,13 @@ export async function sendLogWithRetry(payload: LogPayload, attempt = 1): Promis
         }
 
         // Keep only last 100 failed logs to prevent memory leak
-        if ((window as any).__failedLogs.length > 100) {
+        if (win.__failedLogs.length > 100) {
           if (batchRetryTimerId) {
             clearTimeout(batchRetryTimerId);
             batchRetryTimerId = null;
           }
           sendBatchRetry();
-          (window as any).__failedLogs = [];
+          win.__failedLogs = [];
         }
       }
 
@@ -179,11 +191,12 @@ export async function sendLogWithRetry(payload: LogPayload, attempt = 1): Promis
  * Clears the batch retry timer and attempts to send all stored failed logs
  */
 export async function sendBatchRetry(): Promise<void> {
-  if (
-    typeof window === "undefined" ||
-    !(window as any).__failedLogs ||
-    (window as any).__failedLogs.length === 0
-  ) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const win = window as WindowWithLogState;
+  if (!win.__failedLogs || win.__failedLogs.length === 0) {
     return;
   }
 
@@ -194,17 +207,18 @@ export async function sendBatchRetry(): Promise<void> {
   }
 
   // Also clear global timer if set
-  if ((global as any).batchRetryTimerId) {
-    clearTimeout((global as any).batchRetryTimerId);
-    (global as any).batchRetryTimerId = null;
+  const globalState = global as unknown as GlobalWithLogState;
+  if (globalState.batchRetryTimerId) {
+    clearTimeout(globalState.batchRetryTimerId);
+    globalState.batchRetryTimerId = null;
   }
 
-  const logsToSend: FailedLogEntry[] = [...(window as any).__failedLogs];
-  (window as any).__failedLogs = [];
+  const logsToSend: FailedLogEntry[] = [...win.__failedLogs];
+  win.__failedLogs = [];
   for (const logEntry of logsToSend) {
     try {
-      await ((global as any).sendLogWithRetry
-        ? (global as any).sendLogWithRetry(logEntry.payload, 1)
+      await (globalState.sendLogWithRetry
+        ? globalState.sendLogWithRetry(logEntry.payload, 1)
         : sendLogWithRetry(logEntry.payload, 1));
     } catch (err) {
       console.error("Batch retry failed for log:", logEntry, err);
@@ -221,12 +235,13 @@ export function getCurrentOperationId(): string {
   if (typeof window === "undefined") return crypto.randomUUID();
 
   // Check if there's an active operation ID
-  const storedId = (window as any).__currentOperationId;
+  const win = window as WindowWithLogState;
+  const storedId = win.__currentOperationId;
   if (storedId) return storedId;
 
   // No active operation, create new one
   const newId = crypto.randomUUID();
-  (window as any).__currentOperationId = newId;
+  win.__currentOperationId = newId;
   return newId;
 }
 
@@ -239,8 +254,9 @@ export function getCurrentOperationId(): string {
 export function startOperation(operationName: string): string {
   const operationId = crypto.randomUUID();
   if (typeof window !== "undefined") {
-    (window as any).__currentOperationId = operationId;
-    (window as any).__currentOperationName = operationName;
+    const win = window as WindowWithLogState;
+    win.__currentOperationId = operationId;
+    win.__currentOperationName = operationName;
   }
   return operationId;
 }
@@ -251,8 +267,9 @@ export function startOperation(operationName: string): string {
  */
 export function endOperation(): void {
   if (typeof window !== "undefined") {
-    delete (window as any).__currentOperationId;
-    delete (window as any).__currentOperationName;
+    const win = window as WindowWithLogState;
+    delete win.__currentOperationId;
+    delete win.__currentOperationName;
   }
 }
 
