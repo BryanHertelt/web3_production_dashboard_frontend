@@ -3,6 +3,9 @@
 # Gitlab Ci Local
 .gitlab-ci-local
 
+#Ignore claude
+/.claude
+
 # dependencies
 /node_modules
 /.npm
