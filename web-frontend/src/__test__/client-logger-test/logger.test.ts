@@ -1,4 +1,4 @@
-import * as helpers from '../../shared/logger/client-logger/model/helpers';
+import * as helpers from "../../shared/logger/client-logger/model/helpers";
 
 // Mock helpers module
 jest.mock('../../shared/logger/client-logger/model/helpers');
@@ -44,7 +44,7 @@ const mockState: {
 };
 
 // Mock pino module
-jest.mock('pino', () => {
+jest.mock("pino", () => {
   mockState.mockChild = {
     info: jest.fn(),
     debug: jest.fn(),
@@ -63,7 +63,7 @@ jest.mock('pino', () => {
     error: jest.fn(),
     fatal: jest.fn(),
     child: jest.fn(() => mockState.mockChild),
-    level: 'info',
+    level: "info",
   };
 
   mockState.mockPino = jest.fn((config: MockPinoConfig) => {
@@ -75,11 +75,11 @@ jest.mock('pino', () => {
 
   mockState.mockPino.levels = {
     labels: {
-      20: 'debug',
-      30: 'info',
-      40: 'warn',
-      50: 'error',
-      60: 'fatal',
+      20: "debug",
+      30: "info",
+      40: "warn",
+      50: "error",
+      60: "fatal",
     },
   };
 
@@ -92,16 +92,20 @@ const setupHelperMocks = (helpersModule: typeof helpers = helpers) => {
   (helpersModule.sanitizePayload as jest.Mock).mockImplementation((payload) => payload);
   (helpersModule.shouldSampleLog as jest.Mock).mockReturnValue(true);
   (helpersModule.sendLogWithRetry as jest.Mock).mockResolvedValue(undefined);
-  (helpersModule.getCurrentOperationId as jest.Mock).mockReturnValue('mock-operation-id');
-  (helpersModule.startOperation as jest.Mock).mockReturnValue('mock-operation-id-new');
+  (helpersModule.getCurrentOperationId as jest.Mock).mockReturnValue(
+    "mock-operation-id"
+  );
+  (helpersModule.startOperation as jest.Mock).mockReturnValue(
+    "mock-operation-id-new"
+  );
   (helpersModule.endOperation as jest.Mock).mockImplementation(() => {});
   (helpersModule.getUserContext as jest.Mock).mockReturnValue({
-    user_id: 'test-user',
-    session_id: 'test-session',
+    user_id: "test-user",
+    session_id: "test-session",
   });
 };
 
-describe('logger.ts', () => {
+describe("logger.ts", () => {
   beforeAll(() => {
     // Ensure mockPino is initialized
     if (!mockState.mockPino) {
@@ -113,7 +117,7 @@ describe('logger.ts', () => {
   beforeEach(() => {
     // Clear all mock call history
     jest.clearAllMocks();
-    
+
     // Reset the transmit function
     mockState.lastTransmitSendFn = null;
 
@@ -127,15 +131,15 @@ describe('logger.ts', () => {
     delete (global as Record<string, unknown>).performance;
   });
 
-  describe('Logger initialization', () => {
-    it('should initialize pino with correct configuration in development', () => {
+  describe("Logger initialization", () => {
+    it("should initialize pino with correct configuration in development", () => {
       // Skip this test if we can't properly mock NODE_ENV
       // The logger reads process.env.NODE_ENV at module load time
       // In a real scenario, you'd set NODE_ENV before starting tests
-      
+
       // Instead, let's verify the logger was initialized with some level
       const originalEnv = process.env.NODE_ENV;
-      
+
       try {
         // Set NODE_ENV to development
         delete (process.env as Record<string, unknown>).NODE_ENV;
@@ -143,7 +147,7 @@ describe('logger.ts', () => {
 
         // Clear all module caches completely
         jest.resetModules();
-        
+
         // Clear pino mock
         mockState.mockPino?.mockClear();
         
@@ -170,12 +174,12 @@ describe('logger.ts', () => {
       }
     });
 
-    it('should initialize pino with info level in production', () => {
+    it("should initialize pino with info level in production", () => {
       const originalEnv = process.env.NODE_ENV;
-      
+
       try {
-        Object.defineProperty(process.env, 'NODE_ENV', {
-          value: 'production',
+        Object.defineProperty(process.env, "NODE_ENV", {
+          value: "production",
           writable: true,
           configurable: true,
         });
@@ -190,11 +194,11 @@ describe('logger.ts', () => {
 
         expect(mockState.mockPino).toHaveBeenCalledWith(
           expect.objectContaining({
-            level: 'info',
+            level: "info",
           })
         );
       } finally {
-        Object.defineProperty(process.env, 'NODE_ENV', {
+        Object.defineProperty(process.env, "NODE_ENV", {
           value: originalEnv,
           writable: true,
           configurable: true,
@@ -244,7 +248,7 @@ describe('logger.ts', () => {
     it('should process string messages correctly', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test message'],
+        messages: ["Test message"],
         bindings: [{}],
       };
 
@@ -252,10 +256,10 @@ describe('logger.ts', () => {
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
-          level: 'info',
-          msg: 'Test message',
-          user_id: 'test-user',
-          session_id: 'test-session',
+          level: "info",
+          msg: "Test message",
+          user_id: "test-user",
+          session_id: "test-session",
         })
       );
     });
@@ -263,7 +267,7 @@ describe('logger.ts', () => {
     it('should process object messages with msg property', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: [{ msg: 'Object message', extra: 'data' }],
+        messages: [{ msg: "Object message", extra: "data" }],
         bindings: [{}],
       };
 
@@ -271,9 +275,9 @@ describe('logger.ts', () => {
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
-          level: 'info',
-          msg: 'Object message',
-          extra: 'data',
+          level: "info",
+          msg: "Object message",
+          extra: "data",
         })
       );
     });
@@ -281,7 +285,7 @@ describe('logger.ts', () => {
     it('should process object messages with message property', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: [{ message: 'Alternative message', context: 'value' }],
+        messages: [{ message: "Alternative message", context: "value" }],
         bindings: [{}],
       };
 
@@ -289,9 +293,9 @@ describe('logger.ts', () => {
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
-          level: 'warn',
-          msg: 'Alternative message',
-          context: 'value',
+          level: "warn",
+          msg: "Alternative message",
+          context: "value",
         })
       );
     });
@@ -299,7 +303,7 @@ describe('logger.ts', () => {
     it('should handle multiple messages', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['First', 'Second', { msg: 'Third' }],
+        messages: ["First", "Second", { msg: "Third" }],
         bindings: [{}],
       };
 
@@ -307,7 +311,7 @@ describe('logger.ts', () => {
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
-          msg: 'First Second Third',
+          msg: "First Second Third",
         })
       );
     });
@@ -323,7 +327,7 @@ describe('logger.ts', () => {
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
-          msg: 'Log entry',
+          msg: "Log entry",
         })
       );
     });
@@ -331,12 +335,12 @@ describe('logger.ts', () => {
     it('should extract bindings correctly', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [
           {
             attempt_num: 2,
-            request_id: 'custom-request-id',
-            custom_field: 'custom_value',
+            request_id: "custom-request-id",
+            custom_field: "custom_value",
           },
         ],
       };
@@ -346,8 +350,8 @@ describe('logger.ts', () => {
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
           attempt_num: 2,
-          request_id: 'custom-request-id',
-          custom_field: 'custom_value',
+          request_id: "custom-request-id",
+          custom_field: "custom_value",
         })
       );
     });
@@ -355,7 +359,7 @@ describe('logger.ts', () => {
     it('should use default values when bindings are missing', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -365,7 +369,7 @@ describe('logger.ts', () => {
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
           attempt_num: 1,
-          request_id: 'mock-operation-id',
+          request_id: "mock-operation-id",
         })
       );
     });
@@ -373,7 +377,7 @@ describe('logger.ts', () => {
     it('should include page context when window is available', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -386,14 +390,14 @@ describe('logger.ts', () => {
       const logPayload = calls[0][0] as Record<string, unknown>;
       
       // Verify that page context fields exist (jsdom may override values)
-      expect(logPayload).toHaveProperty('page_url');
-      expect(logPayload).toHaveProperty('page_title');
-      expect(logPayload).toHaveProperty('referrer');
-      expect(logPayload).toHaveProperty('user_agent');
-      
+      expect(logPayload).toHaveProperty("page_url");
+      expect(logPayload).toHaveProperty("page_title");
+      expect(logPayload).toHaveProperty("referrer");
+      expect(logPayload).toHaveProperty("user_agent");
+
       // The values should be strings (even if jsdom provides defaults)
-      expect(typeof logPayload.page_url).toBe('string');
-      expect(typeof logPayload.user_agent).toBe('string');
+      expect(typeof logPayload.page_url).toBe("string");
+      expect(typeof logPayload.user_agent).toBe("string");
     });
 
     it('should handle missing referrer with "direct"', async () => {
@@ -433,7 +437,7 @@ describe('logger.ts', () => {
 
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -441,12 +445,12 @@ describe('logger.ts', () => {
 
       expect(localHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
-          referrer: 'direct',
+          referrer: "direct",
         })
       );
     });
 
-    it('should include operation_name from window', async () => {
+    it("should include operation_name from window", async () => {
       // Need to recreate window with operation name
       delete (global as Record<string, unknown>).window;
       delete (global as Record<string, unknown>).document;
@@ -484,7 +488,7 @@ describe('logger.ts', () => {
 
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -495,16 +499,19 @@ describe('logger.ts', () => {
       const logPayload = calls[0][0] as Record<string, unknown>;
       
       // The operation_name property should exist
-      expect(logPayload).toHaveProperty('operation_name');
+      expect(logPayload).toHaveProperty("operation_name");
       // It should either be undefined (no current operation) or have a value
       // Since we set __currentOperationName, it should capture it or be undefined
-      expect(logPayload.operation_name === undefined || logPayload.operation_name === 'testOperation').toBe(true);
+      expect(
+        logPayload.operation_name === undefined ||
+          logPayload.operation_name === "testOperation"
+      ).toBe(true);
     });
 
     it('should include performance timing when available', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -519,7 +526,7 @@ describe('logger.ts', () => {
       );
     });
 
-    it('should handle missing performance.timing', async () => {
+    it("should handle missing performance.timing", async () => {
       // Need to recreate globals without performance.timing
       delete (global as Record<string, unknown>).window;
       delete (global as Record<string, unknown>).performance;
@@ -551,7 +558,7 @@ describe('logger.ts', () => {
 
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -564,12 +571,12 @@ describe('logger.ts', () => {
       );
     });
 
-    it('should not send log when shouldSampleLog returns false', async () => {
+    it("should not send log when shouldSampleLog returns false", async () => {
       (isolatedHelpers.shouldSampleLog as jest.Mock).mockReturnValue(false);
 
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -581,7 +588,7 @@ describe('logger.ts', () => {
     it('should handle numeric log levels', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -589,7 +596,7 @@ describe('logger.ts', () => {
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
-          level: 'error',
+          level: "error",
         })
       );
     });
@@ -597,7 +604,7 @@ describe('logger.ts', () => {
     it('should fallback to "info" for unknown numeric levels', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -605,7 +612,7 @@ describe('logger.ts', () => {
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
-          level: 'info',
+          level: "info",
         })
       );
     });
@@ -637,7 +644,7 @@ it('should handle errors silently without console output', async () => {
     it('should handle null messages in object', async () => {
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: [{ msg: null, extra: 'data' }],
+        messages: [{ msg: null, extra: "data" }],
         bindings: [{}],
       };
 
@@ -645,13 +652,13 @@ it('should handle errors silently without console output', async () => {
 
       expect(isolatedHelpers.sendLogWithRetry).toHaveBeenCalledWith(
         expect.objectContaining({
-          msg: 'Log entry',
-          extra: 'data',
+          msg: "Log entry",
+          extra: "data",
         })
       );
     });
 
-    it('should handle window undefined for operation_name', async () => {
+    it("should handle window undefined for operation_name", async () => {
       // Delete window completely before loading module
       delete (global as Record<string, unknown>).window;
       delete (global as Record<string, unknown>).document;
@@ -671,7 +678,7 @@ it('should handle errors silently without console output', async () => {
 
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -684,7 +691,7 @@ it('should handle errors silently without console output', async () => {
       );
     });
 
-    it('should handle navigator undefined', async () => {
+    it("should handle navigator undefined", async () => {
       // Recreate window without navigator
       delete (global as Record<string, unknown>).window;
       delete (global as Record<string, unknown>).document;
@@ -721,7 +728,7 @@ it('should handle errors silently without console output', async () => {
 
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -732,12 +739,12 @@ it('should handle errors silently without console output', async () => {
       const logPayload = calls[0][0] as Record<string, unknown>;
       
       // Verify user_agent field exists
-      expect(logPayload).toHaveProperty('user_agent');
+      expect(logPayload).toHaveProperty("user_agent");
       // The value should be a string (either 'unknown' or jsdom's default)
-      expect(typeof logPayload.user_agent).toBe('string');
+      expect(typeof logPayload.user_agent).toBe("string");
     });
 
-    it('should handle performance undefined', async () => {
+    it("should handle performance undefined", async () => {
       // Recreate globals without performance
       delete (global as Record<string, unknown>).window;
       delete (global as Record<string, unknown>).performance;
@@ -767,7 +774,7 @@ it('should handle errors silently without console output', async () => {
 
       const logEvent: LogEvent = {
         ts: Date.now(),
-        messages: ['Test'],
+        messages: ["Test"],
         bindings: [{}],
       };
 
@@ -813,25 +820,25 @@ it('should handle errors silently without console output', async () => {
       });
     });
 
-    it('should create child logger with sample rate', () => {
+    it("should create child logger with sample rate", () => {
       const sampledLogger = testLogger.withSampleRate(0.5, {
-        component: 'test',
+        component: "test",
       });
 
       expect(sampledLogger).toBeDefined();
       expect(isolatedHelpers.sanitizePayload).toHaveBeenCalledWith({
-        component: 'test',
+        component: "test",
       });
     });
 
-    it('should create child logger with sample rate and no context', () => {
+    it("should create child logger with sample rate and no context", () => {
       const sampledLogger = testLogger.withSampleRate(0.1);
 
       expect(sampledLogger).toBeDefined();
     });
 
-    it('should sanitize context when creating child logger', () => {
-      const context = { userId: '123', password: 'secret' };
+    it("should sanitize context when creating child logger", () => {
+      const context = { userId: "123", password: "secret" };
       testLogger.withSampleRate(0.5, context);
 
       expect(isolatedHelpers.sanitizePayload).toHaveBeenCalledWith(context);
@@ -874,30 +881,34 @@ it('should handle errors silently without console output', async () => {
       });
     });
 
-    it('should start operation and return logger with context', () => {
-      (isolatedHelpers.startOperation as jest.Mock).mockReturnValue('op-id-123');
+    it("should start operation and return logger with context", () => {
+      (isolatedHelpers.startOperation as jest.Mock).mockReturnValue(
+        "op-id-123"
+      );
 
-      const opLogger = testLogger.startOperation('processPayment', {
-        userId: '123',
+      const opLogger = testLogger.startOperation("processPayment", {
+        userId: "123",
       });
 
-      expect(isolatedHelpers.startOperation).toHaveBeenCalledWith('processPayment');
+      expect(isolatedHelpers.startOperation).toHaveBeenCalledWith(
+        "processPayment"
+      );
       expect(opLogger).toBeDefined();
-      expect(typeof opLogger.endOperation).toBe('function');
+      expect(typeof opLogger.endOperation).toBe("function");
     });
 
  it('should start operation without context', () => {
       (isolatedHelpers.startOperation as jest.Mock).mockReturnValue('op-id-456');
 
-      const opLogger = testLogger.startOperation('fetchData');
+      const opLogger = testLogger.startOperation("fetchData");
 
       expect(isolatedHelpers.startOperation).toHaveBeenCalledWith('fetchData');
       expect(opLogger).toBeDefined();
     });
 
-    it('should sanitize context when starting operation', () => {
-      const context = { apiKey: 'secret', action: 'test' };
-      testLogger.startOperation('testOp', context);
+    it("should sanitize context when starting operation", () => {
+      const context = { apiKey: "secret", action: "test" };
+      testLogger.startOperation("testOp", context);
 
       expect(isolatedHelpers.sanitizePayload).toHaveBeenCalledWith(context);
     });
@@ -950,8 +961,8 @@ it('should handle errors silently without console output', async () => {
       });
 
       expect(testLogger).toBeDefined();
-      expect(typeof testLogger.withSampleRate).toBe('function');
-      expect(typeof testLogger.startOperation).toBe('function');
+      expect(typeof testLogger.withSampleRate).toBe("function");
+      expect(typeof testLogger.startOperation).toBe("function");
     });
   });
 });
