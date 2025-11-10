@@ -78,6 +78,7 @@ export async function serverRequest<
 
   // Build full URL with query parameters
   const fullUrl = buildUrl(API_BASE_URL, url, query as Record<string, unknown>);
+  // The API_BASE_URL is configured in the config for this api layer. In env: API_SERVER_URL
 
   // Prepare request configuration
   const requestConfig: RequestInit = {
