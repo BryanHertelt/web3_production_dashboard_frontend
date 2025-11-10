@@ -1,0 +1,304 @@
+import type { LogPayload, UserContext, FailedLogEntry } from "./types";
+
+// Configuration constants
+export const LOG_CONFIG = {
+  LEVELS: {
+    DEBUG: 20,
+    INFO: 30,
+    WARN: 40,
+    ERROR: 50,
+    FATAL: 60,
+  },
+  MAX_RETRIES: 3,
+  RETRY_DELAY: 1000,
+  SAMPLE_RATE: 1,
+} as const;
+
+// Batch retry timer configuration
+const BATCH_RETRY_TIME_LIMIT = 30000; // 30 seconds time limit for batch retry
+let batchRetryTimerId: NodeJS.Timeout | null = null;
+
+/**
+ * Convert timestamp to Central European Time string in YYYY-MM-DDTHH:mm:ss format
+ * @param timestamp - Unix timestamp in milliseconds
+ * @returns CET/CEST formatted timestamp string (ISO-like format)
+ */
+export function formatTimestamp(timestamp?: number): string {
+  const date = new Date(timestamp || Date.now());
+  return date
+    .toLocaleString("sv-SE", {
+      // ISO-like (YYYY-MM-DD HH:mm:ss)
+      timeZone: "Europe/Berlin",
+    })
+    .replace(" ", "T");
+}
+
+/**
+ * Sanitize sensitive data from log payload
+ * Recursively redacts fields containing sensitive keywords (password, token, secret, etc.)
+ * @param obj - Object to sanitize
+ * @param visited - WeakSet to track visited objects and prevent circular reference loops
+ * @returns Sanitized object with sensitive fields replaced with '[REDACTED]'
+ */
+export function sanitizePayload<T>(obj: T, visited = new WeakSet<object>()): T {
+  if (!obj || typeof obj !== "object") return obj;
+
+  // Prevent circular reference infinite loop
+  if (visited.has(obj as object)) return obj;
+  visited.add(obj as object);
+
+  const sensitive = [
+  "password",
+    "authorization",
+    "apiKey",
+    "api_key",
+    "apikey",
+    "token",
+    "secret",
+    "cookie",
+    "set-cookie",
+    "auth",
+    "credential",
+    "mail",
+    "wallet",
+    "address",
+  ];
+
+  // Handle arrays separately to preserve array type
+  if (Array.isArray(obj)) {
+    return obj.map((item) => {
+      if (typeof item === "object" && item !== null) {
+        return sanitizePayload(item, visited);
+      }
+      return item;
+    }) as T;
+  }
+
+  const sanitized = { ...obj } as Record<string, unknown>;
+
+  Object.keys(sanitized).forEach((key) => {
+    if (typeof sanitized[key] === "object" && sanitized[key] !== null) {
+      sanitized[key] = sanitizePayload(sanitized[key], visited);
+    } else if (sensitive.some((s) => key.toLowerCase().includes(s))) {
+      sanitized[key] = "[REDACTED]";
+    }
+  });
+
+  return sanitized as T;
+}
+
+/**
+ * Determines whether a log should be sampled based on sample rate
+ * @param logData - Log data object that may contain a sample_rate property
+ * @returns True if the log should be sent, false if it should be dropped
+ */
+export function shouldSampleLog(logData: LogPayload): boolean {
+  // Individuelle Sample-Rate verwenden
+  if (logData.sample_rate !== undefined) {
+    return Math.random() < logData.sample_rate;
+  }
+
+  // Standard: alle Logs senden
+  return true;
+}
+
+interface WindowWithLogState extends Window {
+  __failedLogs?: FailedLogEntry[];
+  __currentOperationId?: string;
+  __currentOperationName?: string;
+}
+
+interface GlobalWithLogState {
+  batchRetryTimerId?: NodeJS.Timeout | null;
+  sendLogWithRetry?: (payload: LogPayload, attempt: number) => Promise<void>;
+}
+
+/**
+ * Send log payload with retry logic directly to Loki
+ * Implements exponential backoff and stores failed logs for batch retry
+ * @param payload - Log payload to send
+ * @param attempt - Current attempt number (1-indexed)
+ */
+export async function sendLogWithRetry(
+  payload: LogPayload,
+  attempt = 1
+): Promise<void> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+  try {
+    const response = await fetch("/api/logging", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Log-Attempt": attempt.toString(),
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+  } catch (err) {
+    clearTimeout(timeoutId);
+    const error = err as Error;
+    if (attempt < LOG_CONFIG.MAX_RETRIES) {
+      const delay = LOG_CONFIG.RETRY_DELAY * Math.pow(2, attempt - 1); // Exponential backoff
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return sendLogWithRetry(payload, attempt + 1);
+    } else {
+      // Store failed logs in memory for potential retry
+      if (typeof window !== "undefined") {
+        const win = window as WindowWithLogState;
+        win.__failedLogs = win.__failedLogs || [];
+        win.__failedLogs.push({ payload, timestamp: Date.now() });
+
+        // Start timer if not already started
+        if (!batchRetryTimerId) {
+          batchRetryTimerId = setTimeout(() => {
+            sendBatchRetry();
+          }, BATCH_RETRY_TIME_LIMIT);
+        }
+
+        // Keep only last 100 failed logs to prevent memory leak
+        if (win.__failedLogs.length > 100) {
+          if (batchRetryTimerId) {
+            clearTimeout(batchRetryTimerId);
+            batchRetryTimerId = null;
+          }
+          sendBatchRetry();
+          win.__failedLogs = [];
+        }
+      }
+
+      throw error;
+    }
+  }
+}
+
+/**
+ * Send all failed logs in memory as batch retry
+ * Clears the batch retry timer and attempts to send all stored failed logs
+ */
+export async function sendBatchRetry(): Promise<void> {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const win = window as WindowWithLogState;
+  if (!win.__failedLogs || win.__failedLogs.length === 0) {
+    return;
+  }
+
+  // Clear the timer since batch is being sent now
+  if (batchRetryTimerId) {
+    clearTimeout(batchRetryTimerId);
+    batchRetryTimerId = null;
+  }
+
+  // Also clear global timer if set
+  const globalState = global as unknown as GlobalWithLogState;
+  if (globalState.batchRetryTimerId) {
+    clearTimeout(globalState.batchRetryTimerId);
+    globalState.batchRetryTimerId = null;
+  }
+
+// Clean up logs older than 5 minutes to prevent memory leak
+  const FIVE_MINUTES = 5 * 60 * 1000;
+  win.__failedLogs = win.__failedLogs.filter(
+    (log) => Date.now() - log.timestamp < FIVE_MINUTES
+  );
+
+  const logsToSend: FailedLogEntry[] = [...win.__failedLogs];
+  win.__failedLogs = [];
+  for (const logEntry of logsToSend) {
+    try {
+      await (globalState.sendLogWithRetry
+        ? globalState.sendLogWithRetry(logEntry.payload, 1)
+        : sendLogWithRetry(logEntry.payload, 1));
+    } catch {
+      // Silent failure - log already attempted retry
+    }
+  }
+}
+
+/**
+ * Get or create current operation ID
+ * Returns existing operation ID if available, otherwise creates a new UUID
+ * @returns Current operation ID
+ */
+export function getCurrentOperationId(): string {
+  if (typeof window === "undefined") return crypto.randomUUID();
+
+  // Check if there's an active operation ID
+  const win = window as WindowWithLogState;
+  const storedId = win.__currentOperationId;
+  if (storedId) return storedId;
+
+  // No active operation, create new one
+  const newId = crypto.randomUUID();
+  win.__currentOperationId = newId;
+  return newId;
+}
+
+/**
+ * Start a new operation and return the operation ID
+ * Stores the operation ID and name in window object for tracking
+ * @param operationName - Name of the operation to track
+ * @returns New operation ID (UUID)
+ */
+export function startOperation(operationName: string): string {
+  const operationId = crypto.randomUUID();
+  if (typeof window !== "undefined") {
+    const win = window as WindowWithLogState;
+    win.__currentOperationId = operationId;
+    win.__currentOperationName = operationName;
+  }
+  return operationId;
+}
+
+/**
+ * End the current operation
+ * Clears the operation ID and name from window object
+ */
+export function endOperation(): void {
+  if (typeof window !== "undefined") {
+    const win = window as WindowWithLogState;
+    delete win.__currentOperationId;
+    delete win.__currentOperationName;
+  }
+}
+
+/**
+ * Get current user context including user ID and session ID
+ * Creates new session ID if one doesn't exist
+ * @returns User context object with user_id and session_id
+ */
+export function getUserContext(): UserContext {
+  let sessionId: string | null = null;
+
+  if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
+    sessionId = sessionStorage.getItem("sessionId");
+  }
+
+  if (
+    !sessionId &&
+    typeof window !== "undefined" &&
+    typeof sessionStorage !== "undefined"
+  ) {
+    sessionId = crypto.randomUUID();
+    sessionStorage.setItem("sessionId", sessionId);
+  }
+
+  return {
+    user_id:
+      typeof window !== "undefined" && typeof localStorage !== "undefined"
+        ? localStorage.getItem("userId") || "anonymous"
+        : "server_side_user",
+    session_id: sessionId || "server_session",
+  };
+}
