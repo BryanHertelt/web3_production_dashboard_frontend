@@ -137,6 +137,9 @@ describe("helpers.ts", () => {
         password: "secret123",
         apiToken: "abc123",
         data: "public",
+        mail: "max@gmail.com",
+        wallet: "wallet",
+        address: "Muster"
       };
 
       const result = sanitizePayload(payload);
@@ -167,22 +170,22 @@ describe("helpers.ts", () => {
       expect(result.message).toBe("test");
     });
 
-    it("should redact all sensitive keywords", () => {
-      const payload = {
-        password: "pass",
-        token: "tok",
-        secret: "sec",
-        key: "key",
-        auth: "auth",
-        credential: "cred",
-      };
+it('should redact all sensitive keywords', () => {
+  const payload = {
+    password: "pass",
+    token: "tok",
+    secret: "sec",
+    apiKey: "key",  // Changed from "key" to "apiKey"
+    auth: "auth",
+    credential: "cred",
+  };
 
-      const result = sanitizePayload(payload);
+  const result = sanitizePayload(payload);
 
-      Object.values(result).forEach((value) => {
-        expect(value).toBe("[REDACTED]");
-      });
-    });
+  Object.values(result).forEach((value) => {
+    expect(value).toBe("[REDACTED]");
+  });
+});
 
     it("should handle null and undefined", () => {
       expect(
