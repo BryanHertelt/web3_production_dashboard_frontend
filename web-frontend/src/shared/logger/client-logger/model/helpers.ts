@@ -48,12 +48,20 @@ export function sanitizePayload<T>(obj: T, visited = new WeakSet<object>()): T {
   visited.add(obj as object);
 
   const sensitive = [
-    "password",
+  "password",
+    "authorization",
+    "apiKey",
+    "api_key",
+    "apikey",
     "token",
     "secret",
-    "key",
+    "cookie",
+    "set-cookie",
     "auth",
     "credential",
+    "mail",
+    "wallet",
+    "address",
   ];
 
   // Handle arrays separately to preserve array type
@@ -134,29 +142,15 @@ export async function sendLogWithRetry(
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-
-    // Log successful retry if not first attempt
-    if (attempt > 1) {
-      console.info(`Log delivery succeeded on attempt ${attempt}`);
-    }
   } catch (err) {
     clearTimeout(timeoutId);
     const error = err as Error;
     if (attempt < LOG_CONFIG.MAX_RETRIES) {
       const delay = LOG_CONFIG.RETRY_DELAY * Math.pow(2, attempt - 1); // Exponential backoff
-      console.warn(
-        `Log delivery failed (attempt ${attempt}), retrying in ${delay}ms:`,
-        error.message
-      );
 
       await new Promise((resolve) => setTimeout(resolve, delay));
       return sendLogWithRetry(payload, attempt + 1);
     } else {
-      console.error(
-        `Log delivery failed after ${LOG_CONFIG.MAX_RETRIES} attempts:`,
-        error.message
-      );
-
       // Store failed logs in memory for potential retry
       if (typeof window !== "undefined") {
         const win = window as WindowWithLogState;
@@ -213,6 +207,12 @@ export async function sendBatchRetry(): Promise<void> {
     globalState.batchRetryTimerId = null;
   }
 
+// Clean up logs older than 5 minutes to prevent memory leak
+  const FIVE_MINUTES = 5 * 60 * 1000;
+  win.__failedLogs = win.__failedLogs.filter(
+    (log) => Date.now() - log.timestamp < FIVE_MINUTES
+  );
+
   const logsToSend: FailedLogEntry[] = [...win.__failedLogs];
   win.__failedLogs = [];
   for (const logEntry of logsToSend) {
@@ -220,8 +220,8 @@ export async function sendBatchRetry(): Promise<void> {
       await (globalState.sendLogWithRetry
         ? globalState.sendLogWithRetry(logEntry.payload, 1)
         : sendLogWithRetry(logEntry.payload, 1));
-    } catch (err) {
-      console.error("Batch retry failed for log:", logEntry, err);
+    } catch {
+      // Silent failure - log already attempted retry
     }
   }
 }

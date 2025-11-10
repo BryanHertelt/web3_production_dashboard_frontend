@@ -134,9 +134,8 @@ const baseLogger = pino({
           // Send the log
           await sendLogWithRetry(logPayload);
         } catch (err) {
-          // Fallback to console if all else fails
-          console.error("Critical logging failure:", err);
-          console.log("Original log:", { level, logEvent });
+          // Silent failure to prevent infinite loops
+          void err;
         }
       },
     },
