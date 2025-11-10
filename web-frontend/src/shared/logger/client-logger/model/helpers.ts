@@ -48,7 +48,7 @@ export function sanitizePayload<T>(obj: T, visited = new WeakSet<object>()): T {
   visited.add(obj as object);
 
   const sensitive = [
-  "password",
+    "password",
     "authorization",
     "apiKey",
     "api_key",
@@ -207,7 +207,7 @@ export async function sendBatchRetry(): Promise<void> {
     globalState.batchRetryTimerId = null;
   }
 
-// Clean up logs older than 5 minutes to prevent memory leak
+  // Clean up logs older than 5 minutes to prevent memory leak
   const FIVE_MINUTES = 5 * 60 * 1000;
   win.__failedLogs = win.__failedLogs.filter(
     (log) => Date.now() - log.timestamp < FIVE_MINUTES
