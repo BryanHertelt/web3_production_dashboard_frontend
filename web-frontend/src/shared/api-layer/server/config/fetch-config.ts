@@ -7,7 +7,7 @@ import type { ServerFetchConfig, NextConfig } from "../model/types";
 /**
  * The base URL for the API server, configurable via environment variable.
  */
-export const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3001";
+export const API_BASE_URL = process.env.API_SERVER_URL || "http://localhost:3001";
 /**
  * The default timeout for API requests in milliseconds.
  *
