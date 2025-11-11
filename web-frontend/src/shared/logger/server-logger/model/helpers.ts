@@ -76,6 +76,11 @@ export function sanitizePayload<T extends Redactable>(value: T): T {
     "secret",
     "cookie",
     "set-cookie",
+    "auth",
+    "credential",
+    "mail",
+    "wallet",
+    "address",
   ]);
   /**
    * --- Step 1 ---
