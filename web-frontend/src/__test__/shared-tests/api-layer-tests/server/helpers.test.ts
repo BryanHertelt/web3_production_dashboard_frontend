@@ -8,8 +8,8 @@ import {
   sanitizeForLogging,
   isJsonResponse,
   safeJsonParse,
-} from "../../../shared/api-layer/server/model/helpers";
-import { serverLogger } from "../../../shared/logger/server-logger/model/logger";
+} from "../../../../shared/api-layer/server/model/helpers";
+import { serverLogger } from "../../../../shared/logger/server-logger/model/logger";
 
 describe("buildUrl", () => {
   it("builds URL without query parameters", () => {

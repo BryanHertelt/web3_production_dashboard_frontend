@@ -1,40 +1,42 @@
-import { PortfolioAPI } from "../../entities/portfolio/api/portfolio-api";
-import { request as realRequest } from "../../shared/api-layer/client/api/request";
-import type { Portfolio } from "../../entities/portfolio/model/types";
+import { CoinsAPI } from "../../../entities/coins/api/coins-api";
+import { request as realRequest } from "../../../shared/api-layer/client/api/request";
+import type { Coins } from "../../../entities/coins/model/types";
 
 // --- Mock setup ---------------------------------------------------------------
 // We mock ONLY the transport wrapper. We do NOT mock the cancel-registry.
-// This keeps the tests focused on what PortfolioAPI passes to `request`.
-jest.mock("../../shared/api-layer/client/api/request", () => ({
+// This keeps the tests focused on what CoinsAPI passes to `request`.
+jest.mock("../../../shared/api-layer/client/api/request", () => ({
   request: jest.fn(),
 }));
 
 // Strongly-typed handle to the mocked `request`.
 const request = realRequest as jest.MockedFunction<typeof realRequest>;
 
-describe("PortfolioAPI (wiring tests)", () => {
+describe("CoinsAPI (wiring tests)", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   // ----------------------------- get ------------------------------------------
 
-  test("get (no args, cancel=false) → calls GET /portfolio and does NOT pass a signal", async () => {
-    const data: Portfolio[] = [
+  test("get (no args, cancel=false) → calls GET /coins and does NOT pass a signal", async () => {
+    const data: Coins[] = [
       {
-        id: 1,
-        owner: "Nick Guber",
-        assets: "bitcoin",
-        joined: "2025-09-28T08:23:23.290333Z",
+        coin: "BTC",
+        amount: 0.25,
+        buyPrice: 42000.0,
+        currentPrice: 47850.0,
+        profitLoss: "+1462.50",
+        profitClass: "profit",
       },
     ];
     request.mockResolvedValueOnce(data);
 
-    const res = await PortfolioAPI.get(); // cancel=false default
+    const res = await CoinsAPI.get(); // cancel=false default
 
     const [cfg, signal] = request.mock.calls[0];
     expect(cfg).toEqual({
-      url: "/portfolio",
+      url: "/coins",
       method: "GET",
       // no query key when undefined
     });
@@ -45,30 +47,32 @@ describe("PortfolioAPI (wiring tests)", () => {
   test("get (cancel=true) → passes an AbortSignal", async () => {
     request.mockResolvedValueOnce([]);
 
-    await PortfolioAPI.get(undefined, true);
+    await CoinsAPI.get(undefined, true);
 
     const [, signal] = request.mock.calls[0];
     expect(signal).toBeInstanceOf(AbortSignal);
   });
 
   test("get (with query, cancel=false) → includes query and no signal", async () => {
-    const data: Portfolio[] = [
+    const data: Coins[] = [
       {
-        id: 1,
-        owner: "Nick Guber",
-        assets: "bitcoin",
-        joined: "2025-09-28T08:23:23.290333Z",
+        coin: "ETH",
+        amount: 5.75,
+        buyPrice: 2800.0,
+        currentPrice: 2650.0,
+        profitLoss: "-862.50",
+        profitClass: "loss",
       },
     ];
     request.mockResolvedValueOnce(data);
 
-    const res = await PortfolioAPI.get({ search: "btc", limit: 10 });
+    const res = await CoinsAPI.get({ search: "eth", limit: 10 });
 
     const [cfg, signal] = request.mock.calls[0];
     expect(cfg).toEqual({
-      url: "/portfolio",
+      url: "/coins",
       method: "GET",
-      query: { search: "btc", limit: 10 },
+      query: { search: "eth", limit: 10 },
     });
     expect(signal).toBeUndefined();
     expect(res).toEqual(data);
@@ -77,13 +81,13 @@ describe("PortfolioAPI (wiring tests)", () => {
   test("get (with query, cancel=true) → includes query and passes AbortSignal", async () => {
     request.mockResolvedValueOnce([]);
 
-    await PortfolioAPI.get({ search: "x" }, true);
+    await CoinsAPI.get({ search: "ada" }, true);
 
     const [cfg, signal] = request.mock.calls[0];
     expect(cfg).toEqual({
-      url: "/portfolio",
+      url: "/coins",
       method: "GET",
-      query: { search: "x" },
+      query: { search: "ada" },
     });
     expect(signal).toBeInstanceOf(AbortSignal);
   });
@@ -92,6 +96,6 @@ describe("PortfolioAPI (wiring tests)", () => {
     const boom = new Error("transport failed");
     request.mockRejectedValueOnce(boom);
 
-    await expect(PortfolioAPI.get()).rejects.toBe(boom);
+    await expect(CoinsAPI.get()).rejects.toBe(boom);
   });
 });

@@ -1,11 +1,11 @@
-import { AxiosError } from "../../shared/api-layer/client/model/types";
+import { AxiosError } from "../../../shared/api-layer/client/model/types";
 import {
   describeStatus,
   statusOf,
   extractMessage,
   isCancel,
   isAxiosErr,
-} from "../../shared/api-layer/client/model/helpers";
+} from "../../../shared/api-layer/client/model/helpers";
 
 // mock console.error so we can inspect logs without polluting test output
 const consoleErrorSpy = jest

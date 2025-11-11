@@ -8,7 +8,7 @@ import {
   RateLimitError,
   UnauthorizedError,
   ForbiddenError,
-} from "../../../shared/api-layer/server/api/errors";
+} from "../../../../shared/api-layer/server/api/errors";
 
 describe("ServerApiError", () => {
   it("is an instance of ServerApiError and Error", () => {

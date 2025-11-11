@@ -2,7 +2,7 @@ import {
   instance,
   onFulfilled,
   onRejected,
-} from "../../shared/api-layer/client/configs/axios-config";
+} from "../../../shared/api-layer/client/configs/axios-config";
 import type {
   AxiosHeaders,
   InternalAxiosRequestConfig,
@@ -17,7 +17,7 @@ const describeStatusMock = jest.fn<
   [unknown]
 >();
 
-jest.mock("../../shared/api-layer/client/model/helpers", () => ({
+jest.mock("../../../shared/api-layer/client/model/helpers", () => ({
   isCancel: (e: unknown) => isCancelMock(e),
   isAxiosErr: (e: unknown) => isAxiosErrMock(e),
   describeStatus: (e: unknown) => describeStatusMock(e),
@@ -26,7 +26,7 @@ jest.mock("../../shared/api-layer/client/model/helpers", () => ({
 // ---- mock logger (default export with .warn / .error) ----
 const loggerWarnMock = jest.fn<void, [unknown, string]>();
 const loggerErrorMock = jest.fn<void, [unknown, string]>();
-jest.mock("../../shared/logger/client-logger/model/logger", () => ({
+jest.mock("../../../shared/logger/client-logger/model/logger", () => ({
   __esModule: true,
   default: {
     warn: (...args: [unknown, string]) => loggerWarnMock(...args),
@@ -66,7 +66,7 @@ describe("axios-config", () => {
       statusText: "OK",
       headers: minimalHeaders(),
       config: minimalConfig(),
-    } satisfies import("../../shared/api-layer/client/model/types").AxiosResponse<{
+    } satisfies import("../../../shared/api-layer/client/model/types").AxiosResponse<{
       ok: boolean;
     }>;
 

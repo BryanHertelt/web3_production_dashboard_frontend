@@ -5,20 +5,20 @@ import {
   put,
   patch,
   del,
-} from "../../../shared/api-layer/server/api/request";
+} from "../../../../shared/api-layer/server/api/request";
 import {
   ServerApiError,
   TimeoutError,
   ServerDownError,
-} from "../../../shared/api-layer/server/api/errors";
-import { fetchWithTimeout } from "../../../shared/api-layer/server/config/fetch-config";
+} from "../../../../shared/api-layer/server/api/errors";
+import { fetchWithTimeout } from "../../../../shared/api-layer/server/config/fetch-config";
 
 // Mock fetch globally
 const fetchMock = jest.fn();
 global.fetch = fetchMock;
 
 // Mock the fetch-config module
-jest.mock("../../../shared/api-layer/server/config/fetch-config", () => ({
+jest.mock("../../../../shared/api-layer/server/config/fetch-config", () => ({
   API_BASE_URL: "http://localhost:3001",
   API_TIMEOUT: 15000,
   MAX_RETRIES: 3,

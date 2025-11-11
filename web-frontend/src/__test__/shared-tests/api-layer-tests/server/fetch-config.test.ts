@@ -5,7 +5,7 @@ import {
   MAX_RETRIES,
   RETRY_DELAY,
   MAX_RETRY_DELAY,
-} from "../../../shared/api-layer/server/config/fetch-config";
+} from "../../../../shared/api-layer/server/config/fetch-config";
 
 // Mock fetch globally
 const fetchMock = jest.fn();

@@ -1,4 +1,4 @@
-import { defineCancelRegistry } from "../../shared/api-layer/client/api/cancel-registry";
+import { defineCancelRegistry } from "../../../shared/api-layer/client/api/cancel-registry";
 it("returns undefined when enable=false", () => {
   const apiObj = { getAll: {} };
   const cancelRegistry = defineCancelRegistry(apiObj);

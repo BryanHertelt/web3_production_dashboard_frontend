@@ -1,4 +1,4 @@
-import { POST } from "../app/api/logging/route";
+import { POST } from "../../../app/api/logging/route";
 
 describe("POST /api/logging", () => {
   let originalFetch;
