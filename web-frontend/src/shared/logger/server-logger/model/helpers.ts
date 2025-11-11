@@ -67,7 +67,7 @@ export function formatTimestamp(ms: number = Date.now()): string {
  */
 export function sanitizePayload<T extends Redactable>(value: T): T {
   const sensitive = new Set([
-     "password",
+    "password",
     "authorization",
     "apiKey",
     "api_key",
