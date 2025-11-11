@@ -44,7 +44,7 @@ export function sanitizePayload<T>(obj: T, visited = new WeakSet<object>()): T {
   if (!obj || typeof obj !== "object") return obj;
 
   // Prevent circular reference infinite loop
-  if (visited.has(obj as object)) return obj;
+  if (visited.has(obj as object)) return "[Circular]" as T;
   visited.add(obj as object);
 
   const sensitive = [
@@ -291,7 +291,11 @@ export function getUserContext(): UserContext {
     typeof sessionStorage !== "undefined"
   ) {
     sessionId = crypto.randomUUID();
-    sessionStorage.setItem("sessionId", sessionId);
+    try {
+      sessionStorage.setItem("sessionId", sessionId);
+    } catch {
+      // Silent failure in private browsing mode or when storage is disabled
+    }
   }
 
   return {
