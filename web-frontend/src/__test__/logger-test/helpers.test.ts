@@ -1,4 +1,4 @@
-import { sanitizePayload } from "../../shared/logger/client-logger/model/helpers";
+import { sanitizePayload } from "../../shared/logger/helpers";
 
 // Helper type for objects that can have circular references
 type CircularObject = Record<string, unknown> & { [key: string]: unknown };

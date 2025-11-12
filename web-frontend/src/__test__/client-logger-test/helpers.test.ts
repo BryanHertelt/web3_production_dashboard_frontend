@@ -1,7 +1,6 @@
 import {
   LOG_CONFIG,
   formatTimestamp,
-  sanitizePayload,
   shouldSampleLog,
   sendLogWithRetry,
   sendBatchRetry,
@@ -14,7 +13,7 @@ import type {
   LogPayload,
   FailedLogEntry,
 } from "../../shared/logger/client-logger/model/types";
-
+import { sanitizePayload } from "../../shared/logger/helpers";
 // Mock crypto.randomUUID
 const mockUUID = "550e8400-e29b-41d4-a716-446655440000";
 
