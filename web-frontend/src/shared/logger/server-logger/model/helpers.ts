@@ -1,5 +1,4 @@
-
-import type {NormalizedError } from "./types";
+import type { NormalizedError } from "./types";
 import { sanitizePayload } from "../../helpers";
 
 /**

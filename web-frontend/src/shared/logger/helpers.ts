@@ -1,4 +1,3 @@
-
 /**
  * Sanitize sensitive data from log payload
  * Recursively redacts fields containing sensitive keywords (password, token, secret, etc.)
