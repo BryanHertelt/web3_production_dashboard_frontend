@@ -16,12 +16,16 @@ const SUBSCRIPT_MAP: SubscriptMap = {
 
 export const formatDecimals = (num: number, roundedNumber: number) => {
     if (
-      Number(num.toString().replace(",", ".")) > 0 &&
-      Number(num.toString().replace(",", ".")) < 1
+      (Number(num.toString().replace(",", ".")) > 0 &&
+      Number(num.toString().replace(",", ".")) < 1) ||
+      (Number(num.toString().replace(",", ".")) < 0 &&
+      Number(num.toString().replace(",", ".")) > -1) 
     ) {
       let numStr = num.toString().replace(",", ".");
       if (numStr.indexOf("e") !== -1) {
-        const exponent = parseInt(numStr.split("-")[1], 10);
+        const parts = numStr.split("e");
+        const exponentPart = parts[1];
+        const exponent = Math.abs(parseInt(exponentPart, 10));
         const result = num.toFixed(exponent);
         numStr = result;
       }
@@ -29,9 +33,13 @@ export const formatDecimals = (num: number, roundedNumber: number) => {
       const parts = numStr.split(".");
       if (parts.length < 2) return roundedNumber.toString();
       const decimalPart = parts[1];
-      const leadingZeros = (decimalPart.match(/^0+/)?.[0].length || 0) - 1;
-  
-      if (leadingZeros >= 2) {
+      const totalLeadingZeros = (decimalPart.match(/^0+/)?.[0].length || 0);
+
+      // We use subscript notation when there are 3+ leading zeros
+      // The subscript shows: total leading zeros - 1
+      // Example: 0.00001 has 4 leading zeros → subscript ₃
+      if (totalLeadingZeros >= 3) {
+        const leadingZeros = totalLeadingZeros - 1;
         const trimmedDecimals = decimalPart.replace(/^0+/, "");
         const noTrailingZeros = trimmedDecimals.replace(/0+$/, "");
         const firstDigits = noTrailingZeros.slice(0, 2);
@@ -62,7 +70,7 @@ export const formatCurrency = (number: number | null): string => {
     const num = Number(number?.toString().replace(",", "."));
     const roundedNumber = Number(num.toFixed(2));
   
-    if (num > 0 && num < 1) {
+    if ((num > 0 && num < 1 )|| (num < 0 && num > -1)) {
       const formattedDecimals = formatDecimals(num, roundedNumber);
       return `$${formattedDecimals}`;
     }
@@ -88,20 +96,19 @@ export const formatValue = (number: number): string | undefined => {
     const num = Number(number.toString().replace(",", "."));
     let roundedNumber = Number(num.toFixed(2));
   
-    if (num > 0 && num < 1) {
+    if ((num > 0 && num < 1) || (num < 0 && num > -1)) {
       roundedNumber = Number(num.toFixed(4));
       const formattedDecimals = formatDecimals(num, roundedNumber);
       return formattedDecimals;
     }
 
-    if (roundedNumber < 1000000) {
+    if (Math.abs(roundedNumber) < 1000000) {
       return roundedNumber.toFixed(2);
-    } else if (roundedNumber < 1000000000) {
+    } else if (Math.abs(roundedNumber) < 1000000000) {
       return `${(roundedNumber / 1000000).toFixed(2)} M`;
-    } else if (roundedNumber < 1000000000000) {
+    } else if (Math.abs(roundedNumber) < 1000000000000) {
       return `${(roundedNumber / 1000000000).toFixed(2)} B`;
     } else {
       return `${(roundedNumber / 1000000000000).toFixed(2)} T`;
     }
-
   };
