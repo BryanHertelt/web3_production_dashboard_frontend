@@ -1,12 +1,12 @@
 import {
   epochNanos,
   formatTimestamp,
-  sanitizePayload,
   shouldSample,
   basicAuthHeader,
   delay,
   normalizeError,
 } from "@/shared/logger/server-logger/model/helpers";
+import { sanitizePayload } from "../../shared/logger/helpers";
 
 class HttpError extends Error {
   code?: string;

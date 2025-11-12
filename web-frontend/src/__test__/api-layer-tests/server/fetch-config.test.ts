@@ -407,7 +407,11 @@ describe("fetchWithTimeout - retry logic", () => {
       retries: 2,
     });
     await jest.runAllTimersAsync();
-    await promise;
+    const result = await promise;
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result).toBe(mockResponse);
+    expect(randomSpy).toHaveBeenCalled();
 
     randomSpy.mockRestore();
   });

@@ -1,9 +1,14 @@
-// src/shared/logger/server-logger/model/helpers.ts
-import type { Redactable, NormalizedError } from "./types";
+
+import type {NormalizedError } from "./types";
+import { sanitizePayload } from "../../helpers";
 
 /**
  * Helper utilities for the server logger.
  */
+
+// Re-export sanitizePayload for backward compatibility
+export { sanitizePayload };
+
 /**
  * Convert a `Date.now()`-style millisecond timestamp to a Loki-compatible
  * nanosecond epoch (as a decimal string).
@@ -45,73 +50,6 @@ export function formatTimestamp(ms: number = Date.now()): string {
   return new Date(ms)
     .toLocaleString("sv-SE", { timeZone: "Europe/Berlin" })
     .replace(" ", "T");
-}
-
-/**
- * Recursively redacts sensitive keys in an arbitrary structure.
- *
- * Keys are matched **case-insensitively** against a small built-in list
- * (e.g., `password`, `authorization`, `apiKey`, `token`, `secret`, `cookie`, …).
- * Primitive values are returned as-is. Arrays and plain objects are traversed
- * and sensitive values replaced with the literal string `"[REDACTED]"`.
- *
- * This function **does not** mutate the input object; it returns a sanitized copy.
- *
- * @typeParam T The input value type, preserved in the return type.
- * @param value Any JSON-like value (object/array/primitive).
- * @returns The same structure with sensitive fields replaced by `"[REDACTED]"`.
- *
- * @example
- * sanitizePayload({ token: "abc", nested: { password: "p" } });
- * // => { token: "[REDACTED]", nested: { password: "[REDACTED]" } }
- */
-export function sanitizePayload<T extends Redactable>(value: T): T {
-  const sensitive = new Set([
-    "password",
-    "authorization",
-    "apiKey",
-    "api_key",
-    "apikey",
-    "token",
-    "secret",
-    "cookie",
-    "set-cookie",
-  ]);
-  /**
-   * --- Step 1 ---
-   * If the value is not an object (i.e. primitive or null),
-   * return it as-is because there’s nothing to sanitize.
-   */
-  if (value === null || typeof value !== "object") return value;
-
-  /**
-   * If the value is an array:
-   * - Iterate over each element.
-   * - Recursively sanitize each item (which may itself be an object or array).
-   * - Return a new array.
-   *
-   * The `as unknown as T` cast tells TypeScript that the returned array has the same structural type as the input.
-   */
-  if (Array.isArray(value)) {
-    return value.map((v) => sanitizePayload(v)) as unknown as T;
-  }
-
-  /**
-   * Handle the case of a plain object.
-   * We iterate through its own enumerable properties and recursively sanitize nested structures.
-   * `out` is a fresh object to avoid mutating the original.
-   */
-  const obj = value as Record<string, unknown>;
-  const out: Record<string, unknown> = {};
-  /**
-   * destructure each key-value pair with `Object.entries()`.
-   * If the key (lowercased) is in the `sensitive` set, replace its value with `"[REDACTED]"`.
-   * Otherwise, recursively go into the value to sanitize nested objects/arrays.
-   */
-  for (const [k, v] of Object.entries(obj)) {
-    out[k] = sensitive.has(k.toLowerCase()) ? "[REDACTED]" : sanitizePayload(v);
-  }
-  return out as T;
 }
 
 /**
