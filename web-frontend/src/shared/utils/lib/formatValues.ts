@@ -19,38 +19,41 @@ export const formatDecimals = (num: number, roundedNumber: number) => {
       (Number(num.toString().replace(",", ".")) > 0 &&
       Number(num.toString().replace(",", ".")) < 1) ||
       (Number(num.toString().replace(",", ".")) < 0 &&
-      Number(num.toString().replace(",", ".")) > -1) 
+      Number(num.toString().replace(",", ".")) > -1)
     ) {
-      let numStr = num.toString().replace(",", ".");
+      // Handle negative numbers by storing the sign and working with absolute value
+      const isNegative = num < 0;
+      const absNum = Math.abs(num);
+
+      let numStr = absNum.toString().replace(",", ".");
       if (numStr.indexOf("e") !== -1) {
         const parts = numStr.split("e");
         const exponentPart = parts[1];
         const exponent = Math.abs(parseInt(exponentPart, 10));
-        const result = num.toFixed(exponent);
+        const result = absNum.toFixed(exponent);
         numStr = result;
       }
-      
+
       const parts = numStr.split(".");
       if (parts.length < 2) return roundedNumber.toString();
       const decimalPart = parts[1];
       const totalLeadingZeros = (decimalPart.match(/^0+/)?.[0].length || 0);
 
-      // We use subscript notation when there are 3+ leading zeros
-      // The subscript shows: total leading zeros - 1
-      // Example: 0.00001 has 4 leading zeros → subscript ₃
       if (totalLeadingZeros >= 3) {
-        const leadingZeros = totalLeadingZeros - 1;
+        const leadingZeros = totalLeadingZeros- 1
         const trimmedDecimals = decimalPart.replace(/^0+/, "");
         const noTrailingZeros = trimmedDecimals.replace(/0+$/, "");
         const firstDigits = noTrailingZeros.slice(0, 2);
-  
+
+
         const subscriptZeros = leadingZeros
           .toString()
           .split("")
           .map((digit: string) => SUBSCRIPT_MAP[digit as keyof SubscriptMap])
           .join("");
-  
-        return `0.0${subscriptZeros} ${firstDigits}`;
+
+        const sign = isNegative ? "-" : "";
+        return `${sign}0.0${subscriptZeros} ${firstDigits}`;
       }
     }
     return roundedNumber.toString();

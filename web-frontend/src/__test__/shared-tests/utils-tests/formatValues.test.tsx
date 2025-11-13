@@ -184,9 +184,9 @@ describe("test for helper: formatDecimals", () => {
   });
 
   it("handles multi-digit subscripts (e.g. 10, 11, 12 leading zeros)", () => {
-    expect(formatDecimals(0.00000000001, 0)).toBe("0.0₁₀ 1"); // 10 zeros → subscript ₁₀
-    expect(formatDecimals(0.000000000001, 0)).toBe("0.0₁₁ 1"); // 11 zeros → subscript ₁₁
-    expect(formatDecimals(0.0000000000001, 0)).toBe("0.0₁₂ 1"); // 12 zeros → subscript ₁₂
+    expect(formatDecimals(0.000000000001, 0)).toBe("0.0₁₀ 1"); // 10 zeros → subscript ₁₀
+    expect(formatDecimals(0.0000000000001, 0)).toBe("0.0₁₁ 1"); // 11 zeros → subscript ₁₁
+    expect(formatDecimals(0.00000000000001, 0)).toBe("0.0₁₂ 1"); // 12 zeros → subscript ₁₂
   });
 
   it("handles edge case where number is exactly 0", () => {
