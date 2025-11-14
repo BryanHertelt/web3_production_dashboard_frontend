@@ -54,17 +54,13 @@ const eslintConfig = [
         "error",
         {
           patterns: [
-            // 2. Block imports from other features using aliases
+            // Block imports from other features (one level deep - the feature name)
+            // This prevents: features/select-time-range importing from features/data-table
+            // But allows: features/data-table/lib importing from features/data-table/model
             {
-              group: ["@/features/*"],
+              group: ["@/features/*", "!@/features/*/*"],
               message:
-                "Do not import from other features using the feature alias. Only import from your own feature.",
-            },
-            // 3. Block imports from other features using relative paths
-            {
-              group: ["../*"],
-              message:
-                "Do not import from other features using relative paths. Use feature aliases or only import from your own feature.",
+                "Do not import from other features. You can only import from subfolders within your own feature (e.g., lib, model, ui within the same feature).",
             },
           ],
         },
