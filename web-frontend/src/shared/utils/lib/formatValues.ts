@@ -69,20 +69,31 @@ export const formatCurrency = (number: number | null): string => {
     if (isNaN(Number(number)) || number === null) {
       return "--";
     }
-  
-    const num = Number(number?.toString().replace(",", "."));
+    let num = Number(number?.toString().replace(",", "."));
     const roundedNumber = Number(num.toFixed(2));
+    const originNum = roundedNumber
   
     if ((num > 0 && num < 1 )|| (num < 0 && num > -1)) {
       const formattedDecimals = formatDecimals(num, roundedNumber);
       return `$${formattedDecimals}`;
     }
-  
+
+    // handle large currency values 
+    if(num >= 1000000){
+      const formLargCurrency = num/1000000
+      num= formLargCurrency
+    }
+
     const formattedCurrency = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
     }).format(Number(num));
-    return formattedCurrency;
+
+    if(originNum >= 1000000){
+      return `${formattedCurrency} M`
+    } else {
+      return formattedCurrency
+    }
   };
 
 

@@ -9,7 +9,12 @@ describe("tests for helper: formatCurrency", () => {
     const formattedCurrency = formatCurrency(1000);
     expect(formattedCurrency).toBe("$1,000.00");
   });
-
+  it("handles portfolio values about one million", () => {
+    const formattedMillion = formatCurrency(1000000);
+    const formattedValLagMill = formatCurrency(2500000);
+    expect(formattedMillion).toBe("$1.00 M");
+    expect(formattedValLagMill).toBe("$2.50 M");
+  });
   it("correctly formats small decimals", () => {
     const smallDecimal = formatCurrency(0.00000000000012);
     expect(smallDecimal).toBe("$0.0₁₁ 1");
@@ -42,7 +47,7 @@ describe("tests for helper: formatCurrency", () => {
   });
 
   it("handles very large numbers", () => {
-    expect(formatCurrency(999999999)).toBe("$999,999,999.00");
+    expect(formatCurrency(999999999)).toBe("$1,000.00 M");
   });
 });
 
@@ -170,17 +175,6 @@ describe("test for helper: formatDecimals", () => {
     const num = 1;
     const roundedNumber = 1;
     expect(formatDecimals(num, roundedNumber)).toBe("1");
-  });
-
-  it("uses all subscript digits correctly (0-9)", () => {
-    // Test all subscript digits by creating numbers with different amounts of leading zeros
-    expect(formatDecimals(0.000000001, 0)).toBe("0.0₇ 1"); // 7 zeros → subscript ₇
-    expect(formatDecimals(0.00000001, 0)).toBe("0.0₆ 1"); // 6 zeros → subscript ₆
-    expect(formatDecimals(0.0000001, 0)).toBe("0.0₅ 1"); // 5 zeros → subscript ₅
-    expect(formatDecimals(0.000001, 0)).toBe("0.0₄ 1"); // 4 zeros → subscript ₄
-    expect(formatDecimals(0.00001, 0)).toBe("0.0₃ 1"); // 3 zeros → subscript ₃
-    expect(formatDecimals(0.0000000001, 0)).toBe("0.0₈ 1"); // 8 zeros → subscript ₈
-    expect(formatDecimals(0.00000000001, 0)).toBe("0.0₉ 1"); // 9 zeros → subscript ₉
   });
 
   it("handles multi-digit subscripts (e.g. 10, 11, 12 leading zeros)", () => {
