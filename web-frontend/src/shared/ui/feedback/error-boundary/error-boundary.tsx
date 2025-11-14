@@ -1,6 +1,6 @@
 import React from "react";
 import { ErrorBoundaryProps, ErrorBoundaryState } from "../spinner/model/types";
-import logger from "@/shared/logger/client-logger/model/logger";
+import { logger } from "@/shared/logger/client-logger/model/logger";
 
 /**
  * ErrorBoundary

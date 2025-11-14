@@ -142,6 +142,15 @@ export async function POST(req) {
       streams,
     };
 
+    const API_USERNAME = process.env.API_USERNAME;
+    const API_KEY_LOKI = process.env.API_KEY_LOKI;
+
+    if (!API_USERNAME || !API_KEY_LOKI) {
+      throw new Error(
+        "Missing required environment variables: API_USERNAME and/or API_KEY_LOKI"
+      );
+    }
+
     // Send the formatted log data to Grafana Loki
     const res = await fetch(lokiUrl, {
       method: "POST",
