@@ -6,7 +6,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { DataTableProps } from "../model/types";
+import { CoreTableProps } from "../model/types";
 
 import {
   Table,
@@ -15,12 +15,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../model/table";
+} from "../model/table-builders";
 
 export function CoreTable<TData, TValue>({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
+}: CoreTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,

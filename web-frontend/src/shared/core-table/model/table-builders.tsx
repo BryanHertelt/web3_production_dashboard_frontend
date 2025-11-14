@@ -1,12 +1,19 @@
 import * as React from "react";
 
+import {
+  TableBuilderProps,
+  TableHeaderProps,
+  TableBodyProps,
+  TableFooterProps,
+  TableRowProps,
+  TableHeadProps,
+  TableCellProps,
+  TableCaptionProps,
+} from "./types";
+
 //This table elements are the base for the CoreTable
 
-interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
-  ref?: React.Ref<HTMLTableElement>;
-}
-
-function Table({ className, ref, ...props }: TableProps) {
+function Table({ className, ref, ...props }: TableBuilderProps) {
   return (
     <div className="relative w-full overflow-auto">
       <table
@@ -16,10 +23,6 @@ function Table({ className, ref, ...props }: TableProps) {
       />
     </div>
   );
-}
-
-interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {
-  ref?: React.Ref<HTMLTableSectionElement>;
 }
 
 function TableHeader({ className, ref, ...props }: TableHeaderProps) {
@@ -32,10 +35,6 @@ function TableHeader({ className, ref, ...props }: TableHeaderProps) {
   );
 }
 
-interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {
-  ref?: React.Ref<HTMLTableSectionElement>;
-}
-
 function TableBody({ className, ref, ...props }: TableBodyProps) {
   return (
     <tbody
@@ -44,10 +43,6 @@ function TableBody({ className, ref, ...props }: TableBodyProps) {
       {...props}
     />
   );
-}
-
-interface TableFooterProps extends React.HTMLAttributes<HTMLTableSectionElement> {
-  ref?: React.Ref<HTMLTableSectionElement>;
 }
 
 function TableFooter({ className, ref, ...props }: TableFooterProps) {
@@ -60,10 +55,6 @@ function TableFooter({ className, ref, ...props }: TableFooterProps) {
   );
 }
 
-interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
-  ref?: React.Ref<HTMLTableRowElement>;
-}
-
 function TableRow({ className, ref, ...props }: TableRowProps) {
   return (
     <tr
@@ -72,10 +63,6 @@ function TableRow({ className, ref, ...props }: TableRowProps) {
       {...props}
     />
   );
-}
-
-interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
-  ref?: React.Ref<HTMLTableCellElement>;
 }
 
 function TableHead({ className, ref, ...props }: TableHeadProps) {
@@ -88,10 +75,6 @@ function TableHead({ className, ref, ...props }: TableHeadProps) {
   );
 }
 
-interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
-  ref?: React.Ref<HTMLTableCellElement>;
-}
-
 function TableCell({ className, ref, ...props }: TableCellProps) {
   return (
     <td
@@ -100,10 +83,6 @@ function TableCell({ className, ref, ...props }: TableCellProps) {
       {...props}
     />
   );
-}
-
-interface TableCaptionProps extends React.HTMLAttributes<HTMLTableCaptionElement> {
-  ref?: React.Ref<HTMLTableCaptionElement>;
 }
 
 function TableCaption({ className, ref, ...props }: TableCaptionProps) {
