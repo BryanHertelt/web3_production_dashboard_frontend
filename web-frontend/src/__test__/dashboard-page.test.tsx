@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import CryptoDashboard from "@/pages/dashboard/ui/dashboard-page";
+import CryptoDashboard from "@/page-components/dashboard/ui/dashboard-page";
 import "@testing-library/jest-dom";
 import { PortfolioAPI, ApiError } from "@/shared/api-layer/client";
 

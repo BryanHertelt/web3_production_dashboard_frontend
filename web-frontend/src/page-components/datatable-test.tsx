@@ -19,6 +19,6 @@ export default function DataTableTestComponent() {
   if (!data) {
     return <> Data is undefined...</>;
   }
-
+  console.log("Data", data);
   return <DataTable data={data.data} />;
 }
