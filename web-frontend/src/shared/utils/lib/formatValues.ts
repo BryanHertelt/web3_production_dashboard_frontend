@@ -75,7 +75,10 @@ export const formatCurrency = (number: number | null): string => {
   
     if ((num > 0 && num < 1 )|| (num < 0 && num > -1)) {
       const formattedDecimals = formatDecimals(num, roundedNumber);
-      return `$${formattedDecimals}`;
+      if (formattedDecimals.startsWith('-')) {
+        return `-$${formattedDecimals.slice(1)}`;
+      }
+      return `+$${formattedDecimals}`;
     }
 
     // handle large currency values 
@@ -89,11 +92,18 @@ export const formatCurrency = (number: number | null): string => {
       currency: "USD",
     }).format(Number(num));
 
+    // Add + sign for positive values, handle - sign for negative values
+    let result = formattedCurrency;
     if(originNum >= 1000000){
-      return `${formattedCurrency} M`
-    } else {
-      return formattedCurrency
+      result = `${formattedCurrency} M`
     }
+
+    // Add explicit + for positive values
+    if (originNum > 0 && !result.startsWith('+')) {
+      result = `+${result}`;
+    }
+
+    return result;
   };
 
 

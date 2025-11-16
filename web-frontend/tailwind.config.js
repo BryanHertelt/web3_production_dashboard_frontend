@@ -9,6 +9,8 @@ module.exports = {
         "color-neutral-100": "#A5A6A9",
         "color-neutral-300": "#56575C",
         "color-neutral-350": "#353840",
+        "profit-green": "#10B981",
+        "loss-red": "#EF4444",
       },
     },
   },

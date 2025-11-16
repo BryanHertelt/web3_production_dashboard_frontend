@@ -5,28 +5,28 @@ import {
 } from "../../../shared/utils";
 
 describe("tests for helper: formatCurrency", () => {
-  it("formatCurrency should return a formatted number", () => {
+  it("formatCurrency should return a formatted number with + sign", () => {
     const formattedCurrency = formatCurrency(1000);
-    expect(formattedCurrency).toBe("$1,000.00");
+    expect(formattedCurrency).toBe("+$1,000.00");
   });
-  it("handles portfolio values about one million", () => {
+  it("handles portfolio values about one million with + sign", () => {
     const formattedMillion = formatCurrency(1000000);
     const formattedValLagMill = formatCurrency(2500000);
-    expect(formattedMillion).toBe("$1.00 M");
-    expect(formattedValLagMill).toBe("$2.50 M");
+    expect(formattedMillion).toBe("+$1.00 M");
+    expect(formattedValLagMill).toBe("+$2.50 M");
   });
-  it("correctly formats small decimals", () => {
+  it("correctly formats small decimals with + sign", () => {
     const smallDecimal = formatCurrency(0.00000000000012);
-    expect(smallDecimal).toBe("$0.0₁₁ 1");
+    expect(smallDecimal).toBe("+$0.0₁₁ 1");
     const singleDigitDecimal = formatCurrency(0.0000003);
-    expect(singleDigitDecimal).toBe("$0.0₅ 3");
+    expect(singleDigitDecimal).toBe("+$0.0₅ 3");
     const oneZeroDecimal = formatCurrency(0.03);
-    expect(oneZeroDecimal).toBe("$0.03");
+    expect(oneZeroDecimal).toBe("+$0.03");
   });
 
-  it("formatCurrency handles decimal numbers correctly", () => {
+  it("formatCurrency handles decimal numbers correctly with + sign", () => {
     const formattedCurrency: string = formatCurrency(1000.1);
-    expect(formattedCurrency).toBe("$1,000.10");
+    expect(formattedCurrency).toBe("+$1,000.10");
   });
 
   it("returns '--' for null input", () => {
@@ -43,11 +43,26 @@ describe("tests for helper: formatCurrency", () => {
 
   it("handles negative numbers correctly", () => {
     expect(formatCurrency(-1000)).toBe("-$1,000.00");
-    expect(formatCurrency(-0.0005)).toBe("$-0.0₂ 5");
+    expect(formatCurrency(-0.0005)).toBe("-$0.0₂ 5");
   });
 
-  it("handles very large numbers", () => {
-    expect(formatCurrency(999999999)).toBe("$1,000.00 M");
+  it("handles very large numbers with + sign", () => {
+    expect(formatCurrency(999999999)).toBe("+$1,000.00 M");
+  });
+
+  it("shows + sign for positive small decimals", () => {
+    expect(formatCurrency(0.42)).toBe("+$0.42");
+    expect(formatCurrency(0.0005)).toBe("+$0.0₂ 5");
+  });
+
+  it("shows + sign for positive large values", () => {
+    expect(formatCurrency(5000)).toBe("+$5,000.00");
+    expect(formatCurrency(1500000)).toBe("+$1.50 M");
+  });
+
+  it("shows - sign for negative values (without dollar sign before minus)", () => {
+    expect(formatCurrency(-0.42)).toBe("-$0.42");
+    expect(formatCurrency(-5000)).toBe("-$5,000.00");
   });
 });
 
