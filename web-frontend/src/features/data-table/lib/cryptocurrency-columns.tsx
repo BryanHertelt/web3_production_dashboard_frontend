@@ -1,6 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Asset } from "@/entities/asset";
 import { formatValue, formatCurrency } from "@/shared/utils";
+import { SortingArrows } from "@/shared/core-table/ui/sorting-arrows";
 
 export const assetColumns: ColumnDef<Asset>[] = [
   {
@@ -27,8 +28,18 @@ export const assetColumns: ColumnDef<Asset>[] = [
   },
   {
     accessorKey: "abs_price_change_daily",
-    header: () => {
-      return <div className="flex flex-row justify-end"> Price/24h </div>;
+    enableSorting: true,
+    header: ({ header }) => {
+      return (
+        <div
+          className="flex flex-row justify-end items-center cursor-pointer group"
+          onClick={header.column.getToggleSortingHandler()}
+        >
+          <SortingArrows header={header} />
+
+          <p className="h-full"> Price/24h</p>
+        </div>
+      );
     },
     cell: (row) => {
       const absPriceChangeDaily = row.row.original.abs_price_change_daily;
@@ -50,8 +61,18 @@ export const assetColumns: ColumnDef<Asset>[] = [
   },
   {
     accessorKey: "abs_profit_loss",
-    header: () => {
-      return <div className="flex flex-row justify-end "> Profit loss </div>;
+    enableSorting: true,
+    header: ({ header }) => {
+      return (
+        <div
+          className="flex flex-row justify-end items-center cursor-pointer group"
+          onClick={header.column.getToggleSortingHandler()}
+        >
+          <SortingArrows header={header} />
+
+          <p className="h-full"> Profit loss</p>
+        </div>
+      );
     },
     cell: (row) => {
       const absProfitLoss = row.row.original.abs_profit_loss;
@@ -75,8 +96,18 @@ export const assetColumns: ColumnDef<Asset>[] = [
   },
   {
     accessorKey: "abs_value",
-    header: () => {
-      return <div className="flex flex-row justify-end"> Value/Amount</div>;
+    enableSorting: true,
+    header: ({ header }) => {
+      return (
+        <div
+          className="flex flex-row justify-end items-center cursor-pointer group"
+          onClick={header.column.getToggleSortingHandler()}
+        >
+          <SortingArrows header={header} />
+
+          <p className="h-full"> Value/Amount</p>
+        </div>
+      );
     },
     cell: (row) => {
       const absValue = row.row.original.abs_value;

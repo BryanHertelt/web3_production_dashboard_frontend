@@ -1,5 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import type { Table } from "@tanstack/react-table";
+import type { Header } from "@tanstack/react-table";
 
 //core table 
 export interface CoreTableProps<TData, TValue> {
@@ -48,4 +49,9 @@ ref?: React.Ref<HTMLTableCaptionElement>;
 // pagination logic 
 export interface PaginationItemProps<TData> {
   table: Table<TData>;
+}
+
+// Sorting Arrow 
+export interface SortingArrowsProps<TData> {
+  header: Header<TData, unknown>;
 }
