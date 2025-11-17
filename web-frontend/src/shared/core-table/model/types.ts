@@ -1,4 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
+import type { Table } from "@tanstack/react-table";
 
 //core table 
 export interface CoreTableProps<TData, TValue> {
@@ -42,4 +43,9 @@ export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElem
 export interface TableCaptionProps
 extends React.HTMLAttributes<HTMLTableCaptionElement> {
 ref?: React.Ref<HTMLTableCaptionElement>;
+}
+
+// pagination logic 
+export interface PaginationItemProps<TData> {
+  table: Table<TData>;
 }
