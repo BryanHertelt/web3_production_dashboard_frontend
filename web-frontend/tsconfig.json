@@ -8,7 +8,7 @@
     "noEmit": true, // Do not emit JS (Next handles it)
     "esModuleInterop": true, // Required for many commonjs libs
     "module": "ESNext", // Module system for bundlers/ESM
-    "moduleResolution": "node", // Recommended for Node/Next.js
+    "moduleResolution": "bundler", // Modern bundler module resolution
     "resolveJsonModule": true, // Import JSON files
     "isolatedModules": true, // For Next.js / Vite / Babel
     "incremental": true, // Faster builds
@@ -23,7 +23,7 @@
         "name": "next"
       } // Next.js plugin for TS
     ],
-    "types": ["node", "react", "react-dom", "jest"] // Ensure React & Node types are included
+    "types": ["node", "jest"] // Ensure Node & Jest types are included
   },
   "include": [
     "svg.d.ts",
