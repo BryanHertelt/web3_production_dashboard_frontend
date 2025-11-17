@@ -10,8 +10,18 @@ export const assetColumns: ColumnDef<Asset>[] = [
     cell: (row) => {
       return (
         <div key={row.row.id} className="flex flex-row">
-          <div className="flex flex-col justify-center w-8 h-8 flex-shrink-0 items-center mr-2 border border-gray-50">
-            {row.row.original.icon}
+          <div className="flex flex-col justify-center w-8 h-8 flex-shrink-0 items-center mr-2">
+            {!row.row.original.icon || row.row.original.icon.length === 0 ? (
+              "X"
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={row.row.original.icon}
+                alt={row.row.original.name}
+                width={20}
+                height={20}
+              />
+            )}
           </div>
           <div className="flex flex-col min-w-0 text-xs justify-center">
             <p className="overflow-hidden text-ellipsis whitespace-nowrap">
