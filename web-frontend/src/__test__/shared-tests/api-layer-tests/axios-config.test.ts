@@ -36,7 +36,7 @@ jest.mock("../../shared/logger/client-logger/model/logger", () => ({
 // Minimal-but-valid Axios shapes for typing
 function minimalConfig(): InternalAxiosRequestConfig {
   return {
-    headers: {} as AxiosHeaders,
+    headers: {} as typeof AxiosHeaders,
   } as InternalAxiosRequestConfig;
 }
 function minimalHeaders(): AxiosResponseHeaders {

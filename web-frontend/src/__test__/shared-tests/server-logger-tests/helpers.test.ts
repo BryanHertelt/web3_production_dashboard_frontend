@@ -6,7 +6,7 @@ import {
   delay,
   normalizeError,
 } from "@/shared/logger/server-logger/model/helpers";
-import { sanitizePayload } from "../../shared/logger/helpers";
+import { sanitizePayload } from "@/shared/logger/server-logger/model/helpers";
 
 class HttpError extends Error {
   code?: string;

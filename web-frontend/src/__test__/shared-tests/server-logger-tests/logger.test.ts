@@ -1,5 +1,6 @@
 import type { ServerLogger } from "@/shared/logger/server-logger/model/types";
 
+
 const pinoInstance = {
   debug: jest.fn(),
   info: jest.fn(),
@@ -68,7 +69,7 @@ async function loadLoggerWithEnv(
   const original = process.env;
   process.env = { ...original, ...env };
 
-  const mod = await import("@/shared/logger/server-logger/model/logger");
+  const mod = await import("@/shared/logger/server-logger");
   const logger: ServerLogger = (mod as { serverLogger: ServerLogger })
     .serverLogger;
 
