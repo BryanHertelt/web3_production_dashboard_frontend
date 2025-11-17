@@ -26,6 +26,7 @@
     "types": ["node", "react", "react-dom", "jest"] // Ensure React & Node types are included
   },
   "include": [
+    "svg.d.ts",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",

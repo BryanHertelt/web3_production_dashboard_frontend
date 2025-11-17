@@ -23,12 +23,11 @@ jest.mock("../../../shared/api-layer/client/model/helpers", () => ({
   describeStatus: (e: unknown) => describeStatusMock(e),
 }));
 
-// ---- mock logger (default export with .warn / .error) ----
+// ---- mock logger (named export with .warn / .error) ----
 const loggerWarnMock = jest.fn<void, [unknown, string]>();
 const loggerErrorMock = jest.fn<void, [unknown, string]>();
-jest.mock("../../../shared/logger/client-logger/model/logger", () => ({
-  __esModule: true,
-  default: {
+jest.mock("../../shared/logger/client-logger/model/logger", () => ({
+  logger: {
     warn: (...args: [unknown, string]) => loggerWarnMock(...args),
     error: (...args: [unknown, string]) => loggerErrorMock(...args),
   },

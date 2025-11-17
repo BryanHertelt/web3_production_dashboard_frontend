@@ -1,0 +1,14 @@
+<svg
+  viewBox="0 0 24 24"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  stroke="currentColor"
+  strokeWidth="3"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+>
+  <circle cx="12" cy="12" r="10.5" />
+
+  <rect x="11" y="6.5" width="2" height="7" rx="1" fill="currentColor" stroke="none" />
+  <circle cx="12" cy="16" r="1.1" fill="currentColor" stroke="none" />
+</svg>
