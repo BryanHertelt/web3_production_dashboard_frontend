@@ -29,7 +29,7 @@ function TableHeader({ className, ref, ...props }: TableHeaderProps) {
   return (
     <thead
       ref={ref}
-      className={`[&_tr]:border-b [&_tr]:border-color-neutral-100 ${className || ""}`}
+      className={`[&_tr]:border-b [&_tr]:border-color-neutral-100 w-1/4 ${className || ""}`}
       {...props}
     />
   );
@@ -69,7 +69,7 @@ function TableHead({ className, ref, ...props }: TableHeadProps) {
   return (
     <th
       ref={ref}
-      className={`h-12 px-4 text-left align-middle font-medium text-color-neutral-100 [&:has([role=checkbox])]:pr-0 ${className || ""}`}
+      className={`h-12 text-left align-middle font-medium text-color-neutral-100 [&:has([role=checkbox])]:pr-0 ${className || ""}`}
       {...props}
     />
   );
@@ -79,7 +79,7 @@ function TableCell({ className, ref, ...props }: TableCellProps) {
   return (
     <td
       ref={ref}
-      className={`p-2 align-middle w-1/4 [&:has([role=checkbox])]:pr-0 ${className || ""}`}
+      className={`p-2 [&:has([role=checkbox])]:pr-0 ${className || ""}`}
       {...props}
     />
   );

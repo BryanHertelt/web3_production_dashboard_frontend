@@ -8,7 +8,7 @@ export interface CoreTableProps<TData, TValue> {
 
 
 
-  //table-builders 
+  //table-builders
 export interface TableBuilderProps extends React.HTMLAttributes<HTMLTableElement> {
     ref?: React.Ref<HTMLTableElement>;
   }
