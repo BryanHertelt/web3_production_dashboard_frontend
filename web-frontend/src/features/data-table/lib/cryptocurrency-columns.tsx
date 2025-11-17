@@ -6,7 +6,9 @@ import { SortingArrows } from "@/shared/core-table/ui/sorting-arrows";
 export const assetColumns: ColumnDef<Asset>[] = [
   {
     accessorKey: "name",
-    header: "Asset",
+    header: () => {
+      return <div className="px-3.5"> Assets </div>;
+    },
     cell: (row) => {
       return (
         <div key={row.row.id} className="flex flex-row">
