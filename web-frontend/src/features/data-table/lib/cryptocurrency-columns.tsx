@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Asset } from "@/entities/asset";
 import { formatValue, formatCurrency } from "@/shared/utils";
 import { SortingArrows } from "@/shared/core-table/ui/sorting-arrows";
+import { logger } from "@/shared/logger/client-logger";
 
 export const assetColumns: ColumnDef<Asset>[] = [
   {
@@ -10,10 +11,26 @@ export const assetColumns: ColumnDef<Asset>[] = [
       return <div className="px-3.5"> Assets </div>;
     },
     cell: (row) => {
+      const hasNoIcon =
+        !row.row.original.icon || row.row.original.icon.length === 0;
+
+      if (hasNoIcon) {
+        logger.warn(
+          {
+            component: "AssetIcon",
+            assetSymbol: row.row.original.symbol,
+            assetName: row.row.original.name,
+            fallbackUsed: "plain-X",
+            reason: "Icon URL missing or empty",
+          },
+          "Asset icon fallback triggered - displaying plain X"
+        );
+      }
+
       return (
         <div key={row.row.id} className="flex flex-row">
           <div className="flex flex-col justify-center w-8 h-8 flex-shrink-0 items-center mr-2">
-            {!row.row.original.icon || row.row.original.icon.length === 0 ? (
+            {hasNoIcon ? (
               "X"
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
@@ -22,6 +39,20 @@ export const assetColumns: ColumnDef<Asset>[] = [
                 alt={row.row.original.name}
                 width={20}
                 height={20}
+                onError={(e) => {
+                  logger.warn(
+                    {
+                      component: "AssetIcon",
+                      assetSymbol: row.row.original.symbol,
+                      assetName: row.row.original.name,
+                      iconUrl: row.row.original.icon,
+                      fallbackUsed: "error-display",
+                      reason: "SVG encoding failed.",
+                    },
+                    "Asset icon failed to load"
+                  );
+                  e.currentTarget.style.display = "X";
+                }}
               />
             )}
           </div>
