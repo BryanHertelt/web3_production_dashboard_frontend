@@ -1,0 +1,2860 @@
+{
+  "uuid": "caa52239-d2e6-4764-bba5-028330dbb268",
+  "lastMigration": 33,
+  "name": "zenetapimock (copy)",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 3030,
+  "hostname": "",
+  "folders": [
+    {
+      "uuid": "ca1000a7-7d2f-4130-ae9b-4c0f4d5bb622",
+      "name": "Portfolio",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "00211faf-7996-4552-a611-11042472f29c"
+        },
+        {
+          "type": "route",
+          "uuid": "344ea0e6-3768-495e-8cb4-30bdbe949108"
+        },
+        {
+          "type": "route",
+          "uuid": "6af7b077-964d-461c-9807-0d7769dac378"
+        },
+        {
+          "type": "route",
+          "uuid": "21f98724-1eb4-4e7b-bab8-cbe671a2d3f9"
+        },
+        {
+          "type": "route",
+          "uuid": "0952c714-6e55-449f-bc88-a93570e028f3"
+        },
+        {
+          "type": "route",
+          "uuid": "9942a869-574b-49bc-aa61-32151ad1c640"
+        },
+        {
+          "type": "route",
+          "uuid": "07d84132-0c9f-4c37-b686-6be13bf37ad1"
+        },
+        {
+          "type": "route",
+          "uuid": "8b5d5fd5-e404-4a38-8bd9-826cb398c365"
+        },
+        {
+          "type": "route",
+          "uuid": "0c1dbbe7-2ca5-421b-bec5-a0ff3b50e165"
+        },
+        {
+          "type": "route",
+          "uuid": "ff54db7b-e751-404b-8ec7-9ca3b1bef48f"
+        },
+        {
+          "type": "route",
+          "uuid": "34e42854-3d00-4583-a947-bb63d0f1bbc4"
+        },
+        {
+          "type": "folder",
+          "uuid": "be4029c9-3370-4a39-92ec-2ce276ca5e65"
+        },
+        {
+          "type": "folder",
+          "uuid": "ddc87dec-11cb-469e-afb6-a07ee39ccfbb"
+        },
+        {
+          "type": "folder",
+          "uuid": "ab5de7f1-8750-4faa-9cfb-05ed858103ad"
+        }
+      ]
+    },
+    {
+      "uuid": "be4029c9-3370-4a39-92ec-2ce276ca5e65",
+      "name": "Sources",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "2c4d0f31-99f5-4315-a454-3a94f2555acc"
+        },
+        {
+          "type": "route",
+          "uuid": "eec5e06e-08e8-49a6-9181-3905929d53d9"
+        },
+        {
+          "type": "route",
+          "uuid": "bb5ced6d-a9fc-47ab-8ffa-7fccad0a0bb6"
+        },
+        {
+          "type": "route",
+          "uuid": "bd13f173-c5f2-4147-8462-b5eb8eebc74a"
+        },
+        {
+          "type": "route",
+          "uuid": "53c36e21-32b3-4537-ae56-4fd00ca021b7"
+        },
+        {
+          "type": "route",
+          "uuid": "f38ea6fd-1564-4809-a8b0-ea617ae4ceed"
+        },
+        {
+          "type": "route",
+          "uuid": "9fc0a071-1de2-45d0-896f-e5bcdb1090bd"
+        },
+        {
+          "type": "route",
+          "uuid": "9e27f125-9f77-48ce-8411-794f9b8e72fe"
+        },
+        {
+          "type": "route",
+          "uuid": "93aaea55-19e0-43db-905d-cbd56ac4f070"
+        },
+        {
+          "type": "route",
+          "uuid": "8adbc018-1eaa-4711-803b-f0a2aa37b4ad"
+        },
+        {
+          "type": "route",
+          "uuid": "c9c3c609-f8ee-479e-afa1-579631d9d8ea"
+        },
+        {
+          "type": "route",
+          "uuid": "51e97dea-8130-486e-b11d-74c402de6277"
+        }
+      ]
+    },
+    {
+      "uuid": "661076bc-32c8-4a5b-a3a1-dd29d18a6206",
+      "name": "Transaction",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "25ed517c-399e-481b-b84c-d0b7c2548dea"
+        },
+        {
+          "type": "route",
+          "uuid": "29027129-fc11-4a48-b544-307248a54479"
+        },
+        {
+          "type": "route",
+          "uuid": "a78c745f-7495-4127-a22a-f91c3030cab3"
+        },
+        {
+          "type": "route",
+          "uuid": "954361de-d6ea-42e0-b7db-cb6d4db469eb"
+        },
+        {
+          "type": "route",
+          "uuid": "48e58964-97b9-4322-bd2a-8a40e258ef6c"
+        }
+      ]
+    },
+    {
+      "uuid": "ddc87dec-11cb-469e-afb6-a07ee39ccfbb",
+      "name": "single_sync",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "0ecd4cfa-5242-4612-87c9-ad161c92c85a"
+        },
+        {
+          "type": "route",
+          "uuid": "d8ca4004-65c2-409b-a418-cb44df15ac79"
+        }
+      ]
+    },
+    {
+      "uuid": "042db140-b46b-488a-84e8-a06daa1ce399",
+      "name": "selected_sync",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "fcdc55d6-cfb0-4396-bbf1-389c8df269a8"
+        }
+      ]
+    },
+    {
+      "uuid": "46a55440-3560-4468-a402-8726841ddc4b",
+      "name": "multi-sync(all sources)",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "8bddb85f-c101-4181-ad77-9840858b1fe2"
+        }
+      ]
+    },
+    {
+      "uuid": "ab5de7f1-8750-4faa-9cfb-05ed858103ad",
+      "name": "sync_many",
+      "children": [
+        {
+          "type": "folder",
+          "uuid": "042db140-b46b-488a-84e8-a06daa1ce399"
+        },
+        {
+          "type": "folder",
+          "uuid": "46a55440-3560-4468-a402-8726841ddc4b"
+        },
+        {
+          "type": "route",
+          "uuid": "18a64b2a-1dce-4276-a123-74d93a69623b"
+        }
+      ]
+    },
+    {
+      "uuid": "2b7f4c1f-4208-479e-ad1f-0b1edd0b78f4",
+      "name": "WS",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "13a34735-b259-4bf2-ae8e-2b8a786c9b1d"
+        }
+      ]
+    },
+    {
+      "uuid": "c2eb2f7d-cfbc-41c5-97e3-54d0ff7be785",
+      "name": "auth",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "15ea2e14-a88b-4ced-a284-a103eafb9b24"
+        }
+      ]
+    },
+    {
+      "uuid": "41026389-61d8-462b-9c2b-f13dda0e17ee",
+      "name": "Assets",
+      "children": [
+        {
+          "type": "route",
+          "uuid": "656e0219-e122-41f9-9953-cdb5f67e939a"
+        },
+        {
+          "type": "route",
+          "uuid": "563f1047-7d52-490b-9f1d-992ebf893fd1"
+        },
+        {
+          "type": "route",
+          "uuid": "db90cfff-1388-4bcb-ad55-0e98433e983b"
+        }
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "uuid": "00211faf-7996-4552-a611-11042472f29c",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "portfolio",
+      "responses": [
+        {
+          "uuid": "0193d85a-1bfa-4f91-9cce-4a071ae56a16",
+          "body": "/*\n{\n  \"name\": \"Bryans second portfolio\",\n  \"base_currency\": \"usd\",\n  \"ignore_assets\": [\n    \"bitcoin\",\n    \"ethereum\"\n  ],\n  \"dust_threshhold\": \"on\",\n  \"dust_threshhold_exclude_under\": \"5\",\n  \"description\": \"Bryans Main Portfolio\",\n  \"include_nft\": \"off\",\n  \"rebalancing_rythm\" : \"d\" //d,m,w,y\n}\n*/ \n\n",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "6af7b077-964d-461c-9807-0d7769dac378",
+      "type": "http",
+      "documentation": "",
+      "method": "delete",
+      "endpoint": "portfolio/:portfolioId",
+      "responses": [
+        {
+          "uuid": "ee42c8e4-621b-42d3-b8ef-cfbf9bae7086",
+          "body": "{\n  \"delete_portfolio\": \"Bryans Portfolio\"\n}",
+          "latency": 0,
+          "statusCode": 204,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "43f776e3-a732-4889-b557-289d952c5953",
+          "body": "{\n  \"error\": \"404 Not Found\"\n}",
+          "latency": 0,
+          "statusCode": 404,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "shd34",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "ff54db7b-e751-404b-8ec7-9ca3b1bef48f",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/info",
+      "responses": [
+        {
+          "uuid": "d43c085c-66b5-4b6b-b537-4e71bb63a45c",
+          "body": "{\n  \"id\": \"{{urlParam 'portfolioId'}}\",\n  \"data\": {\n    \"name\": \"Bryans Portfolio\",\n    \"currency\": \"usd\",\n    \"rel_profit_loss\": 11.11,\n    \"abs_profit_loss\": 1300,\n    \"best_mover\": {\n      \"name\": \"Bitcoin\",\n      \"symbol\": \"BTC\",\n      \"source\": \"Binance\",\n      \"abs_value\": \"1577\",\n      \"rel_value\": \"2.1\"\n    },\n    \"worst_mover\": {\n      \"name\": \"Ethereum\",\n      \"symbol\": \"ETH\",\n      \"source\": \"Coinbase\",\n      \"abs_value\": \"-577\",\n      \"rel_value\": \"-2.1\"\n    },\n    \"last_updated\": \"2025-11-06T12:30:00Z\"\n  }\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "timeframe",
+              "value": "1d",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "22546096-e51a-4f82-9744-d739c5d82b3d",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "btc-eth-history",
+      "responses": [
+        {
+          "uuid": "c9fa9a92-1d18-4f73-ad65-1e35e1d5f23a",
+          "body": "{\n  \"data\": [\n    {\n      \"date\": \"2025-01-01\",\n      \"rel_bitcoin_change\": 20,\n      \"abs_bitcoin_change\": 2000,\n      \"rel_ethereum_change\": 10,\n      \"abs_ethereum_change\": 1500,\n    },\n    {\n      \"date\": \"2025-01-02\",\n      \"rel_bitcoin_change\": -5,\n      \"abs_bitcoin_change\": -600,\n      \"rel_ethereum_change\": 3,\n      \"abs_ethereum_change\": 450,\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "timeframe",
+              "value": "1y",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "0c1dbbe7-2ca5-421b-bec5-a0ff3b50e165",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/value-history",
+      "responses": [
+        {
+          "uuid": "42daee37-4cb9-4870-bc29-84bdd52c331d",
+          "body": "{\n  \"id\": \"{{urlParam 'portfolioId'}}\",\n  \"data\":[\n    {\n      \"date\": \"2025-01-01\",\n      \"abs_portfolio_value\": 12200,\n      \"rel_portfolio_change\": 70\n    }, \n     {\n      \"date\": \"2025-01-03\",\n      \"abs_portfolio_value\": 1223,\n      \"rel_portfolio_change\": 2220\n    }, \n    ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "timeframe",
+              "value": "1y",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "928a832a-9621-4551-8cb2-33b11fb27c66",
+          "body": "{}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "body",
+              "modifier": "",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "8b5d5fd5-e404-4a38-8bd9-826cb398c365",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/cost-basis-history",
+      "responses": [
+        {
+          "uuid": "7f6d7a67-1f74-40da-bbeb-2b854304600d",
+          "body": "{\n  \"id\": \"{{urlParam 'portfolioId'}}\",\n  \"data\":[\n    {\n      \"date\": \"2025-01-01\",\n      \"cost_basis\": 2003\n    }, \n     {\n      \"date\": \"2025-01-03\",\n      \"cost_basis\": 3456 \n    }, \n    ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "timeframe",
+              "value": "1y",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "07d84132-0c9f-4c37-b686-6be13bf37ad1",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/profit-loss-history",
+      "responses": [
+        {
+          "uuid": "36d318dc-674d-466c-98f8-c0f179a0f2d0",
+          "body": "{\n  \"id\":\"{{urlParam 'portfolioId'}}\", \n  \"data\": [\n   {\n      \"date\": \"2025-01-01\",\n      \"abs_portfolio_change\": 12200,\n      \"rel_portfolio_change\": 70,\n    },\n    {\n      \"date\": \"2025-02-01\",\n      \"abs_portfolio_change\": 12200,\n      \"rel_portfolio_change\": 30,\n    }\n    ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "timeframe",
+              "value": "1y",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "9942a869-574b-49bc-aa61-32151ad1c640",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/asset-info",
+      "responses": [
+        {
+          "uuid": "052d45df-0938-4de2-86f1-7525273ad6b0",
+          "body": "{\n  \"id\": \"{{urlParam 'portfolioId'}}\",\n  \"data\": {\n    \"abs_total_value\": 15000,\n    \"total_assets\": 4,\n    \"asset_distribution\": [\n      {\n        \"asset_id\": \"usr_ast_1\",\n        \"asset_type\": \"cryptocurrency\",\n        \"symbol\": \"ETH\",\n        \"icon\": \"I\",\n        \"name\": \"Ethereum\",\n        \"abs_price_change_24h\": 124,\n        \"rel_price_change_24h\": 2,\n        \"abs_profit_loss\": 1256,\n        \"rel_profit_loss\": 12,\n        \"amount\": 3.2,\n        \"abs_value\": 9600,\n        \"allocation_percent\": 64.0\n      },\n      {\n        \"asset_id\": \"usr_ast_2\",\n        \"asset_type\": \"cryptocurrency\",\n        \"symbol\": \"BTC\",\n        \"icon\": \"I\",\n        \"name\": \"Bitcoin\",\n        \"abs_price_change_24h\": -210,\n        \"rel_price_change_24h\": -1.5,\n        \"abs_profit_loss\": 340,\n        \"rel_profit_loss\": 3.2,\n        \"amount\": 0.12,\n        \"abs_value\": 7200,\n        \"allocation_percent\": 48.0\n      },\n      {\n        \"asset_id\": \"usr_ast_3\",\n        \"asset_type\": \"stablecoin\",\n        \"symbol\": \"USDC\",\n        \"icon\": \"I\",\n        \"name\": \"USD Coin\",\n        \"abs_price_change_24h\": 0,\n        \"rel_price_change_24h\": 0,\n        \"abs_profit_loss\": 0,\n        \"rel_profit_loss\": 0,\n        \"amount\": 1200,\n        \"abs_value\": 1200,\n        \"allocation_percent\": 8.0\n      },\n      {\n        \"asset_id\": \"ast_4\",\n        \"asset_type\": \"cryptocurrency\",\n        \"symbol\": \"SOL\",\n        \"icon\": \"I\",\n        \"name\": \"Solana\",\n        \"abs_price_change_24h\": 18,\n        \"rel_price_change_24h\": 1.8,\n        \"abs_profit_loss\": 160,\n        \"rel_profit_loss\": 11.2,\n        \"amount\": 5.85,\n        \"abs_value\": 1000,\n        \"allocation_percent\": 6.6\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "limit",
+              "value": "20",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "asset_type",
+              "value": "cryptocurrency",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "0952c714-6e55-449f-bc88-a93570e028f3",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/sources-info",
+      "responses": [
+        {
+          "uuid": "164cc2c2-a175-4a9b-a181-078ee07d2b93",
+          "body": "{\n  \"id\": \"{{urlParam 'portfolioId'}}\",\n  \"data\": {\n    \"abs_total_value\": 15000,\n    \"source_distribution\": [\n      {\n        \"id\": \"src_1\",\n        \"icon\": \"https://your-cdn.com/icons/binance.svg\",\n        \"name\": \"Binance\",\n        \"type\": \"exchange\",\n        \"abs_price_change_24h\": 124,\n        \"rel_price_change_24h\": 2,\n        \"allocation_percent\": 20,\n        \"abs_value\": 3000,\n        \"asset_count\": 10,\n        \"abs_profit_loss\": 1256,\n        \"rel_profit_loss\": 12\n      },\n      {\n        \"id\": \"src_2\",\n        \"icon\": \"https://your-cdn.com/icons/kraken.svg\",\n        \"name\": \"Kraken\",\n        \"type\": \"exchange\",\n        \"abs_price_change_24h\": -54,\n        \"rel_price_change_24h\": -0.8,\n        \"allocation_percent\": 15,\n        \"abs_value\": 2250,\n        \"asset_count\": 6,\n        \"abs_profit_loss\": 420,\n        \"rel_profit_loss\": 5.5\n      },\n      {\n        \"id\": \"src_3\",\n        \"icon\": \"https://your-cdn.com/icons/metamask.svg\",\n        \"name\": \"MetaMask\",\n        \"type\": \"wallet\",\n        \"abs_price_change_24h\": 310,\n        \"rel_price_change_24h\": 3.2,\n        \"allocation_percent\": 35,\n        \"abs_value\": 5250,\n        \"asset_count\": 14,\n        \"abs_profit_loss\": 1940,\n        \"rel_profit_loss\": 14.3\n      },\n      {\n        \"id\": \"src_4\",\n        \"icon\": \"https://your-cdn.com/icons/ledger.svg\",\n        \"name\": \"Ledger\",\n        \"type\": \"wallet\",\n        \"abs_price_change_24h\": -22,\n        \"rel_price_change_24h\": -0.3,\n        \"allocation_percent\": 10,\n        \"abs_value\": 1500,\n        \"asset_count\": 5,\n        \"abs_profit_loss\": 120,\n        \"rel_profit_loss\": 1.8\n      },\n      {\n        \"id\": \"src_5\",\n        \"icon\": \"https://your-cdn.com/icons/coinbase.svg\",\n        \"name\": \"Coinbase\",\n        \"type\": \"exchange\",\n        \"abs_price_change_24h\": 44,\n        \"rel_price_change_24h\": 0.9,\n        \"allocation_percent\": 20,\n        \"abs_value\": 3000,\n        \"asset_count\": 8,\n        \"abs_profit_loss\": 680,\n        \"rel_profit_loss\": 6\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "21f98724-1eb4-4e7b-bab8-cbe671a2d3f9",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/bundle-info",
+      "responses": [
+        {
+          "uuid": "7d808897-e8fb-457d-9009-2845ef65030b",
+          "body": "{\n\n}\n",
+          "latency": 0,
+          "statusCode": 204,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "53c36e21-32b3-4537-ae56-4fd00ca021b7",
+      "type": "http",
+      "documentation": "",
+      "method": "delete",
+      "endpoint": "portfolio/:portfolioId/source/:sourceId",
+      "responses": [
+        {
+          "uuid": "a1cc41ba-06a8-41b8-973a-62d262c3ffbe",
+          "body": "{\n   \"deleted_source\": \"Example\"\n}",
+          "latency": 0,
+          "statusCode": 204,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "src_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "9fc0a071-1de2-45d0-896f-e5bcdb1090bd",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/source/:sourceId/asset-info",
+      "responses": [
+        {
+          "uuid": "cb1c6100-39fd-4f74-b0be-1e9948b33b03",
+          "body": "{\n  \"id\": \"{{urlParam 'sourceId'}}\",\n  \"data\": {\n    \"name\": \"Binance\",\n    \"type\": \"cex\",\n    \"abs_total_value\": 15000,\n    \"total_assets\": 5,\n    \"asset_distribution\": [\n      {\n        \"id\": \"usr_ast_1\",\n        \"symbol\": \"ETH\",\n        \"icon\": \"https://your-cdn.com/icons/ethereum.svg\",\n        \"name\": \"Ethereum\",\n        \"abs_value_change\": \"1256\",\n        \"rel_value_change\": \"12\",\n        \"amount\": 3.2,\n        \"abs_value\": 9600,\n        \"allocation_percent\": 64.0\n      },\n      {\n        \"id\": \"usr_ast_2\",\n        \"symbol\": \"BTC\",\n        \"icon\": \"https://your-cdn.com/icons/bitcoin.svg\",\n        \"name\": \"Bitcoin\",\n        \"abs_value_change\": \"-350\",\n        \"rel_value_change\": \"-1.8\",\n        \"amount\": 0.12,\n        \"abs_value\": 3400,\n        \"allocation_percent\": 22.7\n      },\n      {\n        \"id\": \"usr_ast_5\",\n        \"symbol\": \"USDC\",\n        \"icon\": \"https://your-cdn.com/icons/usdc.svg\",\n        \"name\": \"USD Coin\",\n        \"abs_value_change\": \"0\",\n        \"rel_value_change\": \"0\",\n        \"amount\": 800,\n        \"abs_value\": 800,\n        \"allocation_percent\": 5.3\n      },\n      {\n        \"id\": \"usr_ast_6\",\n        \"symbol\": \"MATIC\",\n        \"icon\": \"https://your-cdn.com/icons/polygon.svg\",\n        \"name\": \"Polygon\",\n        \"abs_value_change\": \"45\",\n        \"rel_value_change\": \"3.2\",\n        \"amount\": 250,\n        \"abs_value\": 175,\n        \"allocation_percent\": 1.2\n      },\n      {\n        \"id\": \"usr_ast_7\",\n        \"symbol\": \"UNI\",\n        \"icon\": \"https://your-cdn.com/icons/uniswap.svg\",\n        \"name\": \"Uniswap\",\n        \"abs_value_change\": \"-20\",\n        \"rel_value_change\": \"-1.1\",\n        \"amount\": 30,\n        \"abs_value\": 150,\n        \"allocation_percent\": 1.0\n      }\n    ]\n  }\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "src_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "8adbc018-1eaa-4711-803b-f0a2aa37b4ad",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/source/:sourceId/value-history",
+      "responses": [
+        {
+          "uuid": "44a95ce4-5b36-4488-81b0-d9d107921c2b",
+          "body": "// to get the total value of the source just use the last object in the array\n\n{\n  \"id\": \"{{urlParam 'sourceId'}}\",\n  \"data\":[\n    {\n      \"date\": \"2025-01-01\",\n      \"abs_source_value\": 12200,\n      \"rel_source_change\": 70,\n    }, \n     {\n      \"date\": \"2025-01-03\",\n      \"abs_source_value\": 1223,\n      \"rel_source_change\": 2220,\n    }\n  ]\n}\n\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "src_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "timeframe",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "93aaea55-19e0-43db-905d-cbd56ac4f070",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/source/:sourceId/profit-loss-history",
+      "responses": [
+        {
+          "uuid": "12c6daeb-a3fd-4581-ac6d-073e0f6c7990",
+          "body": "{\n  \"id\": \"{{urlParam 'sourceId'}}\", \n  \"data\": [\n   {\n      \"date\": \"2025-01-01\",\n      \"abs_source_change\": 12200,\n      \"rel_source_change\": 70\n    },\n    {\n      \"date\": \"2025-02-01\",\n      \"abs_source_change\": 12200,\n      \"rel_source_change\": 30\n    }\n    ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "src_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "timeframe",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "9e27f125-9f77-48ce-8411-794f9b8e72fe",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/source/:sourceId/cost-basis-history",
+      "responses": [
+        {
+          "uuid": "c61b423f-5898-40f1-9a4b-48d625f2cf21",
+          "body": "{\n  \"id\": \"{{urlParam 'sourceId'}}\",\n  \"data\":[\n    {\n      \"date\": \"2025-01-01\",\n      \"cost_basis\": 2003\n    }, \n     {\n      \"date\": \"2025-01-03\",\n      \"cost_basis\": 3456 \n    }\n    ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "src_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "timeframe",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "bd13f173-c5f2-4147-8462-b5eb8eebc74a",
+      "type": "http",
+      "documentation": "",
+      "method": "patch",
+      "endpoint": "portfolio/:portfolioId/source/:sourceId",
+      "responses": [
+        {
+          "uuid": "02c138cd-c0bd-4da0-9fce-f8f88aa41a6f",
+          "body": "/*\n{\n  \"data\": {\n    \"label\": \"My Binance (Renamed)\",\n    \"description\": \"Optional note\",\n    \"enabled\": true,\n    \"color\": \"#FFD700\"\n  }\n}\n*/",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "src_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "344ea0e6-3768-495e-8cb4-30bdbe949108",
+      "type": "http",
+      "documentation": "",
+      "method": "put",
+      "endpoint": "portfolio/:portfolioId",
+      "responses": [
+        {
+          "uuid": "55c414bb-2324-4a1c-a672-60fce585e35e",
+          "body": "/*\n{\n  \"name\": \"Bryans second portfolio\",\n  \"base_currency\": \"usd\",\n  \"ignore_assets\": [\n    \"bitcoin\",\n    \"ethereum\"\n  ],\n  \"dust_threshhold\": \"on\",\n  \"dust_threshhold_exclude_under\": \"5\",\n  \"description\": \"Bryans Main Portfolio\",\n  \"include_nft\": \"off\",\n  \"rebalancing_rythm\" : \"d\" //d,m,w,y\n}\n*/",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "f38ea6fd-1564-4809-a8b0-ea617ae4ceed",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/source/:sourceId",
+      "responses": [
+        {
+          "uuid": "334b2634-7ac8-4a7e-81a2-2167b794165e",
+          "body": "{\n  \"id\": \"{{urlParam 'sourceId'}}\",\n  \"data\": {\n    \"type\": \"cex\",\n    \"provider\": \"binance\",\n    \"label\": \"My Binance\",\n    \"enabled\" : true,\n    \"status\": \"valid\",\n    \"icon\": \"https://your-cdn.com/icons/binance.svg\"\n    \"connection\": {\n      \"status\": \"connected\",\n      \"lastValidated\": \"2025-02-02T12:08:04Z\",\n      \"error\": null\n    },\n\n    \"sync\": {\n      \"lastSync\": \"2025-02-02T12:09:00Z\",\n      \"lastSyncStatus\": \"success\",\n      \"nextSyncPossibleAt\": \"2025-02-02T12:19:00Z\"\n    },\n\n    \"metadata\": {\n      \"chains\": null,\n      \"estimatedTransactions\": 1042,\n      \"supportedData\": [\"spot_trades\", \"deposits\", \"withdrawals\"]\n    },\n\n    \"createdAt\": \"2025-02-02T12:00:00Z\",\n    \"updatedAt\": \"2025-02-02T12:10:00Z\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "src_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "15a34b3a-8618-413d-b563-f4dfaf2c3dfc",
+          "body": "{\n  \"id\": \"235rgh\",\n  \"data\": {\n    \"type\": \"evm\",\n    \"provider\": \"ethereum\",\n    \"label\": \"My ETH wallet\",\n    \"status\": \"valid\",\n\n    \"connection\": {\n      \"status\": \"connected\",\n      \"lastValidated\": \"2025-02-02T12:08:04Z\",\n      \"error\": null\n    },\n\n    \"sync\": {\n      \"lastSync\": \"2025-02-02T12:18:00Z\",\n      \"lastSyncStatus\": \"success\",\n      \"nextSyncPossibleAt\": \"2025-02-02T12:28:00Z\"\n    },\n\n    \"metadata\": {\n      \"chains\": [\"ethereum\"],\n      \"estimatedTransactions\": 381,\n      \"firstActivity\": \"2020-05-10T12:00:00Z\"\n    },\n\n    \"createdAt\": \"2025-02-01T08:20:00Z\",\n    \"updatedAt\": \"2025-02-02T12:00:00Z\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "25ed517c-399e-481b-b84c-d0b7c2548dea",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "portfolio/:portfolioId/transactions/",
+      "responses": [
+        {
+          "uuid": "334d0aa7-6807-41e3-ae64-b96ad7a8d90b",
+          "body": "/**\nPost this info for buy  \n{\n  \"sourceId\": \"src_1\", \n  \"origin\": \"djjalsdkc\",\n  \"destination\": \"Binance\", \n  \"incomingAssetId\": \"12djasd\",\n  \"outgoingAssetId\": \"djda12dn\", \n  \"type\": \"buy\",\n  \"amount\": 0.5,\n  \"pricePerUnit\": 60000,\n  \"fees\": \"0.4\",\n  \"timestamp\": \"2025-11-06T13:00:00Z\",\n  \"notes\": \"Optional description\",\n  \"hidden\": false\n}\n*/ \n",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "954361de-d6ea-42e0-b7db-cb6d4db469eb",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/transactions/history",
+      "responses": [
+        {
+          "uuid": "0c9033f4-d06a-4807-b5f7-4fdd56bd56f3",
+          "body": "// none => give me all transactions (default on first fetch)\n// if user triggers filter now and paginates, we will just fetch the transactions for the filter query parameter\n\n{\n  \"data\": {\n    \"totalTransactions\": 3,\n    \"totalVolumeUsd\": 43000,\n    \"transactions\": [\n      {\n        \"id\": \"tx_1\",\n        \"data\": {\n          \"sourceId\": \"234rgh\",\n          \"originAssetIcon\": \".svg\",\n          \"originSourceIcon\": \"\",\n          \"destinationAssetIcon\": \"\",\n          \"destinationSourceIcon\": \"\",\n          \"originId\": \"djjalsdkc\",\n          \"destination\": \"Binance\",\n          \"incomingAssetId\": \"12djasd\",\n          \"outgoingAssetId\": \"djda12dn\",\n          \"type\": \"buy\",\n          \"fees\": 50,\n          \"amount\": 0.5,\n          \"pricePerUnit\": 60000,\n          \"transactionId\": \"0x2440284039\",\n          \"notes\": \"string\",\n          \"timestamp\": \"2025-11-06T13:00:00Z\"\n        }\n      },\n      {\n        \"id\": \"tx_2\",\n        \"data\": {\n          \"sourceId\": \"wallet_eth_1\",\n          \"originAssetIcon\": \"eth.svg\",\n          \"originSourceIcon\": \"metamask.svg\",\n          \"destinationAssetIcon\": \"usdc.svg\",\n          \"destinationSourceIcon\": \"uniswap.svg\",\n          \"originId\": \"0xabc123...\",\n          \"destination\": \"Uniswap\",\n          \"incomingAssetId\": \"usdc_1\",\n          \"outgoingAssetId\": \"eth_1\",\n          \"type\": \"swap\",\n          \"fees\": 8.32,\n          \"amount\": 1.2,\n          \"pricePerUnit\": 2914,\n          \"transactionId\": \"0x91affd92341aa9bb\",\n          \"notes\": \"Swapped ETH to USDC\",\n          \"timestamp\": \"2025-10-12T18:44:00Z\"\n        }\n      },\n      {\n        \"id\": \"tx_3\",\n        \"data\": {\n          \"sourceId\": \"kraken_1\",\n          \"originAssetIcon\": \"usdt.svg\",\n          \"originSourceIcon\": \"kraken.svg\",\n          \"destinationAssetIcon\": \"wallet.svg\",\n          \"destinationSourceIcon\": \"\",\n          \"originId\": \"Kraken\",\n          \"destination\": \"0x9988ac21abcedf\",\n          \"incomingAssetId\": \"eth_1\",\n          \"outgoingAssetId\": null,\n          \"type\": \"deposit\",\n          \"fees\": 0,\n          \"amount\": 0.8,\n          \"pricePerUnit\": 3021,\n          \"transactionId\": \"0x44121ffaadca221\",\n          \"notes\": \"Transfer to personal wallet\",\n          \"timestamp\": \"2025-11-01T09:30:00Z\"\n        }\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "type",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "source",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "Asset",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "dateFrom",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "dateTo",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "pageSize",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "page",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "direction",
+              "value": "",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "0ecd4cfa-5242-4612-87c9-ad161c92c85a",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "portfolio/:portfolioId/source/:sourceId/sync",
+      "responses": [
+        {
+          "uuid": "1da45622-d675-4715-a139-f2fb1d2f9317",
+          "body": "/**\n*  {\n*    \"force\": false,\n*    \"dateRange\": {\n*    \"from\": \"2022-01-01\",\n*    \"to\": \"2025-02-01\"\n*  }\n* \n*/\n\n{\n  \"syncId\": \"sync_1\",\n  \"sourceId\": \"src_834dfh2\",\n  \"status\": \"started\",\n  \"startedAt\": \"2025-02-01T12:00:00Z\"\n}\n",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "fcdc55d6-cfb0-4396-bbf1-389c8df269a8",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "portfolio/:portfolioId/source/sync",
+      "responses": [
+        {
+          "uuid": "f9f2d497-57a4-4e6e-bf71-340bf7d26a3e",
+          "body": "/*\n{\n  \"sourceIds\": [\"src_binance_1\", \"src_ledger_1\"],\n  \"force\": false,\n  \"dateRange\": {\n    \"from\": \"2022-01-01\",\n    \"to\": \"2025-02-02\"\n  }\n}\n\n*/\n{\n  \"multiSyncId\": \"msnc_1\",\n  \"status\": \"started\",\n  \"sources\": [\n    { \"sourceId\": \"src_binance_1\", \"status\": \"queued\" },\n    { \"sourceId\": \"src_ledger_1\", \"status\": \"queued\" },\n  ],\n  \"startedAt\": \"2025-02-02T13:30:00Z\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "8bddb85f-c101-4181-ad77-9840858b1fe2",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "portfolio/:portfolioId/source/sync-all",
+      "responses": [
+        {
+          "uuid": "c019ca9d-0264-4fe1-a580-ec4e378c4864",
+          "body": "/*\n{\n  \"force\": false,\n  \"dateRange\": {\n    \"from\": \"2022-01-01\",\n    \"to\": \"2025-02-02\"\n  }\n}\n*/",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "d8ca4004-65c2-409b-a418-cb44df15ac79",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/{portfolioId}/source/{sourceId}/sync/{syncId}/status",
+      "responses": [
+        {
+          "uuid": "04d73ac9-4ee3-41a9-8a3e-df616cfafb18",
+          "body": "{\n  \"id\": \"{{urlParam 'syncId'}}\",\n  \"data\": {\n    \"status\": \"processing\",\n    \"progress\": 61,\n    \"stage\": \"fetching_trades\",\n    \"processed\": 1800,\n    \"total\": 2900,\n    \"etaSeconds\": 45,\n    \"warnings\": [],\n    \"errors\": []\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "src_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "syncId",
+              "value": "snc_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "18a64b2a-1dce-4276-a123-74d93a69623b",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/source/sync/:syncId/status",
+      "responses": [
+        {
+          "uuid": "1e92f3f5-8828-4089-9ad5-61b3fa89c41f",
+          "body": "{\n  \"id\": \"{{urlParam 'syncId'}}\",\n  \"data\": {\n    \"overallStatus\": \"processing\",\n    \"overallProgress\": 43,\n    \"etaSeconds\": 180,\n\n    \"sources\": [\n      {\n        \"id\": \"src_1\",\n        \"data\": {\n          \"type\": \"exchange\",\n          \"status\": \"fetching_trades\",\n          \"progress\": 67,\n          \"processed\": 1800,\n          \"total\": 2600\n        }\n      },\n      {\n        \"id\": \"src_2\",\n        \"data\": {\n          \"type\": \"wallet\",\n          \"status\": \"fetching_onchain_txs\",\n          \"progress\": 35,\n          \"processed\": 40,\n          \"total\": 120\n        }\n      }\n    ]\n  }\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "syncId",
+              "value": "msnc_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "fe37747c-ecf1-40d7-b884-0160419f2ab6",
+          "body": "{\n  \"multiSyncId\": \"{{urlParam 'multiSyncId'}}\",\n  \"overallStatus\": \"processing\",\n  \"overallProgress\": 43,\n  \"etaSeconds\": 180,\n  \"sources\": [\n    {\n      \"sourceId\": \"src_1\",\n      \"type\": \"exchange\",\n      \"status\": \"fetching_trades\",\n      \"progress\": 67,\n      \"processed\": 1800,\n      \"total\": 2600\n    },\n    {\n      \"sourceId\": \"src_2\",\n      \"type\": \"wallet\",\n      \"status\": \"fetching_onchain_txs\",\n      \"progress\": 35,\n      \"processed\": 40,\n      \"total\": 120\n    },\n    {\n      \"sourceId\": \"src_3\",\n      \"type\": \"wallet\",\n      \"status\": \"waiting\",\n      \"progress\": 0\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "multiSyncId",
+              "value": "msnc_2",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "13a34735-b259-4bf2-ae8e-2b8a786c9b1d",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "sync/:syncId/events",
+      "responses": [
+        {
+          "uuid": "cfc47e9a-b0e6-401a-b457-edf623781ca9",
+          "body": "{\n  \"event\": \"multi-sync-started\",\n  \"multiSyncId\": \"{{urlParam 'syncId'}}\",\n  \"startedAt\": \"2025-02-02T13:30:00Z\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "syncId",
+              "value": "msnc_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "34e851ba-26ca-499e-b01b-325b98d2855c",
+          "body": "{\n  \"event\": \"source-started\",\n  \"sourceId\": \"src_binance_1\",\n  \"stage\": \"authenticating\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "00043ac6-94f8-453e-96e7-a910cc1e10a0",
+          "body": "{\n  \"event\": \"source-stage\",\n  \"sourceId\": \"src_binance_1\",\n  \"stage\": \"fetching_trades\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "0a1c8d28-477b-4dea-a0c0-01d19e452642",
+          "body": "{\n  \"event\": \"source-progress\",\n  \"sourceId\": \"src_binance_1\",\n  \"progress\": 18,\n  \"processed\": 450,\n  \"total\": 2500,\n  \"stage\": \"fetching_trades\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "a9ec8cc7-3b6d-4a64-aad1-43364e8d91d8",
+          "body": "{\n  \"event\": \"source-progress\",\n  \"sourceId\": \"src_binance_1\",\n  \"progress\": 72,\n  \"processed\": 1800,\n  \"total\": 2500,\n  \"stage\": \"fetching_trades\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "36d07b74-a3a1-467d-a985-f62ca6ddfa95",
+          "body": "{\n  \"event\": \"source-started\",\n  \"sourceId\": \"src_ledger_1\",\n  \"stage\": \"scanning_blocks\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "63f43f1c-1514-4dfa-bbeb-00050f72ef3f",
+          "body": "{\n  \"event\": \"source-progress\",\n  \"sourceId\": \"src_ledger_1\",\n  \"progress\": 10,\n  \"processed\": 20,\n  \"total\": 200,\n  \"stage\": \"scanning_blocks\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "3441ea70-6819-4da4-b012-b7c1bf36f565",
+          "body": "{\n  \"event\": \"warning\",\n  \"sourceId\": \"src_ledger_1\",\n  \"type\": \"rpc_error\",\n  \"retryAfterSeconds\": 5,\n  \"message\": \"Temporary node timeout\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "054abce8-bbe5-4dd7-b5d6-4f4ee63ab3a9",
+          "body": "{\n  \"event\": \"source-completed\",\n  \"sourceId\": \"src_binance_1\",\n  \"imported\": 1420,\n  \"durationSeconds\": 41\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "61038389-67fa-4b50-86cc-ab6a169ff3a2",
+          "body": "{\n  \"event\": \"source-progress\",\n  \"sourceId\": \"src_ledger_1\",\n  \"progress\": 68,\n  \"processed\": 136,\n  \"total\": 200,\n  \"stage\": \"scanning_blocks\"\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "b68bd820-ffc6-4352-8460-7b88bba0bf49",
+          "body": "{\n  \"event\": \"source-completed\",\n  \"sourceId\": \"src_ledger_1\",\n  \"imported\": 182,\n  \"durationSeconds\": 140\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "c03280fd-6c8a-4fe9-8ee7-7890ed323a1b",
+          "body": "{\n  \"event\": \"multi-sync-completed\",\n  \"multiSyncId\": \"{{urlParam 'syncId'}}\",\n  \"totalImported\": 1602,\n  \"completedAt\": \"2025-02-02T13:33:08Z\",\n  \"durationSeconds\": 188\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": "SEQUENTIAL",
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "c9c3c609-f8ee-479e-afa1-579631d9d8ea",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/source",
+      "responses": [
+        {
+          "uuid": "7d90f2fe-0a90-4cf3-a292-31e9a875f54b",
+          "body": "{\n  \"data\": [\n    {\n      \"id\": \"234rgh\",\n      \"data\": {\n        \"type\": \"cex\",\n        \"provider\": \"binance\",\n        \"label\": \"My Binance\",\n        \"enabled\": true,\n        \"status\": \"valid\",\n        \"icon\": \"https://your-cdn.com/icons/binance.svg\"\n      }\n    },\n    {\n      \"id\": \"235rgh\",\n      \"data\": {\n        \"type\": \"evm\",\n        \"provider\": \"ethereum\",\n        \"label\": \"ETH Wallet\",\n        \"enabled\": true,\n        \"status\": \"valid\",\n        \"icon\": \"https://your-cdn.com/icons/ethereum.svg\"\n      }\n    },\n    {\n      \"id\": \"236rgh\",\n      \"data\": {\n        \"type\": \"manual\",\n        \"provider\": \"manual\",\n        \"label\": \"My Manual Source\",\n        \"enabled\": true,\n        \"status\": \"valid\",\n        \"icon\": \"https://your-cdn.com/icons/manual.svg\"\n      }\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "eec5e06e-08e8-49a6-9181-3905929d53d9",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "portfolio/:portfolioId/source/cex",
+      "responses": [
+        {
+          "uuid": "c4eba6ff-9524-42a2-9710-760207fb6b1e",
+          "body": "/* using the auth/public-key endpoint to get the public key\n{\n  \"provider\": \"binance\",\n  \"label\": \"My Binance\",\n  \"apiKey\": \"encrypted(...)\",\n  \"apiSecret\": \"encrypted(...)\"\n}\n*/",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "bb5ced6d-a9fc-47ab-8ffa-7fccad0a0bb6",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "portfolio/:portfolioId/source/wallet",
+      "responses": [
+        {
+          "uuid": "471565a2-6595-403f-875e-3f42e3fd9fa1",
+          "body": "/*\n{\n  \"address\": \"0xabc...\",\n  \"chain\": \"ethereum\",\n  \"label\": \"Main Wallet\"\n}\n*/",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "51e97dea-8130-486e-b11d-74c402de6277",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "portfolio/:portfolioId/source/:sourceId/validate",
+      "responses": [
+        {
+          "uuid": "25de6bc6-f859-4e30-99a0-08ce56801b90",
+          "body": "\n{\n  \"id\": \"{{urlParam 'sourceId'}}\",\n  \"data\": {\n    \"status\": \"valid\",\n    \"provider\": \"binance\",\n    \"permissions\": [\"read\"],\n    \"supportedData\": [\n      \"spot_trades\",\n      \"deposits\",\n      \"withdrawals\"\n    ],\n    \"estimatedTransactions\": 1042,\n    \"accountSummary\": {\n      \"balancesFound\": true,\n      \"subAccountsDetected\": 0\n    },\n    \"firstActivity\": \"2019-03-15T10:00:00Z\",\n    \"lastActivity\": \"2025-01-29T19:30:00Z\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "src_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "07e06a3a-05df-4f0a-adb8-057566be1970",
+          "body": "{\n  \"sourceId\": \"{{urlParam 'sourceId'}}\",\n  \"status\": \"invalid\",\n  \"error\": \"Malformed EVM address.\"\n}\n",
+          "latency": 0,
+          "statusCode": 400,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "shc34",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "235rgh",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "6cec2cbd-f579-4805-918c-8515fd5240e6",
+          "body": "{\n  \"error\": \"INVALID_CREDENTIALS\",\n  \"message\": \"Binance rejected the API key.\"\n}\n",
+          "latency": 0,
+          "statusCode": 401,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "shc34",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "body",
+              "modifier": "sourceId",
+              "value": "236rgh",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "1a310b46-1441-4dea-ab81-4480dd133553",
+          "body": "{\n  \"error\": \"INSUFFICIENT_PERMISSIONS\",\n  \"required\": [\"read\"],\n  \"missing\": [\"read\"]\n}",
+          "latency": 0,
+          "statusCode": 403,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "shc34",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "237rgh",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "407be532-7dee-4f3a-817e-e5dfc2ed83aa",
+          "body": "{\n  \"id\": \"{{urlParam 'sourceId'}}\",\n  \"data\": {\n    \"status\": \"valid\",\n    \"provider\": \"ethereum\",\n    \"address\": \"0xabc123...\",\n    \"chain\": \"ethereum\",\n    \"estimatedTransactions\": 312,\n    \"firstActivity\": \"2020-05-10T12:20:00Z\",\n    \"lastActivity\": \"2025-02-01T18:00:00Z\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "shc34",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "sourceId",
+              "value": "235rgh",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "15ea2e14-a88b-4ced-a284-a103eafb9b24",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "auth/public-key",
+      "responses": [
+        {
+          "uuid": "abc1eb8c-5fd0-4efb-b016-b3c0de3dcec7",
+          "body": "//mit diesem Public key wird \n{\n  \"publicKey\": \"-----BEGIN PUBLIC KEY-----\\n...\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "34e42854-3d00-4583-a947-bb63d0f1bbc4",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/settings",
+      "responses": [
+        {
+          "uuid": "62c02a25-f701-4f55-945c-9171f27eb7a1",
+          "body": "{\n  \"id\": \"{{urlParam 'portfolioId'}}\",\n  \"data\": {\n    \"name\": \"Bryans second portfolio\",\n    \"base_currency\": \"usd\",\n    \"ignore_assets\": [\n      \"bitcoin\",\n      \"ethereum\"\n    ],\n    \"dust_threshhold\": \"on\",\n    \"dust_threshhold_exclude_under\": \"5\",\n    \"description\": \"Bryans Main Portfolio\",\n    \"include_nft\": \"off\",\n    \"rebalancing_rythm\" : \"d\" //d,m,w,y\n    }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "bb39f431-fcf8-4214-aecd-8bcd9a66e117",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "exchanges",
+      "responses": [
+        {
+          "uuid": "333ba7e8-8a50-41fc-8c39-7837c3a48e39",
+          "body": "{\n  \"data\": [\n    {\"exchange\": \"binance\", \"displayName\": \"Binance\"},\n    {\"exchange\": \"coinbase\", \"displayName\": \"Coinbase\"},\n    {\"exchange\": \"kraken\", \"displayName\": \"Kraken\"}\n    ]\n}\n",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "75f78afe-b6bb-4800-a717-91726ee097d6",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "exchanges/:provider/requirements",
+      "responses": [
+        {
+          "uuid": "9c7776ce-5ce5-4d47-b68d-30582aabf4d1",
+          "body": "{\n  \"provider\": \"binance\",\n  \"data\": {\n    \"displayName\": \"Binance\",\n    \"logo\": \"https://cdn.app.com/exchanges/binance.png\",\n    \"type\": \"cex\",\n    \"credentials\": [\n      {\n        \"id\": \"apiKey\",\n        \"label\": \"API Key\",\n        \"required\": true,\n        \"inputType\": \"text\",\n        \"placeholder\": \"Enter your Binance API key\",\n        \"minLength\": 16\n      },\n      {\n        \"id\": \"apiSecret\",\n        \"label\": \"API Secret\",\n        \"required\": true,\n        \"inputType\": \"password\",\n        \"placeholder\": \"Enter your Binance API secret\"\n      }\n    ],\n    \"permissions_required\": [\"read\"],\n    \"instructionsUrl\": \"https://www.binance.com/en/support/faq/...\",\n    \"notes\": \"Make sure your API key has 'read' access enabled.\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "provider",
+              "value": "binance",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "7b34b609-2086-4ecd-9af0-20aaa50afcd4",
+          "body": "{\n  \"provider\": \"kraken\",\n  \"data\": {\n    \"displayName\": \"Kraken\",\n    \"logo\": \"https://cdn.app.com/exchanges/kraken.png\",\n    \"type\": \"cex\",\n    \"credentials\": [\n      {\n        \"id\": \"apiKey\",\n        \"label\": \"API Key\",\n        \"required\": true,\n        \"inputType\": \"text\",\n        \"placeholder\": \"Enter your Kraken API key\"\n      },\n      {\n        \"id\": \"apiSecret\",\n        \"label\": \"API Private Key\",\n        \"required\": true,\n        \"inputType\": \"password\",\n        \"placeholder\": \"Enter your Kraken private key\"\n      }\n    ],\n    \"permissions_required\": [\"query\"],\n    \"instructionsUrl\": \"https://support.kraken.com/hc/en-us/articles/... \",\n    \"notes\": \"Kraken calls the API secret 'Private Key'.\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "provider",
+              "value": "kraken",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "39de9512-2358-4774-bc60-ac1a6f7d362d",
+          "body": "{\n  \"provider\": \"coinbase\",\n  \"data\": {\n    \"displayName\": \"Coinbase\",\n    \"logo\": \"https://cdn.app.com/exchanges/coinbase.png\",\n    \"type\": \"cex\",\n    \"credentials\": [\n      {\n        \"id\": \"apiKey\",\n        \"label\": \"API Key\",\n        \"required\": true,\n        \"inputType\": \"text\"\n      },\n      {\n        \"id\": \"apiSecret\",\n        \"label\": \"API Secret\",\n        \"required\": true,\n        \"inputType\": \"password\"\n      },\n      {\n        \"id\": \"passphrase\",\n        \"label\": \"Passphrase\",\n        \"required\": true,\n        \"inputType\": \"text\",\n        \"placeholder\": \"Your API Passphrase\"\n      }\n    ],\n    \"permissions_required\": [\"view\"],\n    \"instructionsUrl\": \"https://help.coinbase.com/en/exchange/api/how-to-create-an-api-key\",\n    \"notes\": \"Coinbase requires an additional passphrase.\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "provider",
+              "value": "coinbase",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "e82724da-12e6-4ae2-bf22-bd1b02cb5ae2",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "wallet",
+      "responses": [
+        {
+          "uuid": "a14d27c2-4dfe-404b-b05a-4f68cd522d51",
+          "body": "{\n  \"data\": [\n    { \"type\": \"evm\", \"label\": \"EVM Wallet\" },\n    { \"type\": \"solana\", \"label\": \"Solana Wallet\" },\n    { \"type\": \"bitcoin\", \"label\": \"Bitcoin Wallet\" },\n    { \"type\": \"cosmos\", \"label\": \"Cosmos Wallet\" }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "b52ce682-22dc-4481-b410-81dcd5214212",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "wallet/:type/requirements",
+      "responses": [
+        {
+          "uuid": "9b16395f-97a5-4f30-96ea-b8fe0ff72a93",
+          "body": "{\n  \"type\": \"evm\",\n  \"data\": {\n    \"title\": \"EVM Wallet\",\n    \"description\": \"Connect an EVM-compatible wallet (Ethereum, Polygon, Arbitrum, Base…).\",\n    \"fields\": [\n      {\n        \"id\": \"address\",\n        \"label\": \"Wallet Address\",\n        \"type\": \"string\",\n        \"required\": true,\n        \"placeholder\": \"0x1234...\"\n      },\n      {\n        \"id\": \"chains\",\n        \"label\": \"Select Chains\",\n        \"type\": \"multi-select\",\n        \"required\": false,\n        \"options\": [\n          \"ethereum\",\n          \"polygon\",\n          \"arbitrum\",\n          \"optimism\",\n          \"base\",\n          \"bnb\",\n          \"avalanche\"\n        ]\n      },\n      {\n        \"id\": \"label\",\n        \"label\": \"Wallet Label\",\n        \"type\": \"string\",\n        \"required\": false\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "type",
+              "value": "evm",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "bde552ff-a7ea-4a58-95c1-e065793015b2",
+          "body": "{\n  \"type\": \"solana\",\n  \"data\": {\n    \"title\": \"Solana Wallet\",\n    \"description\": \"Connect a Solana address.\",\n    \"fields\": [\n      {\n        \"id\": \"address\",\n        \"label\": \"Wallet Address\",\n        \"type\": \"string\",\n        \"required\": true,\n        \"placeholder\": \"F3r2k...xs9A\"\n      },\n      {\n        \"id\": \"label\",\n        \"label\": \"Wallet Label\",\n        \"type\": \"string\",\n        \"required\": false\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "type",
+              "value": "solana",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "6bbfa995-fcbf-4fd8-aa47-5482535bca5d",
+          "body": "{\n  \"type\": \"bitcoin\",\n  \"data\": {\n    \"title\": \"Bitcoin / UTXO Wallet\",\n    \"description\": \"Connect a Bitcoin, Litecoin, or other UTXO-based address.\",\n    \"fields\": [\n      {\n        \"id\": \"address\",\n        \"label\": \"Wallet Address\",\n        \"type\": \"string\",\n        \"required\": true,\n        \"placeholder\": \"bc1q...\"\n      },\n      {\n        \"id\": \"label\",\n        \"label\": \"Wallet Label\",\n        \"type\": \"string\",\n        \"required\": false\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "type",
+              "value": "bitcoin",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "1cf5ddd3-6106-4d26-a317-04acbc59543d",
+          "body": "{\n  \"type\": \"cosmos\",\n  \"data\": {\n    \"title\": \"Cosmos Wallet\",\n    \"description\": \"Connect a Cosmos SDK wallet (Cosmos Hub, Osmosis, Juno, Injective…).\",\n    \"fields\": [\n      {\n        \"id\": \"address\",\n        \"label\": \"Wallet Address\",\n        \"type\": \"string\",\n        \"required\": true,\n        \"placeholder\": \"cosmos1..., osmo1..., inj1...\"\n      },\n      {\n        \"id\": \"label\",\n        \"label\": \"Wallet Label\",\n        \"type\": \"string\",\n        \"required\": false\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "type",
+              "value": "cosmos",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "9bf4f59f-9fc5-4fc6-b24e-cc4cc113e5ac",
+          "body": "{\n  \"type\": \"tron\",\n  \"data\": {\n    \"title\": \"TRON Wallet\",\n    \"description\": \"Connect a TRON wallet address (USDT-TRC20 supported).\",\n    \"fields\": [\n      {\n        \"id\": \"address\",\n        \"label\": \"Wallet Address\",\n        \"type\": \"string\",\n        \"required\": true,\n        \"placeholder\": \"T... (Base58)\"\n      },\n      {\n        \"id\": \"label\",\n        \"label\": \"Wallet Label\",\n        \"type\": \"string\",\n        \"required\": false\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "type",
+              "value": "tron",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "0e1057d1-ee50-4655-8c35-fce0b2367dfc",
+          "body": "{\n  \"type\": \"substrate\",\n  \"data\": {\n    \"title\": \"Substrate Wallet\",\n    \"description\": \"Connect a Substrate-based address (Polkadot, Kusama, Astar…).\",\n    \"fields\": [\n      {\n        \"id\": \"address\",\n        \"label\": \"Wallet Address\",\n        \"type\": \"string\",\n        \"required\": true,\n        \"placeholder\": \"1..., 5... (SS58 encoded)\"\n      },\n      {\n        \"id\": \"label\",\n        \"label\": \"Wallet Label\",\n        \"type\": \"string\",\n        \"required\": false\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "type",
+              "value": "substrate",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "b72177b6-6e6e-41dc-911d-2d72d8efc0f3",
+          "body": "{\n  \"type\": \"cardano\",\n  \"data\": {\n    \"title\": \"Cardano Wallet\",\n    \"description\": \"Connect a Cardano (ADA) wallet address.\",\n    \"fields\": [\n      {\n        \"id\": \"address\",\n        \"label\": \"Wallet Address\",\n        \"type\": \"string\",\n        \"required\": true,\n        \"placeholder\": \"addr1...\"\n      },\n      {\n        \"id\": \"label\",\n        \"label\": \"Wallet Label\",\n        \"type\": \"string\",\n        \"required\": false\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "type",
+              "value": "cardano",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "2c4d0f31-99f5-4315-a454-3a94f2555acc",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "portfolio/:portfolioId/source/manual",
+      "responses": [
+        {
+          "uuid": "833dd80a-6577-4165-a949-ba793ed55177",
+          "body": "/*\n{\n  \"label\": \"OTC Desk\",\n  \"description\": \"Over-the-counter transactions from a private broker\",\n}\n*/",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "656e0219-e122-41f9-9953-cdb5f67e939a",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "assets/discover",
+      "responses": [
+        {
+          "uuid": "5341efb8-f0a3-49dd-a2cf-219b737001d5",
+          "body": "/*\n{\n  \"contractAddress\": \"0xXYZ123\",\n  \"chain\": \"ethereum\"\n}\n*/\n{\n      \"id\": \"ast_1\",\n      \"data\": {\n        \"symbol\": \"ETH\",\n        \"name\": \"Ethereum\",\n        \"icon\": \"eth.svg\",\n        \"type\": \"cryptocurrency\",\n        \"decimals\": 8,\n        \"chain\": \"ethereum\",\n        \"absValue\": 3600\n      }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "563f1047-7d52-490b-9f1d-992ebf893fd1",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "assets",
+      "responses": [
+        {
+          "uuid": "1c8e63ee-cf0e-4150-bad9-15e164675c70",
+          "body": "{\n  \"data\": [\n    {\n      \"id\": \"ast_1\",\n      \"data\": {\n        \"symbol\": \"ETH\",\n        \"name\": \"Ethereum\",\n        \"icon\": \"eth.svg\",\n        \"type\": \"cryptocurrency\",\n        \"decimals\": 18,\n        \"chain\": \"ethereum\"\n      }\n    },\n    {\n      \"id\": \"ast_5\",\n      \"data\": {\n        \"symbol\": \"USDC\",\n        \"name\": \"USD Coin\",\n        \"icon\": \"usdc.svg\",\n        \"type\": \"stablecoin\",\n        \"decimals\": 6,\n        \"chain\": \"ethereum\"\n      }\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "chain",
+              "value": "ethereum",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "6021a8bf-111d-4b83-aca0-f26002ffd8e2",
+          "body": "{\n  \"data\": [\n    {\n      \"id\": \"eth_1\",\n      \"data\": {\n        \"symbol\": \"ETH\",\n        \"name\": \"Ethereum\",\n        \"icon\": \"eth.svg\",\n        \"type\": \"cryptocurrency\",\n        \"decimals\": 18,\n        \"chain\": \"ethereum\"\n      }\n    },\n    \n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "symbol",
+              "value": "eth",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "db90cfff-1388-4bcb-ad55-0e98433e983b",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "assets/:assetId",
+      "responses": [
+        {
+          "uuid": "e06b4315-b3a7-4377-817a-cfb87ac62da7",
+          "body": "{\n  \"id\": \"ast_1\",\n  \"data\": {\n    \"symbol\": \"ETH\",\n    \"name\": \"Ethereum\",\n    \"icon\": \"eth.svg\",\n    \"type\": \"cryptocurrency\",\n    \"decimals\": 18,\n    \"chain\": \"ethereum\",\n    \"absValue\": 3600\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "assetId",
+              "value": "ast_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "29027129-fc11-4a48-b544-307248a54479",
+      "type": "http",
+      "documentation": "",
+      "method": "patch",
+      "endpoint": "portfolio/:portfolioId/transactions/:transactionId",
+      "responses": [
+        {
+          "uuid": "38d685f1-ee66-4599-9b01-b3d3dc32ff78",
+          "body": "// used if editable == true\n/*\n{\n  \"data\": {\n    \"amount\": 0.8,\n    \"pricePerUnit\": 2800,\n    \"fees\": \"0.5\",\n    \"type\": \"buy\",\n    \"incomingAssetId\": \"12djasd\",     \n    \"outgoingAssetId\": \"djda12dn\",\n    \"notes\": \"Corrected amount and fees\",\n    \"timestamp\": \"2025-11-06T14:05:00Z\"\n  }\n}\n*/",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "transactionId",
+              "value": "tx_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "cb326f32-ac85-4f23-b913-cefedf6e8d8e",
+          "body": "//used if editable == false\n/*\n{\n  \"data\": {\n    \"hidden\": true,\n  }\n}*/",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "a78c745f-7495-4127-a22a-f91c3030cab3",
+      "type": "http",
+      "documentation": "",
+      "method": "delete",
+      "endpoint": "portfolio/:portfolioId/transactions/:transactionId",
+      "responses": [
+        {
+          "uuid": "efd1dc2d-c5d0-40b5-ba4a-e3329013bf8c",
+          "body": "{\n   \"deleted_transaction\": \"Example\"\n}",
+          "latency": 0,
+          "statusCode": 204,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "transactionId",
+              "value": "tx_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "48e58964-97b9-4322-bd2a-8a40e258ef6c",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "portfolio/:portfolioId/transactions/:transactionId",
+      "responses": [
+        {
+          "uuid": "10334463-b3b7-437d-a353-596b27ae5791",
+          "body": "{\n  \"id\": \"{{urlParam 'transactionId'}}\",\n  \"data\": {\n    \"transactionId\": \"0x2440284039\",              // CEX or blockchain unique id\n    \"sourceId\": \"src_1\",\n    \"origin\": \"djjalsdkc\",\n    \"destination\": \"Binance\",\n    \"incomingAssetId\": \"12djasd\",\n    \"outgoingAssetId\": \"djda12dn\",\n    \"protocol\": \"Uniswap\",\n    \"type\": \"buy\",\n    \"amount\": 0.5,\n    \"pricePerUnit\": 60000,\n    \"fees\": \"0.4\",\n    \"notes\": \"string\",\n    \"timestamp\": \"2025-11-06T13:00:00Z\",\n    \"editable\": false\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "portfolioId",
+              "value": "ptf_1",
+              "invert": false,
+              "operator": "equals"
+            },
+            {
+              "target": "params",
+              "modifier": "transactionId",
+              "value": "tx_1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    }
+  ],
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "22546096-e51a-4f82-9744-d739c5d82b3d"
+    },
+    {
+      "type": "folder",
+      "uuid": "ca1000a7-7d2f-4130-ae9b-4c0f4d5bb622"
+    },
+    {
+      "type": "folder",
+      "uuid": "661076bc-32c8-4a5b-a3a1-dd29d18a6206"
+    },
+    {
+      "type": "folder",
+      "uuid": "2b7f4c1f-4208-479e-ad1f-0b1edd0b78f4"
+    },
+    {
+      "type": "folder",
+      "uuid": "c2eb2f7d-cfbc-41c5-97e3-54d0ff7be785"
+    },
+    {
+      "type": "route",
+      "uuid": "bb39f431-fcf8-4214-aecd-8bcd9a66e117"
+    },
+    {
+      "type": "route",
+      "uuid": "e82724da-12e6-4ae2-bf22-bd1b02cb5ae2"
+    },
+    {
+      "type": "route",
+      "uuid": "75f78afe-b6bb-4800-a717-91726ee097d6"
+    },
+    {
+      "type": "route",
+      "uuid": "b52ce682-22dc-4481-b410-81dcd5214212"
+    },
+    {
+      "type": "folder",
+      "uuid": "41026389-61d8-462b-9c2b-f13dda0e17ee"
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "http://localhost:8000",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    },
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "data": [],
+  "callbacks": []
+}
