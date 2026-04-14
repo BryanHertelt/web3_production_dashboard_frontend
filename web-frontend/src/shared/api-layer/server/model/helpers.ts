@@ -2,7 +2,6 @@
  * Helper functions for server-side API operations
  */
 
-import { serverLogger } from "../../../logger/server-logger/model/logger";
 import {
   ServerApiError,
   TimeoutError,
@@ -146,57 +145,6 @@ export function extractErrorDetails(error: unknown): ErrorDetails {
 }
 
 /**
- * Logs an error with additional context and details, using appropriate log levels and including environment-specific handling.
- *
- * @param context - A string describing the context where the error occurred (e.g., 'API Request').
- * @param error - The error to log.
- * @param details - Optional additional details to include in the log.
- */
-export async function logError(
-  context: string,
-  error: unknown,
-  details?: Record<string, unknown>
-): Promise<void> {
-  const errorDetails = extractErrorDetails(error);
-
-  const logData = {
-    context,
-    message: errorDetails.message,
-    status: errorDetails.status,
-    code: errorDetails.code,
-    ...details,
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-  };
-
-  // Use appropriate log level based on error type
-  if (errorDetails.status && errorDetails.status < 500) {
-    // Client errors - less severe
-    await serverLogger.warn("[Server API Warning]", logData);
-  } else {
-    // Server errors or unknown - more severe
-    await serverLogger.error("[Server API Error]", logData);
-  }
-
-  // In development, also log stack trace
-  if (
-    process.env.NODE_ENV === "development" &&
-    errorDetails.originalError?.stack
-  ) {
-    await serverLogger.error("Stack trace:", {
-      stack: errorDetails.originalError.stack,
-    });
-  }
-
-  // In production, send to error tracking service
-  if (process.env.NODE_ENV === "production") {
-    // TODO: Send to Sentry, DataDog, LogRocket, etc.
-    // Example:
-    // Sentry.captureException(error, { contexts: { api: logData } });
-  }
-}
-
-/**
  * Categorizes an HTTP status code into predefined categories for easier handling.
  *
  * @param status - The HTTP status code to categorize.
@@ -305,12 +253,6 @@ export async function handleErrorResponse(
       : `Request failed with status ${response.status}`;
   const category = getStatusCategory(response.status);
 
-  // Log error with details
-  logError(`${method} ${url}`, message, {
-    status: response.status,
-    category,
-    errorData: sanitizeForLogging(errorData),
-  });
 
   // Throw specific error types based on status
   switch (response.status) {
@@ -349,23 +291,12 @@ export function handleRequestError(
   method: string
 ): never {
   // Already a ServerApiError - just log and rethrow
-  if (error instanceof ServerApiError) {
-    logError(`${method} ${url}`, error, {
-      status: error.status,
-      code: error.code,
-    });
-    throw error;
-  }
-
   // Timeout error
   if (isTimeoutError(error)) {
     const timeoutError = new TimeoutError(
       "Request timeout exceeded",
       error as Error
     );
-    logError(`${method} ${url}`, timeoutError, {
-      originalError: extractErrorDetails(error),
-    });
     throw timeoutError;
   }
 
@@ -375,9 +306,7 @@ export function handleRequestError(
       "API server is not responding",
       error as Error
     );
-    logError(`${method} ${url}`, networkError, {
-      originalError: extractErrorDetails(error),
-    });
+
     throw networkError;
   }
 
@@ -393,9 +322,6 @@ export function handleRequestError(
     }
   );
 
-  logError(`${method} ${url}`, unknownError, {
-    originalError: details,
-  });
 
   throw unknownError;
 }

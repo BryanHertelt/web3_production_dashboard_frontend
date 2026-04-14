@@ -2,7 +2,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Asset } from "@/entities/asset";
 import { formatValue, formatCurrency } from "@/shared/utils";
 import { SortingArrows } from "@/shared/core-table/ui/sorting-arrows";
-import { logger } from "@/shared/logger/client-logger";
 
 export const assetColumns: ColumnDef<Asset>[] = [
   {
@@ -15,16 +14,7 @@ export const assetColumns: ColumnDef<Asset>[] = [
         !row.row.original.icon || row.row.original.icon.length === 0;
 
       if (hasNoIcon) {
-        logger.warn(
-          {
-            component: "AssetIcon",
-            assetSymbol: row.row.original.symbol,
-            assetName: row.row.original.name,
-            fallbackUsed: "plain-X",
-            reason: "Icon URL missing or empty",
-          },
-          "Asset icon fallback triggered - displaying plain X"
-        );
+       console.warn("Has no icon")
       }
 
       return (
@@ -39,20 +29,6 @@ export const assetColumns: ColumnDef<Asset>[] = [
                 alt={row.row.original.name}
                 width={20}
                 height={20}
-                onError={(e) => {
-                  logger.warn(
-                    {
-                      component: "AssetIcon",
-                      assetSymbol: row.row.original.symbol,
-                      assetName: row.row.original.name,
-                      iconUrl: row.row.original.icon,
-                      fallbackUsed: "error-display",
-                      reason: "SVG encoding failed.",
-                    },
-                    "Asset icon failed to load"
-                  );
-                  e.currentTarget.style.display = "X";
-                }}
               />
             )}
           </div>

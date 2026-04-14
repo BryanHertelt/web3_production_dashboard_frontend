@@ -8,7 +8,6 @@ import {
   handleErrorResponse,
   handleRequestError,
 } from "../model/helpers";
-import { serverLogger } from "../../../logger/server-logger/model/logger";
 import type { RequestOptions } from "../model/types";
 
 /**
@@ -103,13 +102,6 @@ export async function serverRequest<
         }
       : undefined;
 
-  // Log request in development
-  if (process.env.NODE_ENV === "development") {
-    await serverLogger.info(`[Server API] ${method} ${url}`, {
-      query: sanitizeForLogging(query),
-      body: sanitizeForLogging(body),
-    });
-  }
 
   try {
     // Make request with timeout and retry logic
@@ -139,13 +131,6 @@ export async function serverRequest<
       // Handle non-JSON responses (text, blob, etc.)
       const text = await response.text();
       data = text as unknown as TResponse; // Type assertion for non-JSON responses
-    }
-
-    // Log successful request in development
-    if (process.env.NODE_ENV === "development") {
-      await serverLogger.info(
-        `[Server API] ${method} ${url} - ${response.status} OK`
-      );
     }
 
     return data;

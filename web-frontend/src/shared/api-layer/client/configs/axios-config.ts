@@ -1,7 +1,6 @@
 import axios from "axios";
 import type { AxiosInstance, AxiosResponse } from "../model/types";
 import { isCancel, isAxiosErr, describeStatus } from "../model/helpers";
-import { logger } from "@/shared/logger/client-logger/model/logger";
 
 export const instance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -41,28 +40,9 @@ export const onRejected = (error: unknown) => {
   if (isCancel(error)) return Promise.reject(error);
 
   if (isAxiosErr(error)) {
-    const method = error.config?.method?.toUpperCase?.();
-    const url = error.config?.url || "(unknown url)";
-    const status = error.response?.status;
-    const { level, message } = describeStatus(error);
-
-    logger[level](
-      {
-        err: {
-          message: error.message,
-          name: error.name,
-          status,
-          method,
-          url,
-        },
-      },
-      `[API] - ${message} Code - ${status}`
-    );
-
     return Promise.reject(error);
   }
 
-  logger.error({ thrown: String(error) }, "[API] Unknown error object thrown");
   return Promise.reject(error);
 };
 
