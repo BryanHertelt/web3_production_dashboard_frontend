@@ -13,9 +13,9 @@
     "isolatedModules": true, // For Next.js / Vite / Babel
     "incremental": true, // Faster builds
     "jsx": "preserve", // New JSX transform (React 17+)
-    "baseUrl": ".", // Base for path aliases
     "paths": {
       // Path alias for @/ → src/
+      "*": ["./*"], 
       "@/*": ["./src/*"]
     },
     "plugins": [
