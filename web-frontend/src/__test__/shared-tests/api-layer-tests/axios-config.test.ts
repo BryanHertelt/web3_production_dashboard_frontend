@@ -26,7 +26,7 @@ jest.mock("../../../shared/api-layer/client/model/helpers", () => ({
 // ---- mock logger (named export with .warn / .error) ----
 const loggerWarnMock = jest.fn<void, [unknown, string]>();
 const loggerErrorMock = jest.fn<void, [unknown, string]>();
-jest.mock("../../shared/logger/client-logger/model/logger", () => ({
+jest.mock("../../../shared/logger/client-logger/model/logger", () => ({
   logger: {
     warn: (...args: [unknown, string]) => loggerWarnMock(...args),
     error: (...args: [unknown, string]) => loggerErrorMock(...args),

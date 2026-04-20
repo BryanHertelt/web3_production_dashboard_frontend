@@ -2,6 +2,7 @@
  * Helper functions for server-side API operations
  */
 
+import { serverLogger } from "../../../logger/server-logger/model/logger";
 import {
   ServerApiError,
   TimeoutError,
@@ -150,6 +151,47 @@ export function extractErrorDetails(error: unknown): ErrorDetails {
  * @param status - The HTTP status code to categorize.
  * @returns The category of the status code: 'success', 'redirect', 'client_error', 'server_error', or 'unknown'.
  */
+
+/**
+ * Logs an error with appropriate severity based on HTTP status code.
+ *
+ * @param context - Description of where/why the error occurred.
+ * @param error - The error to log.
+ * @param details - Additional context to attach to the log entry.
+ */
+export async function logError(
+  context: string,
+  error: unknown,
+  details?: Record<string, unknown>
+): Promise<void> {
+  const errorDetails = extractErrorDetails(error);
+
+  const logData = {
+    context,
+    message: errorDetails.message,
+    status: errorDetails.status,
+    code: errorDetails.code,
+    ...details,
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+  };
+
+  if (errorDetails.status && errorDetails.status < 500) {
+    await serverLogger.warn("[Server API Warning]", logData);
+  } else {
+    await serverLogger.error("[Server API Error]", logData);
+  }
+
+  if (
+    process.env.NODE_ENV === "development" &&
+    errorDetails.originalError?.stack
+  ) {
+    await serverLogger.error("Stack trace:", {
+      stack: errorDetails.originalError.stack,
+    });
+  }
+}
+
 export function getStatusCategory(
   status: number
 ): "success" | "redirect" | "client_error" | "server_error" | "unknown" {
