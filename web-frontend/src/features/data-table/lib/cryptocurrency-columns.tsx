@@ -1,9 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Asset } from "@/entities/asset";
+import { AssetDistribution } from "@/entities/asset/model/types";
 import { formatValue, formatCurrency } from "@/shared/utils";
 import { SortingArrows } from "@/shared/core-table/ui/sorting-arrows";
 
-export const assetColumns: ColumnDef<Asset>[] = [
+export const assetColumns: ColumnDef<AssetDistribution>[] = [
   {
     accessorKey: "name",
     header: () => {
@@ -16,6 +16,7 @@ export const assetColumns: ColumnDef<Asset>[] = [
       if (hasNoIcon) {
        console.warn("Has no icon")
       }
+      
 
       return (
         <div key={row.row.id} className="flex flex-row">

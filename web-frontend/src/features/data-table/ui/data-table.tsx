@@ -7,13 +7,11 @@ import DataTableLoad from "../../../shared/assets/icons/data-table-icons/data_ta
 
 
 export const DataTable = () => {
-  const portfolioId = "shc34";
+  const portfolioId = "ptf_1";
   const { data, isLoading, isError } = useAssetInfo({
     portfolioId,
     query: {},
   });
-
-
 
   const tableCard =
     "bg-base-dark-bg w-1/2 h-1/2 p-4 border-2 border-color-neutral-350 rounded-md";
@@ -47,10 +45,13 @@ export const DataTable = () => {
     );
   }
 
+  console.log("Type of assetdistribution", data.data)
+
+
   return (
     <div className={`${tableCard}`}>
       <div className="w-full h-full overflow-scroll">
-        <CoreTable columns={assetColumns} data={data.data} />
+        <CoreTable columns={assetColumns} data={data.data.asset_distribution} />
       </div>
     </div>
   );

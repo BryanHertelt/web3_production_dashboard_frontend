@@ -1,7 +1,7 @@
 import { searchQuery } from "@/shared/api-layer/client";
 import { UseQueryOptions } from "@tanstack/react-query";
 
-export interface Asset {
+export interface AssetDistribution {
   asset_id: string;
   asset_type: string;
   symbol: string;
@@ -14,6 +14,17 @@ export interface Asset {
   amount: number;
   abs_value: number;
   allocation_percent: number;
+}
+
+export interface Asset {
+abs_total_value: number, 
+total_assets: number, 
+asset_distribution: AssetDistribution[]
+}
+
+export interface AssetData {
+id: string, 
+data: Asset
 }
 
 export interface AssetInfo {

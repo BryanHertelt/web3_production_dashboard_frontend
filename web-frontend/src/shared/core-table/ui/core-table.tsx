@@ -33,6 +33,7 @@ export function CoreTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
   });
 
+
   return (
     <div className="overflow-hidden rounded-md bg-base-dark-bg text-white">
       <Table>
