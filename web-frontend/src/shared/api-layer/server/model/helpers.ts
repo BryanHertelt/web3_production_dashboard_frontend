@@ -331,8 +331,10 @@ export function handleRequestError(
   _url: string,
   _method: string
 ): never {
-  // Already a ServerApiError - just log and rethrow
-  // Timeout error
+  if (error instanceof ServerApiError) {
+    throw error;
+  }
+
   if (isTimeoutError(error)) {
     const timeoutError = new TimeoutError(
       "Request timeout exceeded",
