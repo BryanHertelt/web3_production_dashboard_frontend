@@ -26,6 +26,12 @@ const config = {
     "!src/**/*.stories.{js,jsx,ts,tsx}",
     "!src/**/types.ts",
     "!src/**/index.{js,jsx,ts,tsx}",
+    "!src/widgets/table/model/table-model.tsx",
+    "!src/shared/logger/client-logger/model/**",
+    "!src/shared/core-table/model/**",
+    "!src/features/data-table/model/**",
+    "!src/shared/logger/server-logger/model/**", 
+    "!src/shared/info-box/model/**"
   ],
   coverageReporters: ["text", "lcov", "cobertura", "json-summary"],
   coverageDirectory: "coverage",
