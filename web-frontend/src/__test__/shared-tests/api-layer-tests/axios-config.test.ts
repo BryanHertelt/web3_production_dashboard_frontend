@@ -37,7 +37,7 @@ jest.mock("../../../shared/logger/client-logger/model/logger", () => ({
 function minimalConfig(): InternalAxiosRequestConfig {
   return {
     headers: {} as typeof AxiosHeaders,
-  } as InternalAxiosRequestConfig;
+  } as unknown as InternalAxiosRequestConfig;
 }
 function minimalHeaders(): AxiosResponseHeaders {
   return {} as AxiosResponseHeaders;

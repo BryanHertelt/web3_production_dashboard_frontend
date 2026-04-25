@@ -51,7 +51,7 @@ export const DataTable = () => {
   return (
     <div className={`${tableCard}`}>
       <div className="w-full h-full overflow-scroll">
-        <CoreTable columns={assetColumns} data={data.data.asset_distribution} />
+        <CoreTable columns={assetColumns} data={data.data[0]?.asset_distribution ?? []} />
       </div>
     </div>
   );
