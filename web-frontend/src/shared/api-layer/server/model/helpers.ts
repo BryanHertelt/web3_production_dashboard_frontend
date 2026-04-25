@@ -285,15 +285,14 @@ export async function safeJsonParse<T>(
  */
 export async function handleErrorResponse(
   response: Response,
-  url: string,
-  method: string
+  _url: string,
+  _method: string
 ): Promise<never> {
   const errorData = await safeJsonParse<Record<string, unknown>>(response, {});
   const message =
     typeof errorData?.message === "string"
       ? errorData.message
       : `Request failed with status ${response.status}`;
-  const category = getStatusCategory(response.status);
 
 
   // Throw specific error types based on status
@@ -329,8 +328,8 @@ export async function handleErrorResponse(
  */
 export function handleRequestError(
   error: unknown,
-  url: string,
-  method: string
+  _url: string,
+  _method: string
 ): never {
   // Already a ServerApiError - just log and rethrow
   // Timeout error

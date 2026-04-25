@@ -3,7 +3,6 @@ import { fetchWithTimeout } from "../config/fetch-config";
 import { ServerApiError } from "./errors";
 import {
   buildUrl,
-  sanitizeForLogging,
   isJsonResponse,
   handleErrorResponse,
   handleRequestError,
