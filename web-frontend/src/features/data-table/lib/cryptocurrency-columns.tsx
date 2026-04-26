@@ -47,7 +47,7 @@ export const assetColumns: ColumnDef<AssetDistribution>[] = [
     },
   },
   {
-    accessorKey: "abs_price_change_daily",
+    accessorKey: "abs_price_change_24h",
     enableSorting: true,
     header: ({ header }) => {
       return (
@@ -62,7 +62,7 @@ export const assetColumns: ColumnDef<AssetDistribution>[] = [
       );
     },
     cell: (row) => {
-      const absPriceChangeDaily = row.row.original.abs_price_change_daily;
+      const absPriceChangeDaily = row.row.original.abs_price_change_24h;
       const absColor =
         absPriceChangeDaily > 0
           ? "text-profit-green"

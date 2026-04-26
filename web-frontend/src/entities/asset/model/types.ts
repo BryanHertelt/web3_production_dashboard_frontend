@@ -7,8 +7,8 @@ export interface AssetDistribution {
   symbol: string;
   icon: string;
   name: string;
-  abs_price_change_daily: number;
-  rel_price_change_daily: number;
+  abs_price_change_24h: number;
+  rel_price_change_24h: number;
   abs_profit_loss: number;
   rel_profit_loss: number;
   amount: number;
@@ -28,9 +28,8 @@ data: Asset
 }
 
 export interface AssetInfo {
-  portfolio_id: string;
-  data: Asset[];
-  abs_total_value: number;
+  id: string;
+  data: Asset;
 }
 
 //Query hook types
