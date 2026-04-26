@@ -49,7 +49,7 @@ export const DataTable = () => {
 
 
   return (
-    <div className={`${tableCard}`}>
+    <div className={`${tableCard} w-3/4 h-5/6`}>
       <div className="w-full h-full overflow-scroll">
         <CoreTable columns={assetColumns} data={data.data.asset_distribution ?? []} />
       </div>
