@@ -1,6 +1,16 @@
 const path = require("path");
 
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/data-table-test",
+        permanent: false,
+      },
+    ];
+  },
+
   outputFileTracingRoot: path.join(__dirname),
   output: "standalone",
   serverExternalPackages: ["pino", "pino-pretty"],
